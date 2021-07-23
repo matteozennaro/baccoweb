@@ -1,0 +1,1258 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>bacco.mock &mdash; bacco 0.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> bacco
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../quickstart.html">QuickStart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../code.html">Code</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">bacco</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>bacco.mock</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for bacco.mock</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Implementation of the &#39;Mocks&#39; class and helper functions</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="p">(</span><span class="n">division</span><span class="p">,</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">absolute_import</span><span class="p">)</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Mock&quot;</span><span class="p">]</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">scipy.optimize</span> <span class="k">import</span> <span class="n">curve_fit</span> <span class="k">as</span> <span class="n">cf</span>
+<span class="kn">from</span> <span class="nn">scipy.special</span> <span class="k">import</span> <span class="n">erf</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">os.path</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">copy</span>
+
+<span class="kn">from</span> <span class="nn">.utils</span> <span class="k">import</span> <span class="n">do_profile</span>
+<span class="kn">from</span> <span class="nn">.utils</span> <span class="k">import</span> <span class="n">cached_property</span>
+<span class="kn">from</span> <span class="nn">.cyengine</span> <span class="k">import</span> <span class="n">cymock</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">Cosmology</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">statistics</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">config</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;bacco.mock&#39;</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">_wrap</span><span class="p">(</span><span class="n">dp</span><span class="p">,</span> <span class="n">LBox</span><span class="p">,</span> <span class="n">invert</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Fix for periodic boundaries</span>
+<span class="sd">    input:</span>
+<span class="sd">        dp: array of distances or positions</span>
+<span class="sd">        LBox: Size of the periodic box</span>
+<span class="sd">        inverse: If True, fix the position for absolute distances</span>
+<span class="sd">                 If False, fix the position for distances between points</span>
+<span class="sd">    output:</span>
+<span class="sd">        dp: array of distances or positions</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">_dp</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">dp</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">invert</span> <span class="o">==</span> <span class="kc">False</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
+            <span class="n">_dp</span><span class="p">[</span><span class="n">_dp</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]</span> <span class="o">&gt;</span>  <span class="n">LBox</span><span class="o">/</span><span class="mf">2.</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span> <span class="o">-=</span> <span class="n">LBox</span>
+            <span class="n">_dp</span><span class="p">[</span><span class="n">_dp</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]</span> <span class="o">&lt;</span> <span class="o">-</span><span class="n">LBox</span><span class="o">/</span><span class="mf">2.</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span> <span class="o">+=</span> <span class="n">LBox</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
+            <span class="n">_dp</span><span class="p">[</span><span class="n">_dp</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">LBox</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span> <span class="o">-=</span> <span class="n">LBox</span>
+            <span class="n">_dp</span><span class="p">[</span><span class="n">_dp</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span> <span class="o">+=</span> <span class="n">LBox</span>
+    <span class="k">return</span> <span class="n">_dp</span>
+
+<span class="k">def</span> <span class="nf">No_Assembly_Bias_Mock</span><span class="p">(</span><span class="n">Mock</span><span class="p">,</span> <span class="n">dx</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span> <span class="n">seed</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span> <span class="c1">#TODO Fix for new mock standard</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Return a full mock sample without GALAXY assembly bias.</span>
+<span class="sd">    dx: the bin size in dex to do the shuffling </span>
+<span class="sd">    seed: the random seed</span>
+<span class="sd">    input:</span>
+<span class="sd">        Mock: Mock class object</span>
+<span class="sd">        dx: bin lenght in dex of the halomass</span>
+<span class="sd">        seed: random seed</span>
+<span class="sd">    output:</span>
+<span class="sd">        Mock: Mock class object</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">if</span> <span class="n">seed</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
+    <span class="n">_Mock</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">Mock</span><span class="p">)</span>
+    
+    <span class="k">if</span> <span class="n">_Mock</span><span class="o">.</span><span class="n">zsd</span><span class="p">:</span> <span class="c1">#If the mock has redshift space distortion, we take it out first and add it again at the end.</span>
+        <span class="c1">#TODO Check if this is working!</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="n">_Mock</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;Time&#39;</span><span class="p">]</span>
+        <span class="n">LBox</span> <span class="o">=</span> <span class="n">_Mock</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;BoxSize&#39;</span><span class="p">]</span>
+        <span class="n">Hz</span> <span class="o">=</span> <span class="n">_Mock</span><span class="o">.</span><span class="n">Cosmology</span><span class="o">.</span><span class="n">hubble_z</span><span class="p">(</span><span class="n">a</span><span class="p">)</span><span class="o">*</span><span class="mf">100.</span>
+        
+        <span class="n">_Mock</span><span class="o">.</span><span class="n">galaxies</span><span class="p">[</span><span class="s1">&#39;pos&#39;</span><span class="p">][:,</span> <span class="n">_Mock</span><span class="o">.</span><span class="n">axis_zsd</span><span class="p">]</span> <span class="o">-=</span> <span class="n">_Mock</span><span class="o">.</span><span class="n">galaxies</span><span class="p">[</span><span class="s1">&#39;vel&#39;</span><span class="p">][:,</span><span class="n">_Mock</span><span class="o">.</span><span class="n">axis_zsd</span><span class="p">]</span><span class="o">*</span><span class="n">_Mock</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;HubbleParam&#39;</span><span class="p">]</span><span class="o">/</span><span class="p">(</span><span class="n">a</span><span class="o">*</span><span class="n">Hz</span><span class="p">)</span>
+        <span class="n">Mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">_Mock</span><span class="o">.</span><span class="n">galaxies</span><span class="p">[</span><span class="s1">&#39;pos&#39;</span><span class="p">][:,</span> <span class="n">_Mock</span><span class="o">.</span><span class="n">axis_zsd</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">_Mock</span><span class="o">.</span><span class="n">galaxies</span><span class="p">[</span><span class="s1">&#39;pos&#39;</span><span class="p">][:,</span> <span class="n">_Mock</span><span class="o">.</span><span class="n">axis_zsd</span><span class="p">][</span><span class="n">Mask</span><span class="p">]</span> <span class="o">+=</span> <span class="n">LBox</span>
+        <span class="n">Mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">_Mock</span><span class="o">.</span><span class="n">galaxies</span><span class="p">[</span><span class="s1">&#39;pos&#39;</span><span class="p">][:,</span> <span class="n">_Mock</span><span class="o">.</span><span class="n">axis_zsd</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">LBox</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">_Mock</span><span class="o">.</span><span class="n">galaxies</span><span class="p">[</span><span class="s1">&#39;pos&#39;</span><span class="p">][:,</span> <span class="n">_Mock</span><span class="o">.</span><span class="n">axis_zsd</span><span class="p">][</span><span class="n">Mask</span><span class="p">]</span> <span class="o">-=</span> <span class="n">LBox</span>
+        
+    <span class="n">_pos</span> <span class="o">=</span> <span class="n">_Mock</span><span class="o">.</span><span class="n">galaxies</span><span class="p">[</span><span class="s1">&#39;pos&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="n">_Mock</span><span class="o">.</span><span class="n">Haloes</span><span class="p">[</span><span class="s1">&#39;pos&#39;</span><span class="p">][</span><span class="n">_Mock</span><span class="o">.</span><span class="n">galaxies</span><span class="p">[</span><span class="s1">&#39;halo_index&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)]</span>
+    <span class="n">_pos</span> <span class="o">=</span> <span class="n">_wrap</span><span class="p">(</span><span class="n">_pos</span><span class="p">,</span><span class="n">_Mock</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;BoxSize&#39;</span><span class="p">])</span>
+    <span class="n">_vel</span> <span class="o">=</span> <span class="n">_Mock</span><span class="o">.</span><span class="n">galaxies</span><span class="p">[</span><span class="s1">&#39;vel&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="n">_Mock</span><span class="o">.</span><span class="n">Haloes</span><span class="p">[</span><span class="s1">&#39;vel&#39;</span><span class="p">][</span><span class="n">_Mock</span><span class="o">.</span><span class="n">galaxies</span><span class="p">[</span><span class="s1">&#39;halo_index&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)]</span>
+    
+    <span class="n">_logM</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">_Mock</span><span class="o">.</span><span class="n">galaxies</span><span class="p">[</span><span class="s1">&#39;m200c&#39;</span><span class="p">])</span>
+    
+    <span class="n">dx</span> <span class="o">=</span> <span class="mf">0.1</span>
+    <span class="n">Xmin</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nanmin</span><span class="p">(</span><span class="n">_logM</span><span class="p">[</span><span class="n">_logM</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">])</span><span class="o">/</span><span class="n">dx</span><span class="p">)</span><span class="o">*</span><span class="n">dx</span>
+    <span class="n">Xmax</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nanmax</span><span class="p">(</span><span class="n">_logM</span><span class="p">)</span><span class="o">/</span><span class="n">dx</span><span class="p">)</span><span class="o">*</span><span class="n">dx</span>
+
+    <span class="n">NBin</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">((</span><span class="n">Xmax</span><span class="o">-</span><span class="n">Xmin</span><span class="p">)</span><span class="o">/</span><span class="n">dx</span><span class="p">))</span>
+    <span class="n">_logM</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">_Mock</span><span class="o">.</span><span class="n">Haloes</span><span class="p">[</span><span class="s1">&#39;m200c&#39;</span><span class="p">])</span>
+    <span class="n">iMass</span>    <span class="o">=</span> <span class="p">((</span><span class="n">_logM</span><span class="o">-</span><span class="n">Xmin</span><span class="p">)</span><span class="o">/</span><span class="n">dx</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+    
+    <span class="n">_shuffle_haloID</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">_Mock</span><span class="o">.</span><span class="n">Haloes</span><span class="p">[</span><span class="s1">&#39;pos&#39;</span><span class="p">]),</span><span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+    
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">NBin</span><span class="p">):</span>
+        <span class="n">IDs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">i</span> <span class="o">==</span> <span class="n">iMass</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">IDs_Shuffle</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">IDs</span><span class="p">)</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">shuffle</span><span class="p">(</span><span class="n">IDs_Shuffle</span><span class="p">)</span>
+        <span class="n">_shuffle_haloID</span><span class="p">[</span><span class="n">IDs</span><span class="p">]</span> <span class="o">=</span> <span class="n">IDs_Shuffle</span>
+    
+    <span class="n">_Mock</span><span class="o">.</span><span class="n">galaxies</span><span class="p">[</span><span class="s1">&#39;pos&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">_Mock</span><span class="o">.</span><span class="n">Haloes</span><span class="p">[</span><span class="s1">&#39;pos&#39;</span><span class="p">][</span><span class="n">_shuffle_haloID</span><span class="p">[</span><span class="n">_Mock</span><span class="o">.</span><span class="n">galaxies</span><span class="p">[</span><span class="s1">&#39;halo_index&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)]]</span> <span class="o">+</span> <span class="n">_pos</span>
+    <span class="n">_Mock</span><span class="o">.</span><span class="n">galaxies</span><span class="p">[</span><span class="s1">&#39;vel&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">_Mock</span><span class="o">.</span><span class="n">Haloes</span><span class="p">[</span><span class="s1">&#39;vel&#39;</span><span class="p">][</span><span class="n">_shuffle_haloID</span><span class="p">[</span><span class="n">_Mock</span><span class="o">.</span><span class="n">galaxies</span><span class="p">[</span><span class="s1">&#39;halo_index&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)]]</span> <span class="o">+</span> <span class="n">_vel</span>
+    <span class="n">_Mock</span><span class="o">.</span><span class="n">galaxies</span><span class="p">[</span><span class="s1">&#39;pos&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">_wrap</span><span class="p">(</span><span class="n">_Mock</span><span class="o">.</span><span class="n">galaxies</span><span class="p">[</span><span class="s1">&#39;pos&#39;</span><span class="p">],</span><span class="n">_Mock</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;BoxSize&#39;</span><span class="p">],</span> <span class="n">invert</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+    <span class="n">_Mock</span><span class="o">.</span><span class="n">galaxies</span><span class="p">[</span><span class="s1">&#39;m200c&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">_Mock</span><span class="o">.</span><span class="n">Haloes</span><span class="p">[</span><span class="s1">&#39;m200c&#39;</span><span class="p">][</span><span class="n">_shuffle_haloID</span><span class="p">[</span><span class="n">_Mock</span><span class="o">.</span><span class="n">galaxies</span><span class="p">[</span><span class="s1">&#39;halo_index&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)]]</span>
+    <span class="n">_Mock</span><span class="o">.</span><span class="n">galaxies</span><span class="p">[</span><span class="s1">&#39;halo_index&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">_shuffle_haloID</span><span class="p">[</span><span class="n">_Mock</span><span class="o">.</span><span class="n">galaxies</span><span class="p">[</span><span class="s1">&#39;halo_index&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)]</span>
+    <span class="n">_Mock</span><span class="o">.</span><span class="n">Haloes</span><span class="p">[</span><span class="s1">&#39;pos&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">_Mock</span><span class="o">.</span><span class="n">Haloes</span><span class="p">[</span><span class="s1">&#39;pos&#39;</span><span class="p">][</span><span class="n">_shuffle_haloID</span><span class="p">[</span><span class="n">_Mock</span><span class="o">.</span><span class="n">galaxies</span><span class="p">[</span><span class="s1">&#39;halo_index&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)]]</span>
+    <span class="n">_Mock</span><span class="o">.</span><span class="n">Haloes</span><span class="p">[</span><span class="s1">&#39;vel&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">_Mock</span><span class="o">.</span><span class="n">Haloes</span><span class="p">[</span><span class="s1">&#39;vel&#39;</span><span class="p">][</span><span class="n">_shuffle_haloID</span><span class="p">[</span><span class="n">_Mock</span><span class="o">.</span><span class="n">galaxies</span><span class="p">[</span><span class="s1">&#39;halo_index&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)]]</span>
+    
+    <span class="k">if</span> <span class="n">_Mock</span><span class="o">.</span><span class="n">zsd</span><span class="p">:</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="n">_Mock</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;Time&#39;</span><span class="p">]</span>
+        <span class="n">LBox</span> <span class="o">=</span> <span class="n">_Mock</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;BoxSize&#39;</span><span class="p">]</span>
+        <span class="n">Hz</span> <span class="o">=</span> <span class="n">_Mock</span><span class="o">.</span><span class="n">Cosmology</span><span class="o">.</span><span class="n">hubble_z</span><span class="p">(</span><span class="n">a</span><span class="p">)</span><span class="o">*</span><span class="mf">100.</span>
+        
+        <span class="n">_Mock</span><span class="o">.</span><span class="n">galaxies</span><span class="p">[</span><span class="s1">&#39;pos&#39;</span><span class="p">][:,</span> <span class="n">_Mock</span><span class="o">.</span><span class="n">axis_zsd</span><span class="p">]</span> <span class="o">+=</span> <span class="n">_Mock</span><span class="o">.</span><span class="n">galaxies</span><span class="p">[</span><span class="s1">&#39;vel&#39;</span><span class="p">][:,</span><span class="n">_Mock</span><span class="o">.</span><span class="n">axis_zsd</span><span class="p">]</span><span class="o">*</span><span class="n">_Mock</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;HubbleParam&#39;</span><span class="p">]</span><span class="o">/</span><span class="p">(</span><span class="n">a</span><span class="o">*</span><span class="n">Hz</span><span class="p">)</span>
+        <span class="n">Mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">_Mock</span><span class="o">.</span><span class="n">galaxies</span><span class="p">[</span><span class="s1">&#39;pos&#39;</span><span class="p">][:,</span> <span class="n">_Mock</span><span class="o">.</span><span class="n">axis_zsd</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">_Mock</span><span class="o">.</span><span class="n">galaxies</span><span class="p">[</span><span class="s1">&#39;pos&#39;</span><span class="p">][:,</span> <span class="n">_Mock</span><span class="o">.</span><span class="n">axis_zsd</span><span class="p">][</span><span class="n">Mask</span><span class="p">]</span> <span class="o">+=</span> <span class="n">LBox</span>
+        <span class="n">Mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">_Mock</span><span class="o">.</span><span class="n">galaxies</span><span class="p">[</span><span class="s1">&#39;pos&#39;</span><span class="p">][:,</span> <span class="n">_Mock</span><span class="o">.</span><span class="n">axis_zsd</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">LBox</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">_Mock</span><span class="o">.</span><span class="n">galaxies</span><span class="p">[</span><span class="s1">&#39;pos&#39;</span><span class="p">][:,</span> <span class="n">_Mock</span><span class="o">.</span><span class="n">axis_zsd</span><span class="p">][</span><span class="n">Mask</span><span class="p">]</span> <span class="o">-=</span> <span class="n">LBox</span>
+    
+    <span class="k">return</span> <span class="n">_Mock</span>
+
+<span class="k">def</span> <span class="nf">HOD_Calculate_CenSat</span><span class="p">(</span><span class="n">Mh</span><span class="p">,</span> <span class="n">Mmin</span><span class="p">,</span> <span class="n">sigmaLogM</span><span class="p">,</span> <span class="n">M1</span><span class="p">,</span> <span class="n">Mcut</span><span class="p">,</span> <span class="n">alpha</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    For an array of halo masses, its return the number of centrals and satelite galaxies</span>
+<span class="sd">    per halo for the 5-parameter form of the HOD (Zheng+2005, Contreras+2013)</span>
+<span class="sd">    Its asume a poissonian distribution for the satellite galaxies</span>
+<span class="sd">    Input:</span>
+<span class="sd">        Mh: Array of halo masses, in units of Msun/h</span>
+<span class="sd">        Mmin, sigmaLogM, M1, Mcut, alpha: HOD 5-Parameter, masses in Msun/h</span>
+<span class="sd">    Output:</span>
+<span class="sd">        Array of Centrals per halo, Array of Satellites per halo</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">HOD_NCen</span><span class="p">(</span><span class="n">Mh</span><span class="p">,</span> <span class="n">Mmin</span><span class="p">,</span> <span class="n">sigmaLogM</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">Mh</span><span class="p">)),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">poisson</span><span class="p">(</span><span class="n">HOD_NSat</span><span class="p">(</span><span class="n">Mh</span><span class="p">,</span> <span class="n">M1</span><span class="p">,</span> <span class="n">Mcut</span><span class="p">,</span> <span class="n">alpha</span><span class="p">))</span>
+
+<span class="k">def</span> <span class="nf">HOD_NCen</span><span class="p">(</span><span class="n">Mh</span><span class="p">,</span> <span class="n">Mmin</span><span class="p">,</span> <span class="n">sigmaLogM</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    For an array of halo masses, Mh, its give the mean occupation of central galaxies</span>
+<span class="sd">    Input:</span>
+<span class="sd">        Mh: Array of halo masses, in units of Msun/h</span>
+<span class="sd">        Mmin, sigmaLogM: HOD 5-Parameter, masses in Msun/h</span>
+<span class="sd">    Output:</span>
+<span class="sd">        Array of probabilities of having a Centrals per halo</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="mf">0.5</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="n">erf</span><span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">Mh</span><span class="p">)</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">Mmin</span><span class="p">))</span><span class="o">/</span><span class="n">sigmaLogM</span><span class="p">))</span>
+
+<span class="k">def</span> <span class="nf">HOD_NSat</span><span class="p">(</span><span class="n">Mh</span><span class="p">,</span> <span class="n">M1</span><span class="p">,</span> <span class="n">Mcut</span><span class="p">,</span> <span class="n">alpha</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    For an array of halo masses, Mh, its give the mean occupation of satellite galaxies</span>
+<span class="sd">    Input:</span>
+<span class="sd">        Mh: Array of halo masses, in units of Msun/h</span>
+<span class="sd">        M1, Mcut, alpha: HOD 5-Parameter, masses in Msun/h</span>
+<span class="sd">    Output:</span>
+<span class="sd">        Array of probabilities of having a Satellites per halo</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">Mh</span> <span class="o">&lt;</span> <span class="n">Mcut</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="p">((</span><span class="n">Mh</span><span class="o">-</span><span class="n">Mcut</span><span class="p">)</span><span class="o">/</span><span class="n">M1</span><span class="p">)</span><span class="o">**</span><span class="n">alpha</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">HOD_NCen_log</span><span class="p">(</span><span class="n">log_Mh</span><span class="p">,</span> <span class="n">log_Mmin</span><span class="p">,</span> <span class="n">sigmaLogM</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    For an array of halo masses, Mh, its give the mean occupation of central galaxies</span>
+<span class="sd">    Input:</span>
+<span class="sd">        Mh: Array of halo masses, in units of Msun/h</span>
+<span class="sd">        log_Mmin, sigmaLogM: HOD 5-Parameter, masses in Msun/h</span>
+<span class="sd">    Output:</span>
+<span class="sd">        Array of log probabilities of having a Centrals per halo</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="mf">0.5</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="n">erf</span><span class="p">((</span><span class="n">log_Mh</span><span class="o">-</span><span class="n">log_Mmin</span><span class="p">)</span><span class="o">/</span><span class="n">sigmaLogM</span><span class="p">)))</span>
+
+
+<span class="k">def</span> <span class="nf">HOD_NSat_log</span><span class="p">(</span><span class="n">log_Mh</span><span class="p">,</span> <span class="n">log_M1</span><span class="p">,</span> <span class="n">log_Mcut</span><span class="p">,</span> <span class="n">alpha</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    For an array of halo masses, Mh, its give the mean occupation of satellite galaxies</span>
+<span class="sd">    Input:</span>
+<span class="sd">        Mh: Array of halo masses, in units of Msun/h</span>
+<span class="sd">        log_M1, log_Mcut, alpha: HOD 5-Parameter, masses in Msun/h</span>
+<span class="sd">    Output:</span>
+<span class="sd">        Array of log probabilities of having a Satellites per halo</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">log_Mh</span> <span class="o">&lt;</span> <span class="n">log_Mcut</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">alpha</span><span class="o">*</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="mi">10</span><span class="o">**</span><span class="n">log_Mh</span><span class="o">-</span><span class="mi">10</span><span class="o">**</span><span class="n">log_Mcut</span><span class="p">)</span><span class="o">-</span><span class="n">log_M1</span><span class="p">))</span>
+
+<span class="k">def</span> <span class="nf">Fitting_Satellites</span><span class="p">(</span><span class="n">Xt</span><span class="p">,</span> <span class="n">Yt</span><span class="p">,</span> <span class="n">NHalo</span><span class="p">,</span> <span class="n">NHalo_Lim</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">Ngal_Lim</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Fit a HOD profile using the 5-parameter form of the HOD (Satellite part, Zheng+2005, Contreras+2013)</span>
+<span class="sd">    Input:</span>
+<span class="sd">        Xt: Halo mass, in unites of log10(Mh/Msun/h)</span>
+<span class="sd">        Yt: Average abundance of satellites per halo &lt;Nsat&gt;</span>
+<span class="sd">        NHalo: Number of haloes per bin</span>
+<span class="sd">        NHalo_Lim: Limit in NHalo for the fitting</span>
+<span class="sd">        Ngal_Lim: Limit of Ngal for the fitting</span>
+<span class="sd">    Output:</span>
+<span class="sd">        [log_M1, log_Mcut, alpha], [log_M1_err, log_Mcut_err, alpha_err]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">Cond</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">((</span><span class="n">Yt</span> <span class="o">&gt;</span> <span class="n">Ngal_Lim</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">NHalo</span> <span class="o">&gt;</span> <span class="n">NHalo_Lim</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">Yt</span><span class="p">)))</span>
+    <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">Xt</span><span class="p">[</span><span class="n">Cond</span><span class="p">])</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+    <span class="n">Y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">Yt</span><span class="p">[</span><span class="n">Cond</span><span class="p">])</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+    <span class="n">Bars</span><span class="p">,</span> <span class="n">Err</span> <span class="o">=</span> <span class="n">cf</span><span class="p">(</span><span class="n">HOD_NSat_log</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">p0</span><span class="o">=</span><span class="p">[</span><span class="mf">12.5</span><span class="p">,</span> <span class="mf">11.5</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">bounds</span><span class="o">=</span><span class="p">(</span>
+        <span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">],</span> <span class="p">[</span><span class="mi">15</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">]),</span> <span class="n">maxfev</span><span class="o">=</span><span class="mi">10000000</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">Bars</span><span class="p">,</span> <span class="n">Err</span>
+
+<span class="k">def</span> <span class="nf">Fitting_Centrals</span><span class="p">(</span><span class="n">Xt</span><span class="p">,</span> <span class="n">Yt</span><span class="p">,</span> <span class="n">NHalo</span><span class="p">,</span> <span class="n">NHalo_Lim</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">Ngal_Lim</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Fit a HOD profile using the 5-parameter form of the HOD (Central part, Zheng+2005, Contreras+2013)</span>
+<span class="sd">    Input:</span>
+<span class="sd">        Xt: Halo mass, in unites of log10(Mh/Msun/h)</span>
+<span class="sd">        Yt: Average abundance of satellites per halo &lt;Nsat&gt;</span>
+<span class="sd">        NHalo: Number of haloes per bin</span>
+<span class="sd">        NHalo_Lim: Limit in NHalo for the fitting</span>
+<span class="sd">        Ngal_Lim: Limit of Ngal for the fitting</span>
+<span class="sd">    Output:</span>
+<span class="sd">        [log_Mmin, sigmaLogM], [log_M1_err, log_Mcut_err, alpha_err]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">Cond</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">((</span><span class="n">Yt</span> <span class="o">&gt;</span> <span class="n">Ngal_Lim</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">NHalo</span> <span class="o">&gt;</span> <span class="n">NHalo_Lim</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">Yt</span><span class="p">)))</span>
+    <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">Xt</span><span class="p">[</span><span class="n">Cond</span><span class="p">])</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+    <span class="n">Y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">Yt</span><span class="p">[</span><span class="n">Cond</span><span class="p">])</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+    <span class="n">Bars</span><span class="p">,</span> <span class="n">Err</span> <span class="o">=</span> <span class="n">cf</span><span class="p">(</span><span class="n">HOD_NCen_log</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">p0</span><span class="o">=</span><span class="p">[</span><span class="mi">11</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">],</span> <span class="n">bounds</span><span class="o">=</span><span class="p">([</span><span class="mi">10</span><span class="p">,</span> <span class="mf">0.001</span><span class="p">],</span> <span class="p">[</span><span class="mi">14</span><span class="p">,</span> <span class="mi">3</span><span class="p">]),</span> <span class="n">maxfev</span><span class="o">=</span><span class="mi">10000000</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">Bars</span><span class="p">,</span> <span class="n">Err</span>
+
+<span class="k">def</span> <span class="nf">MassFunction</span><span class="p">(</span><span class="n">log_Ms</span><span class="o">=</span><span class="mf">10.66</span><span class="p">,</span> <span class="n">phi1</span><span class="o">=</span><span class="mf">3.96e-3</span><span class="p">,</span> <span class="n">alpha1</span><span class="o">=-</span><span class="mf">0.35</span><span class="p">,</span> <span class="n">phi2</span><span class="o">=</span><span class="mf">0.79e-3</span><span class="p">,</span> <span class="n">alpha2</span><span class="o">=-</span><span class="mf">1.47</span><span class="p">,</span> <span class="n">h</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span> <span class="n">logMmin</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">logMmax</span><span class="o">=</span><span class="mi">14</span><span class="p">,</span> <span class="n">NBin</span><span class="o">=</span><span class="mi">161</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Gives the Mass Function (or luminocity function) using a a double Schechter fit.</span>
+<span class="sd">    Default values from Baldry et al. 2012, Fig. 13, converted to be with the h factor</span>
+<span class="sd">    CAREFULL: X-axis is in LogScale log(M/M_{h^{-1}\odot})</span>
+<span class="sd">    Input:</span>
+<span class="sd">         double Schechter fit parameters (log_Ms, phi1, alpha1, phi2, alpha2)</span>
+<span class="sd">         h: hubble parameter</span>
+<span class="sd">         logMmin: Minimum halo mass, in units of log(M/Msun}) #TODO CHECK h FACTOR</span>
+<span class="sd">         logMmax: Maximum halo mass, in units of log(M/Msun}) #TODO CHECK h FACTOR</span>
+<span class="sd">         NBin: Number of bins</span>
+<span class="sd">         </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">h</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">log_Ms</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">h</span><span class="p">)</span>
+        <span class="n">phi1</span> <span class="o">/=</span> <span class="n">h</span><span class="o">**</span><span class="mi">3</span>
+        <span class="n">phi2</span> <span class="o">/=</span> <span class="n">h</span><span class="o">**</span><span class="mi">3</span>
+        <span class="c1"># TODO CHECK h FACTOR</span>
+    <span class="n">LogM</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">logMmin</span><span class="p">,</span> <span class="n">logMmax</span><span class="p">,</span> <span class="n">NBin</span><span class="p">,</span> <span class="n">endpoint</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">MRatio</span> <span class="o">=</span> <span class="mi">10</span><span class="o">**</span><span class="p">(</span><span class="n">LogM</span> <span class="o">-</span> <span class="n">log_Ms</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">LogM</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">MRatio</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">phi1</span><span class="o">*</span><span class="n">MRatio</span><span class="o">**</span><span class="n">alpha1</span><span class="o">+</span><span class="n">phi2</span><span class="o">*</span><span class="n">MRatio</span><span class="o">**</span><span class="n">alpha2</span><span class="p">)</span><span class="o">*</span><span class="n">MRatio</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">MF2CMF</span><span class="p">(</span><span class="n">MF_x</span><span class="p">,</span> <span class="n">MF_y</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Transform from a Mass (luminocity) function format </span>
+<span class="sd">    to a cummulative Mass (luminocity) Function</span>
+<span class="sd">    Input:</span>
+<span class="sd">        MF_x: x-axis of the mass/lum function</span>
+<span class="sd">        MF_y: y-axis of the mass/lum function</span>
+<span class="sd">    Output:</span>
+<span class="sd">        y-axis of the cummulative mass/lum function</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">Len_SMF</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">MF_x</span><span class="p">)</span>
+    <span class="n">CMF_y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">Len_SMF</span><span class="p">)</span>
+    <span class="n">CMF_y</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">MF_y</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="p">(</span><span class="n">MF_x</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">MF_x</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">])</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">Len_SMF</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+        <span class="n">CMF_y</span><span class="p">[</span><span class="o">-</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">CMF_y</span><span class="p">[</span><span class="o">-</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="n">MF_y</span><span class="p">[</span><span class="o">-</span><span class="n">i</span><span class="p">]</span><span class="o">*</span><span class="p">(</span><span class="n">MF_x</span><span class="p">[</span><span class="o">-</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">MF_x</span><span class="p">[</span><span class="o">-</span><span class="n">i</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">CMF_y</span>
+
+<span class="k">def</span> <span class="nf">line</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">y1</span><span class="p">,</span> <span class="n">y2</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Old fashin-Always usefull &quot;Line equation&quot;</span>
+<span class="sd">    Input:</span>
+<span class="sd">        x:  evaluation point</span>
+<span class="sd">        x1: x-cordinate of point &quot;1&quot;</span>
+<span class="sd">        x2: x-cordinate of point &quot;2&quot;</span>
+<span class="sd">        y1: y-cordinate of point &quot;1&quot;</span>
+<span class="sd">        y2: y-cordinate of point &quot;2&quot;</span>
+<span class="sd">    Output</span>
+<span class="sd">        f(x)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">y2</span><span class="o">-</span><span class="n">y1</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="n">x2</span><span class="o">-</span><span class="n">x1</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">x</span><span class="o">-</span><span class="n">x1</span><span class="p">)</span><span class="o">+</span><span class="n">y1</span>
+
+<span class="k">def</span> <span class="nf">SHAM_monotonic</span><span class="p">(</span><span class="n">Psh</span><span class="p">,</span> <span class="n">SMF_x</span><span class="p">,</span> <span class="n">SMF_y</span><span class="p">,</span> <span class="n">Lbox</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A monotonic SHAM, assumin a 1-1 relation with Psh</span>
+<span class="sd">    Input:</span>
+<span class="sd">        Psh: infall SH mass, infall Vmax, etc</span>
+<span class="sd">        SMF_x: x-axis of the stellar mass function, in units of log(M/h^-1 Msun)</span>
+<span class="sd">        SMF_y: y-axis of the stellar mass function, in units of Ngal/h^3Mpc^-3/dex</span>
+<span class="sd">        Lbox: lenght of the peridic box of the simulation</span>
+<span class="sd">    Output:</span>
+<span class="sd">        Stellar mass of the mock galaxies</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">Len_SMF</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">SMF_x</span><span class="p">)</span>
+    <span class="n">Len_sh</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">Psh</span><span class="p">)</span>
+    <span class="n">ASMF_y</span> <span class="o">=</span> <span class="n">MF2CMF</span><span class="p">(</span><span class="n">SMF_x</span><span class="p">,</span> <span class="n">SMF_y</span><span class="p">)</span><span class="c1"># change from SMF2ASMF to MF2CMF</span>
+    <span class="n">ind</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">Psh</span><span class="p">)</span>
+    <span class="n">nden</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">Len_sh</span><span class="p">))[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">Lbox</span><span class="p">)</span><span class="o">**</span><span class="mi">3</span>
+    <span class="n">Stell</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">Len_sh</span><span class="p">)</span>
+    <span class="n">_Stell</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">Len_sh</span><span class="p">)</span>
+    <span class="n">sh_i</span> <span class="o">=</span> <span class="n">Len_sh</span> <span class="o">-</span> <span class="mi">1</span>
+    <span class="n">asmf_i</span> <span class="o">=</span> <span class="n">Len_SMF</span> <span class="o">-</span> <span class="mi">1</span>
+    <span class="k">while</span><span class="p">(</span><span class="n">ASMF_y</span><span class="p">[</span><span class="n">asmf_i</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">nden</span><span class="p">[</span><span class="n">sh_i</span><span class="p">]):</span>
+        <span class="n">Stell</span><span class="p">[</span><span class="n">sh_i</span><span class="p">]</span> <span class="o">=</span> <span class="n">SMF_x</span><span class="p">[</span><span class="n">asmf_i</span><span class="p">]</span>
+        <span class="n">sh_i</span> <span class="o">-=</span> <span class="mi">1</span>
+    <span class="k">while</span><span class="p">(</span><span class="n">sh_i</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">asmf_i</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">ASMF_y</span><span class="p">[</span><span class="n">asmf_i</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">nden</span><span class="p">[</span><span class="n">sh_i</span><span class="p">]:</span><span class="c1">#-1 to be check</span>
+            <span class="n">asmf_i</span> <span class="o">-=</span> <span class="mi">1</span>
+        <span class="k">elif</span> <span class="n">ASMF_y</span><span class="p">[</span><span class="n">asmf_i</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">nden</span><span class="p">[</span><span class="n">sh_i</span><span class="p">]:</span>
+            <span class="n">Stell</span><span class="p">[</span><span class="n">sh_i</span><span class="p">]</span> <span class="o">=</span> <span class="n">line</span><span class="p">(</span><span class="n">nden</span><span class="p">[</span><span class="n">sh_i</span><span class="p">],</span> <span class="n">ASMF_y</span><span class="p">[</span><span class="n">asmf_i</span><span class="p">],</span> <span class="n">ASMF_y</span><span class="p">[</span><span class="n">asmf_i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">],</span>
+                               <span class="n">SMF_x</span><span class="p">[</span><span class="n">asmf_i</span><span class="p">],</span> <span class="n">SMF_x</span><span class="p">[</span><span class="n">asmf_i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">])</span>
+            <span class="n">sh_i</span> <span class="o">-=</span> <span class="mi">1</span>
+    <span class="k">while</span><span class="p">(</span><span class="n">sh_i</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">asmf_i</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">):</span>
+        <span class="n">Stell</span><span class="p">[</span><span class="n">sh_i</span><span class="p">]</span> <span class="o">=</span> <span class="n">SMF_x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">sh_i</span> <span class="o">-=</span> <span class="mi">1</span>
+    <span class="n">_Stell</span><span class="p">[</span><span class="n">ind</span><span class="p">]</span> <span class="o">=</span> <span class="n">Stell</span>
+    <span class="k">return</span> <span class="n">_Stell</span>
+
+<span class="k">def</span> <span class="nf">SHAM_scatter</span><span class="p">(</span><span class="n">Psh</span><span class="p">,</span> <span class="n">SMF_x</span><span class="p">,</span> <span class="n">SMF_y</span><span class="p">,</span> <span class="n">Lbox</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">seed</span> <span class="o">=</span> <span class="mi">1</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A SHAM with Scatter, assumin a scatter of sigma over SHAM_monotonic</span>
+<span class="sd">    Input:</span>
+<span class="sd">        Psh: infall SH mass, infall Vmax, etc</span>
+<span class="sd">        SMF_x: x-axis of the stellar mass function, in units of log(M/h^-1 Msun)</span>
+<span class="sd">        SMF_y: y-axis of the stellar mass function, in units of Ngal/h^3Mpc^-3/dex</span>
+<span class="sd">        Lbox: lenght of the peridic box of the simulation</span>
+<span class="sd">        sigma: Scatter of the stellar mass</span>
+<span class="sd">        seed: random seed</span>
+<span class="sd">    Output:</span>
+<span class="sd">        Stellar mass of the mock galaxies</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1">#if engine == &#39;python&#39;:</span>
+        <span class="c1">#Stell = SHAM_monotonic(Psh, SMF_x, SMF_y, Lbox)</span>
+        <span class="c1">#Stell = np.random.normal(Stell, sigma)</span>
+        <span class="c1">#Stell = SHAM_monotonic(Stell, SMF_x, SMF_y, Lbox)</span>
+    <span class="n">_Stell</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">Psh</span><span class="p">),</span><span class="n">dtype</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+    <span class="n">Stell</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">Psh</span><span class="p">),</span><span class="n">dtype</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+    <span class="n">cymock</span><span class="o">.</span><span class="n">SHAM_monotonic</span><span class="p">(</span><span class="n">_Stell</span><span class="p">,</span><span class="n">Psh</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">),</span> <span class="n">SMF_x</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">),</span> <span class="n">SMF_y</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">Psh</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span> <span class="p">,</span><span class="n">Lbox</span><span class="p">)</span>
+    <span class="n">_Stell</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">_Stell</span><span class="p">,</span> <span class="n">sigma</span><span class="p">)</span>
+    <span class="n">cymock</span><span class="o">.</span><span class="n">SHAM_monotonic</span><span class="p">(</span><span class="n">Stell</span><span class="p">,</span><span class="n">_Stell</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">),</span> <span class="n">SMF_x</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">),</span> <span class="n">SMF_y</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">_Stell</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span> <span class="p">,</span><span class="n">Lbox</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">Stell</span>
+
+
+<div class="viewcode-block" id="Mock"><a class="viewcode-back" href="../../code.html#bacco.Mock">[docs]</a><span class="k">class</span> <span class="nc">Mock</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A class that create mock galaxies from a simulation or a list of haloes</span>
+<span class="sd">    Input:</span>
+<span class="sd">        Sim: Simulation class</span>
+<span class="sd">        TypeOfMock: HOD or SHAM</span>
+<span class="sd">        halo_vdisp: Velocity dispersion of the haloes, in case the simulation does not provide it.</span>
+<span class="sd">        Mmin, sigmaLogM, M1, Mcut, alpha: 5-Parameter HOD</span>
+<span class="sd">        alpha_c, alpha_s: Velocity bias parameters</span>
+<span class="sd">        sigma_Mstell: Scatter of the SHAM</span>
+<span class="sd">        SHAM_Prop: SHAM property (eg. vpeak, vmax, etc)</span>
+<span class="sd">        StellarMassFunction: For SHAMs, in a [2,NBin] format,  with Masses in log(M) and Nden in linear scale</span>
+<span class="sd">        NoOrphans: No Orphans, use this for the moment</span>
+<span class="sd">        mhalo: Main halo mass type (eg. halo_mfof, halo_m200c)</span>
+<span class="sd">        units_in_kpc: Units of the simulation in kpc</span>
+<span class="sd">        nthreads: Number of threads, only for the HOD</span>
+<span class="sd">        theory_mass_function: Force a halo mass to be universal</span>
+<span class="sd">        seed: random seed</span>
+<span class="sd">        verbose: verbose, if None, use the config verbose</span>
+<span class="sd">    Output:</span>
+<span class="sd">        mock class</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Sim</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">TypeOfMock</span><span class="o">=</span><span class="s1">&#39;HOD&#39;</span><span class="p">,</span> <span class="n">halo_vdisp</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">Mmin</span><span class="o">=</span><span class="mi">10</span><span class="o">**</span><span class="mf">11.5</span><span class="p">,</span> <span class="n">sigmaLogM</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">M1</span><span class="o">=</span><span class="mi">10</span><span class="o">**</span><span class="mf">12.</span><span class="p">,</span> <span class="n">Mcut</span><span class="o">=</span><span class="mi">10</span><span class="o">**</span><span class="mf">11.5</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">alpha_c</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">alpha_s</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                 <span class="n">sigma_Mstell</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">SHAM_Prop</span><span class="o">=</span><span class="s1">&#39;vpeak&#39;</span><span class="p">,</span>  <span class="n">StellarMassFunction</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">NoOrphans</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">mhalo</span> <span class="o">=</span> <span class="s1">&#39;halo_m200c&#39;</span><span class="p">,</span>
+                 <span class="n">units_in_kpc</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">nthreads</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">theory_mass_function</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        
+        <span class="k">if</span> <span class="n">Sim</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> <span class="k">raise</span> <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Simulation not given&quot;</span><span class="p">)</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span> <span class="o">=</span> <span class="n">verbose</span> <span class="k">if</span> <span class="n">verbose</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;verbose&#39;</span><span class="p">]</span>
+    
+        <span class="bp">self</span><span class="o">.</span><span class="n">TypeOfMock</span> <span class="o">=</span> <span class="n">TypeOfMock</span>
+    
+        <span class="bp">self</span><span class="o">.</span><span class="n">header</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;OmegaLambda&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">Sim</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;OmegaLambda&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;OmegaBaryon&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">Sim</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;OmegaBaryon&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;Omega&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">Sim</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;Omega&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;Sigma8&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">Sim</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;Sigma8&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;HubbleParam&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">Sim</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;HubbleParam&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;Time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">Sim</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;Time&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;Redshift&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">Sim</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;Redshift&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;BoxSize&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">Sim</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;BoxSize&#39;</span><span class="p">]</span> <span class="k">if</span> <span class="n">units_in_kpc</span> <span class="o">==</span> <span class="kc">False</span> <span class="k">else</span> <span class="n">Sim</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;BoxSize&#39;</span><span class="p">]</span><span class="o">/</span><span class="mf">1e3</span>
+        <span class="k">if</span> <span class="s1">&#39;OmegaNu&#39;</span> <span class="ow">in</span> <span class="n">Sim</span><span class="o">.</span><span class="n">header</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span> <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;OmegaNu&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">Sim</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;OmegaNu&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="s1">&#39;neutrino_mass&#39;</span> <span class="ow">in</span> <span class="n">Sim</span><span class="o">.</span><span class="n">header</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span> <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;neutrino_mass&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">Sim</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;neutrino_mass&#39;</span><span class="p">]</span>
+        
+        <span class="n">a</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;Time&#39;</span><span class="p">]</span>
+        <span class="n">LBox</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;BoxSize&#39;</span><span class="p">]</span>
+        <span class="n">Hz</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Cosmology</span><span class="o">.</span><span class="n">hubble_z</span><span class="p">(</span><span class="n">a</span><span class="p">)</span><span class="o">*</span><span class="mf">100.</span>
+        <span class="n">Hubble_factor</span> <span class="o">=</span> <span class="n">Sim</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;HubbleParam&#39;</span><span class="p">]</span><span class="o">/</span><span class="p">(</span><span class="n">a</span><span class="o">*</span><span class="n">Hz</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">Cosmology</span> <span class="o">=</span> <span class="n">Sim</span><span class="o">.</span><span class="n">Cosmology</span>
+        <span class="k">try</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">snaplist</span> <span class="o">=</span> <span class="n">Sim</span><span class="o">.</span><span class="n">snaplist</span>
+        <span class="k">except</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">snaplist</span> <span class="o">=</span> <span class="kc">None</span>
+        
+        <span class="k">if</span> <span class="n">theory_mass_function</span><span class="p">:</span>
+            <span class="n">_m200c</span> <span class="o">=</span> <span class="n">Sim</span><span class="o">.</span><span class="n">fof</span><span class="p">[</span><span class="n">mhalo</span><span class="p">]</span><span class="o">*</span><span class="mf">1e10</span>
+            <span class="n">tmp</span> <span class="o">=</span> <span class="n">_m200c</span><span class="o">.</span><span class="n">argsort</span><span class="p">()</span>
+            <span class="n">den</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">tmp</span><span class="p">))</span>
+            <span class="n">den</span><span class="p">[</span><span class="n">tmp</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">_m200c</span><span class="p">)</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">_m200c</span><span class="p">)))</span><span class="o">/</span><span class="n">LBox</span><span class="o">**</span><span class="mi">3</span>
+            <span class="n">_mass</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logspace</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nanmin</span><span class="p">(</span><span class="n">_m200c</span><span class="p">[</span><span class="n">_m200c</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">])),</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nanmax</span><span class="p">(</span><span class="n">_m200c</span><span class="p">[</span><span class="n">_m200c</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">])),</span><span class="mi">5000</span><span class="p">)</span>
+            <span class="n">_tmpMass</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Cosmology</span><span class="o">.</span><span class="n">get_halomassfunction</span><span class="p">(</span><span class="n">_mass</span><span class="p">,</span> <span class="n">qty</span><span class="o">=</span><span class="s1">&#39;dn_dlnM&#39;</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">_mass</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">_mass</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+            <span class="n">cumm_MF</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">_tmpMass</span><span class="p">)</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">cumsum</span><span class="p">(</span><span class="n">_tmpMass</span><span class="p">)</span>
+            <span class="n">cumm_MF</span><span class="p">[</span><span class="n">cumm_MF</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1e-10</span>
+            <span class="n">m200c</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">interp</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">den</span><span class="p">),</span><span class="n">np</span><span class="o">.</span><span class="n">flip</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">cumm_MF</span><span class="p">)),</span> <span class="n">np</span><span class="o">.</span><span class="n">flip</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">_mass</span><span class="p">))))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">m200c</span> <span class="o">=</span> <span class="n">Sim</span><span class="o">.</span><span class="n">fof</span><span class="p">[</span><span class="n">mhalo</span><span class="p">]</span><span class="o">*</span><span class="mf">1e10</span>
+                
+        <span class="k">if</span> <span class="n">TypeOfMock</span> <span class="o">==</span> <span class="s1">&#39;hod&#39;</span> <span class="ow">or</span> <span class="n">TypeOfMock</span> <span class="o">==</span> <span class="s1">&#39;HOD&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;HOD_Mmin&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">Mmin</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;HOD_sigmaLogM&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sigmaLogM</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;HOD_M1&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">M1</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;HOD_Mcut&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">Mcut</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;HOD_alpha&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">alpha</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;HOD_alpha_c&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">alpha_c</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;HOD_alpha_s&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">alpha_s</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">Haloes</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">Haloes</span><span class="p">[</span><span class="s1">&#39;m200c&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">m200c</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">Haloes</span><span class="p">[</span><span class="s1">&#39;vel&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">Sim</span><span class="o">.</span><span class="n">fof</span><span class="p">[</span><span class="s1">&#39;halo_vel&#39;</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">Haloes</span><span class="p">[</span><span class="s1">&#39;pos&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">Sim</span><span class="o">.</span><span class="n">fof</span><span class="p">[</span><span class="s1">&#39;halo_pos&#39;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="s1">&#39;halo_vdisp_200c&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">Sim</span><span class="o">.</span><span class="n">fof</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span> <span class="n">_vdisp</span><span class="p">(</span><span class="n">Sim</span><span class="p">)</span>
+            <span class="n">halo_vdisp</span> <span class="o">=</span> <span class="n">Sim</span><span class="o">.</span><span class="n">fof</span><span class="p">[</span><span class="s1">&#39;halo_vdisp_200c&#39;</span><span class="p">]</span>
+            
+            <span class="n">sigma_c</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">halo_vdisp</span><span class="p">),</span> <span class="mi">3</span><span class="p">))</span>
+            <span class="n">halo_vdisp</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">halo_vdisp</span><span class="p">)]</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">if</span> <span class="n">alpha_c</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
+                    <span class="n">sigma_c</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">alpha_c</span><span class="o">*</span><span class="n">halo_vdisp</span><span class="p">)</span> <span class="c1">#halo_vdisp is linear, no 3D</span>
+
+            <span class="n">NCen</span><span class="p">,</span> <span class="n">NSat</span> <span class="o">=</span> <span class="n">HOD_Calculate_CenSat</span><span class="p">(</span><span class="n">m200c</span><span class="p">,</span> <span class="n">Mmin</span><span class="p">,</span> <span class="n">sigmaLogM</span><span class="p">,</span> <span class="n">M1</span><span class="p">,</span> <span class="n">Mcut</span><span class="p">,</span> <span class="n">alpha</span><span class="p">)</span>
+            <span class="n">NHalo</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">m200c</span><span class="p">)</span>
+            <span class="n">NGalaxies</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">NCen</span><span class="p">)</span><span class="o">+</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">NSat</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">galaxies</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="c1">##</span>
+            <span class="n">Npart</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">Sim</span><span class="o">.</span><span class="n">fof</span><span class="p">[</span><span class="s1">&#39;halo_dm_pos&#39;</span><span class="p">])</span>
+            
+            <span class="n">sqrt_a</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">galaxies</span><span class="p">[</span><span class="s1">&#39;pos&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">NGalaxies</span><span class="o">*</span><span class="mi">3</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">galaxies</span><span class="p">[</span><span class="s1">&#39;vel&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">NGalaxies</span><span class="o">*</span><span class="mi">3</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">galaxies</span><span class="p">[</span><span class="s1">&#39;m200c&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">NGalaxies</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">galaxies</span><span class="p">[</span><span class="s1">&#39;centrals&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">NGalaxies</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">galaxies</span><span class="p">[</span><span class="s1">&#39;halo_index&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">NGalaxies</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
+            <span class="c1"># NCen, NSat, NSat (without any sm particles), NSat in haloes with NSat &gt; sm particles</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">galaxies</span><span class="p">[</span><span class="s1">&#39;ngal&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
+            <span class="n">_fof_pos</span> <span class="o">=</span> <span class="p">(</span><span class="n">Sim</span><span class="o">.</span><span class="n">fof</span><span class="p">[</span><span class="s1">&#39;halo_pos&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">))</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">m200c</span><span class="p">)</span><span class="o">*</span><span class="mi">3</span><span class="p">)</span>
+            <span class="n">_fof_vel</span> <span class="o">=</span> <span class="p">(</span><span class="n">Sim</span><span class="o">.</span><span class="n">fof</span><span class="p">[</span><span class="s1">&#39;halo_vel&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">))</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">m200c</span><span class="p">)</span><span class="o">*</span><span class="mi">3</span><span class="p">)</span>
+            <span class="n">_sigma_c</span> <span class="o">=</span> <span class="p">(</span><span class="n">sigma_c</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">))</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">m200c</span><span class="p">)</span><span class="o">*</span><span class="mi">3</span><span class="p">)</span>
+            <span class="n">cymock</span><span class="o">.</span><span class="n">HOD_Populate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">galaxies</span><span class="p">[</span><span class="s1">&#39;pos&#39;</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">galaxies</span><span class="p">[</span><span class="s1">&#39;vel&#39;</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">galaxies</span><span class="p">[</span><span class="s1">&#39;m200c&#39;</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">galaxies</span><span class="p">[</span><span class="s1">&#39;centrals&#39;</span><span class="p">],</span><span class="bp">self</span><span class="o">.</span><span class="n">galaxies</span><span class="p">[</span><span class="s1">&#39;halo_index&#39;</span><span class="p">],</span> <span class="n">m200c</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">),</span> <span class="n">NCen</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">),</span> <span class="n">NSat</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">),</span> <span class="n">_fof_pos</span><span class="p">,</span> <span class="n">_fof_vel</span><span class="p">,</span> <span class="n">_sigma_c</span><span class="p">,</span> <span class="n">Sim</span><span class="o">.</span><span class="n">fof</span><span class="p">[</span><span class="s1">&#39;halo_dm_pos&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">Npart</span><span class="o">*</span><span class="mi">3</span><span class="p">),</span> <span class="n">Sim</span><span class="o">.</span><span class="n">fof</span><span class="p">[</span><span class="s1">&#39;halo_dm_vel&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">Npart</span><span class="o">*</span><span class="mi">3</span><span class="p">),</span> <span class="n">Sim</span><span class="o">.</span><span class="n">fof</span><span class="p">[</span><span class="s1">&#39;halo_sdm_off&#39;</span><span class="p">],</span> <span class="n">Sim</span><span class="o">.</span><span class="n">fof</span><span class="p">[</span><span class="s1">&#39;halo_sdm_len&#39;</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">galaxies</span><span class="p">[</span><span class="s1">&#39;ngal&#39;</span><span class="p">],</span> <span class="nb">float</span><span class="p">(</span><span class="n">Hubble_factor</span><span class="p">),</span> <span class="nb">float</span><span class="p">(</span><span class="n">alpha_s</span><span class="p">),</span> <span class="n">LBox</span><span class="p">,</span> <span class="n">nthreads</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">axis_zsd</span><span class="p">,</span> <span class="n">seed</span><span class="p">)</span>
+
+                
+            <span class="bp">self</span><span class="o">.</span><span class="n">galaxies</span><span class="p">[</span><span class="s1">&#39;pos&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">galaxies</span><span class="p">[</span><span class="s1">&#39;pos&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">NGalaxies</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">Sim</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;BoxSize&#39;</span><span class="p">]:</span> <span class="bp">self</span><span class="o">.</span><span class="n">galaxies</span><span class="p">[</span><span class="s1">&#39;pos&#39;</span><span class="p">]</span> <span class="o">/=</span> <span class="mf">1e3</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">galaxies</span><span class="p">[</span><span class="s1">&#39;vel&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">galaxies</span><span class="p">[</span><span class="s1">&#39;vel&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">NGalaxies</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+            <span class="n">sigma_c</span> <span class="o">=</span> <span class="n">_sigma_c</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">m200c</span><span class="p">),</span> <span class="mi">3</span><span class="p">)</span>
+    
+        <span class="k">elif</span> <span class="n">TypeOfMock</span> <span class="o">==</span> <span class="s1">&#39;sham&#39;</span> <span class="ow">or</span> <span class="n">TypeOfMock</span> <span class="o">==</span> <span class="s1">&#39;SHAM&#39;</span><span class="p">:</span>
+            
+            <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;ParticleMass&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">Sim</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;ParticleMass&#39;</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;SHAM_Sigma&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sigma_Mstell</span>
+            
+            <span class="bp">self</span><span class="o">.</span><span class="n">Haloes</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">Haloes</span><span class="p">[</span><span class="s1">&#39;m200c&#39;</span><span class="p">]</span>    <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">m200c</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">Haloes</span><span class="p">[</span><span class="s1">&#39;mfof&#39;</span><span class="p">]</span>     <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">Sim</span><span class="o">.</span><span class="n">fof</span><span class="p">[</span><span class="s1">&#39;halo_mfof&#39;</span><span class="p">])</span><span class="o">*</span><span class="mf">1e10</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">Haloes</span><span class="p">[</span><span class="s1">&#39;pos&#39;</span><span class="p">]</span>     <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">Sim</span><span class="o">.</span><span class="n">fof</span><span class="p">[</span><span class="s1">&#39;halo_pos&#39;</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">Haloes</span><span class="p">[</span><span class="s1">&#39;vel&#39;</span><span class="p">]</span>     <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">Sim</span><span class="o">.</span><span class="n">fof</span><span class="p">[</span><span class="s1">&#39;halo_vel&#39;</span><span class="p">])</span>
+            
+            <span class="k">if</span> <span class="n">NoOrphans</span><span class="p">:</span> <span class="n">mask_alive</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">Sim</span><span class="o">.</span><span class="n">sub</span><span class="p">[</span><span class="s1">&#39;orphan_snap&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span> <span class="n">mask_alive</span> <span class="o">=</span> <span class="n">mask_alive</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">Sim</span><span class="o">.</span><span class="n">sub</span><span class="p">[</span><span class="s1">&#39;pos&#39;</span><span class="p">]),</span><span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
+            <span class="n">NGalaxies</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">mask_alive</span><span class="p">)</span>
+            
+            <span class="bp">self</span><span class="o">.</span><span class="n">galaxies</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">galaxies</span><span class="p">[</span><span class="s1">&#39;halo_id&#39;</span><span class="p">]</span>        <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">Sim</span><span class="o">.</span><span class="n">sub</span><span class="p">[</span><span class="s1">&#39;grnr&#39;</span><span class="p">][</span><span class="n">mask_alive</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">galaxies</span><span class="p">[</span><span class="s1">&#39;pos&#39;</span><span class="p">]</span>            <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">Sim</span><span class="o">.</span><span class="n">sub</span><span class="p">[</span><span class="s1">&#39;pos&#39;</span><span class="p">][</span><span class="n">mask_alive</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">units_in_kpc</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">galaxies</span><span class="p">[</span><span class="s1">&#39;pos&#39;</span><span class="p">]</span> <span class="o">/=</span> <span class="mf">1e3</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">galaxies</span><span class="p">[</span><span class="s1">&#39;vel&#39;</span><span class="p">]</span>            <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">Sim</span><span class="o">.</span><span class="n">sub</span><span class="p">[</span><span class="s1">&#39;vel&#39;</span><span class="p">][</span><span class="n">mask_alive</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">galaxies</span><span class="p">[</span><span class="s1">&#39;centrals&#39;</span><span class="p">]</span>       <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">Sim</span><span class="o">.</span><span class="n">sub</span><span class="p">[</span><span class="s1">&#39;parent_halo&#39;</span><span class="p">][</span><span class="s1">&#39;central&#39;</span><span class="p">][</span><span class="n">mask_alive</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">galaxies</span><span class="p">[</span><span class="n">SHAM_Prop</span><span class="p">]</span>        <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">Sim</span><span class="o">.</span><span class="n">sub</span><span class="p">[</span><span class="n">SHAM_Prop</span><span class="p">][</span><span class="n">mask_alive</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">galaxies</span><span class="p">[</span><span class="s1">&#39;MStell&#39;</span><span class="p">]</span>         <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">NGalaxies</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">galaxies</span><span class="p">[</span><span class="s1">&#39;mpeak&#39;</span><span class="p">]</span>          <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">Sim</span><span class="o">.</span><span class="n">sub</span><span class="p">[</span><span class="s1">&#39;mpeak&#39;</span><span class="p">][</span><span class="n">mask_alive</span><span class="p">]</span><span class="o">*</span><span class="mf">1e10</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">galaxies</span><span class="p">[</span><span class="s1">&#39;len&#39;</span><span class="p">]</span>            <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">Sim</span><span class="o">.</span><span class="n">sub</span><span class="p">[</span><span class="s1">&#39;len&#39;</span><span class="p">][</span><span class="n">mask_alive</span><span class="p">])</span>
+            <span class="k">if</span> <span class="s1">&#39;peak_time&#39;</span> <span class="ow">in</span> <span class="n">Sim</span><span class="o">.</span><span class="n">sub</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span> <span class="bp">self</span><span class="o">.</span><span class="n">galaxies</span><span class="p">[</span><span class="s1">&#39;peak_time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">Sim</span><span class="o">.</span><span class="n">sub</span><span class="p">[</span><span class="s1">&#39;peak_time&#39;</span><span class="p">][</span><span class="n">mask_alive</span><span class="p">])</span><span class="c1">#Not in TNG, FIXME</span>
+            <span class="k">if</span> <span class="s1">&#39;mdot_at_mpeak&#39;</span> <span class="ow">in</span> <span class="n">Sim</span><span class="o">.</span><span class="n">sub</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span> <span class="bp">self</span><span class="o">.</span><span class="n">galaxies</span><span class="p">[</span><span class="s1">&#39;mdot_at_mpeak&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">Sim</span><span class="o">.</span><span class="n">sub</span><span class="p">[</span><span class="s1">&#39;mdot_at_mpeak&#39;</span><span class="p">][</span><span class="n">mask_alive</span><span class="p">]</span><span class="o">*</span><span class="mf">1e10</span><span class="p">)</span><span class="c1">#Not in TNG, FIXME</span>
+
+            <span class="k">if</span> <span class="s1">&#39;m200c&#39;</span> <span class="ow">in</span> <span class="n">Sim</span><span class="o">.</span><span class="n">sub</span><span class="p">[</span><span class="s1">&#39;parent_halo&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span> <span class="bp">self</span><span class="o">.</span><span class="n">galaxies</span><span class="p">[</span><span class="s1">&#39;m200c&#39;</span><span class="p">]</span>      <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">Sim</span><span class="o">.</span><span class="n">sub</span><span class="p">[</span><span class="s1">&#39;parent_halo&#39;</span><span class="p">][</span><span class="s1">&#39;m200c&#39;</span><span class="p">][</span><span class="n">mask_alive</span><span class="p">]</span><span class="o">*</span><span class="mf">1e10</span><span class="p">)</span>
+            <span class="k">if</span> <span class="s1">&#39;mfof&#39;</span> <span class="ow">in</span> <span class="n">Sim</span><span class="o">.</span><span class="n">sub</span><span class="p">[</span><span class="s1">&#39;parent_halo&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span> <span class="bp">self</span><span class="o">.</span><span class="n">galaxies</span><span class="p">[</span><span class="s1">&#39;mfof&#39;</span><span class="p">]</span>        <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">Sim</span><span class="o">.</span><span class="n">sub</span><span class="p">[</span><span class="s1">&#39;parent_halo&#39;</span><span class="p">][</span><span class="s1">&#39;mfof&#39;</span><span class="p">][</span><span class="n">mask_alive</span><span class="p">]</span><span class="o">*</span><span class="mf">1e10</span><span class="p">)</span>
+            <span class="k">if</span> <span class="s1">&#39;r200c&#39;</span> <span class="ow">in</span> <span class="n">Sim</span><span class="o">.</span><span class="n">sub</span><span class="p">[</span><span class="s1">&#39;parent_halo&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span> <span class="bp">self</span><span class="o">.</span><span class="n">galaxies</span><span class="p">[</span><span class="s1">&#39;r200c&#39;</span><span class="p">]</span>      <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">Sim</span><span class="o">.</span><span class="n">sub</span><span class="p">[</span><span class="s1">&#39;parent_halo&#39;</span><span class="p">][</span><span class="s1">&#39;r200c&#39;</span><span class="p">][</span><span class="n">mask_alive</span><span class="p">]</span><span class="o">*</span><span class="mf">1e10</span><span class="p">)</span>
+            <span class="k">if</span> <span class="s1">&#39;index&#39;</span> <span class="ow">in</span> <span class="n">Sim</span><span class="o">.</span><span class="n">sub</span><span class="p">[</span><span class="s1">&#39;parent_halo&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span> <span class="bp">self</span><span class="o">.</span><span class="n">galaxies</span><span class="p">[</span><span class="s1">&#39;halo_index&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">Sim</span><span class="o">.</span><span class="n">sub</span><span class="p">[</span><span class="s1">&#39;parent_halo&#39;</span><span class="p">][</span><span class="s1">&#39;index&#39;</span><span class="p">][</span><span class="n">mask_alive</span><span class="p">])</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+            <span class="k">if</span> <span class="s1">&#39;central&#39;</span> <span class="ow">in</span> <span class="n">Sim</span><span class="o">.</span><span class="n">sub</span><span class="p">[</span><span class="s1">&#39;parent_halo&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span> <span class="bp">self</span><span class="o">.</span><span class="n">galaxies</span><span class="p">[</span><span class="s1">&#39;central&#39;</span><span class="p">]</span>  <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">Sim</span><span class="o">.</span><span class="n">sub</span><span class="p">[</span><span class="s1">&#39;parent_halo&#39;</span><span class="p">][</span><span class="s1">&#39;central&#39;</span><span class="p">][</span><span class="n">mask_alive</span><span class="p">])</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">bool</span><span class="p">)</span>
+            <span class="k">if</span> <span class="s1">&#39;Mdot&#39;</span> <span class="ow">in</span> <span class="n">Sim</span><span class="o">.</span><span class="n">sub</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span> <span class="bp">self</span><span class="o">.</span><span class="n">galaxies</span><span class="p">[</span><span class="s1">&#39;Mdot&#39;</span><span class="p">]</span>                       <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">Sim</span><span class="o">.</span><span class="n">sub</span><span class="p">[</span><span class="s1">&#39;Mdot&#39;</span><span class="p">][</span><span class="n">mask_alive</span><span class="p">]</span><span class="o">*</span><span class="mf">1e10</span><span class="p">)</span>
+            
+            <span class="k">if</span> <span class="n">StellarMassFunction</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> <span class="n">MF_x</span><span class="p">,</span> <span class="n">MF_y</span> <span class="o">=</span> <span class="n">MassFunction</span><span class="p">(</span><span class="n">NBin</span><span class="o">=</span><span class="mi">5000</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span><span class="n">MF_x</span><span class="p">,</span> <span class="n">MF_y</span> <span class="o">=</span> <span class="n">StellarMassFunction</span>
+            
+            <span class="bp">self</span><span class="o">.</span><span class="n">galaxies</span><span class="p">[</span><span class="s1">&#39;MStell&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">SHAM_scatter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">galaxies</span><span class="p">[</span><span class="n">SHAM_Prop</span><span class="p">],</span> <span class="n">MF_x</span><span class="p">,</span> <span class="n">MF_y</span><span class="p">,</span> <span class="n">LBox</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="n">sigma_Mstell</span><span class="p">,</span> <span class="n">seed</span> <span class="o">=</span> <span class="n">seed</span><span class="p">)</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;No accepted TypeOfMock&quot;</span><span class="p">)</span>
+    
+
+    <span class="k">def</span> <span class="nf">_vdisp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">Sim</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Compute the velocity dispersion of the haloes in case is not given</span>
+<span class="sd">            Input:</span>
+<span class="sd">                Sim: Simulation class</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span> <span class="n">part</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">Sim</span><span class="o">.</span><span class="n">dm</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span> <span class="n">part</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">Sim</span><span class="o">.</span><span class="n">sdm</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;No halo_vdisp, calculating it...&#39;</span><span class="p">)</span>
+        <span class="n">halo_vdisp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">m200c</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">fi</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">Sim</span><span class="o">.</span><span class="n">fof</span><span class="p">[</span><span class="s1">&#39;halo_m200c&#39;</span><span class="p">])):</span>
+            <span class="n">index</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="n">Sim</span><span class="o">.</span><span class="n">fof</span><span class="p">[</span><span class="s1">&#39;halo_offsets&#39;</span><span class="p">][</span><span class="n">fi</span><span class="p">]</span><span class="o">-</span><span class="n">Sim</span><span class="o">.</span><span class="n">fof</span><span class="p">[</span><span class="s1">&#39;halo_len&#39;</span><span class="p">][</span><span class="n">fi</span><span class="p">],</span> <span class="n">fof</span><span class="p">[</span><span class="s1">&#39;halo_offsets&#39;</span><span class="p">][</span><span class="n">fi</span><span class="p">])</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">index</span><span class="p">):</span>
+                <span class="n">halo_vdisp</span><span class="p">[</span><span class="n">fi</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="n">part</span><span class="p">[</span><span class="s1">&#39;vel&#39;</span><span class="p">][</span><span class="n">index</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="o">-</span> <span class="n">Sim</span><span class="o">.</span><span class="n">fof</span><span class="p">[</span><span class="s1">&#39;halo_vel&#39;</span><span class="p">][</span><span class="n">fi</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span><span class="o">**</span><span class="mi">2</span><span class="o">+</span><span class="p">(</span><span class="n">part</span><span class="p">[</span><span class="s1">&#39;vel&#39;</span><span class="p">][</span><span class="n">index</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="o">-</span> <span class="n">Sim</span><span class="o">.</span><span class="n">fof</span><span class="p">[</span><span class="s1">&#39;halo_vel&#39;</span><span class="p">][</span><span class="n">fi</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span><span class="o">**</span><span class="mi">2</span><span class="o">+</span><span class="p">(</span><span class="n">part</span><span class="p">[</span><span class="s1">&#39;vel&#39;</span><span class="p">][</span><span class="n">index</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="o">-</span> <span class="n">Sim</span><span class="o">.</span><span class="n">fof</span><span class="p">[</span><span class="s1">&#39;halo_vel&#39;</span><span class="p">][</span><span class="n">fi</span><span class="p">][</span><span class="mi">2</span><span class="p">])</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">index</span><span class="p">)))</span><span class="o">**</span><span class="mf">0.5</span><span class="o">/</span><span class="mf">3.</span>
+        <span class="n">Sim</span><span class="o">.</span><span class="n">fof</span><span class="p">[</span><span class="s1">&#39;halo_vdisp&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">halo_vdisp</span>
+        <span class="k">del</span> <span class="n">part</span>
+        
+<div class="viewcode-block" id="Mock.Prop_n"><a class="viewcode-back" href="../../code.html#bacco.Mock.Prop_n">[docs]</a>    <span class="k">def</span> <span class="nf">Prop_n</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">prop</span><span class="o">=</span><span class="s1">&#39;MStell&#39;</span><span class="p">,</span> <span class="n">Mask</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Returns the minimum value of a property for a given number density</span>
+<span class="sd">            Input:</span>
+<span class="sd">                n: Number density</span>
+<span class="sd">                prop: Property of the mock class to aplay the number density</span>
+<span class="sd">                Mask: Subsample of galaxies to use </span>
+<span class="sd">                verbose: Always usefull verbose</span>
+<span class="sd">            Output:</span>
+<span class="sd">                Cut in the property for the number density &#39;n&#39;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">Mask</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> <span class="n">Mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">galaxies</span><span class="p">[</span><span class="n">prop</span><span class="p">]),</span><span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
+        <span class="n">_Prop</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">galaxies</span><span class="p">[</span><span class="n">prop</span><span class="p">][</span><span class="n">Mask</span><span class="p">]))[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">N</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">n</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;BoxSize&#39;</span><span class="p">]</span><span class="o">**</span><span class="mi">3</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">N</span> <span class="o">&gt;=</span> <span class="nb">len</span><span class="p">(</span><span class="n">_Prop</span><span class="p">):</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;WARNING! n*V &gt; Ngal&#39;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">_Prop</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span> <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Cut in </span><span class="si">%s</span><span class="s2"> = </span><span class="si">%f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">prop</span><span class="p">,</span> <span class="n">_Prop</span><span class="p">[</span><span class="n">N</span><span class="p">]))</span>
+            <span class="k">return</span> <span class="n">_Prop</span><span class="p">[</span><span class="n">N</span><span class="p">]</span></div>
+    
+<div class="viewcode-block" id="Mock.sat_fraction"><a class="viewcode-back" href="../../code.html#bacco.Mock.sat_fraction">[docs]</a>    <span class="k">def</span> <span class="nf">sat_fraction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">SHAM_Cut</span><span class="o">=-</span><span class="mi">10</span><span class="p">,</span> <span class="n">SHAM_GalProp</span><span class="o">=</span><span class="s1">&#39;MStell&#39;</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Return the satellite fraction of a mock. For an HOD it will use the full sample and for a SHAM only a subsample</span>
+<span class="sd">            Input:</span>
+<span class="sd">                SHAM_GalProp: SHAM propery (eg. Stellar mass) to select the galaxies</span>
+<span class="sd">                SHAM_Cut: cut in the SHAM propery, not value if &#39;n&#39; is given</span>
+<span class="sd">                n: cut in number density based on the SHAM_GalProp</span>
+<span class="sd">            Output:</span>
+<span class="sd">                satellite fraction</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">TypeOfMock</span> <span class="o">==</span> <span class="s1">&#39;hod&#39;</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">TypeOfMock</span> <span class="o">==</span> <span class="s1">&#39;HOD&#39;</span><span class="p">:</span>
+            <span class="n">Mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">galaxies</span><span class="p">[</span><span class="s1">&#39;pos&#39;</span><span class="p">])</span> <span class="p">,</span><span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">TypeOfMock</span> <span class="o">==</span> <span class="s1">&#39;sham&#39;</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">TypeOfMock</span> <span class="o">==</span> <span class="s1">&#39;SHAM&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">n</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span> <span class="n">SHAM_Cut</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Prop_n</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">SHAM_GalProp</span><span class="p">)</span>
+            <span class="n">Mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">galaxies</span><span class="p">[</span><span class="n">SHAM_GalProp</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">SHAM_Cut</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">return</span> <span class="mf">1.</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">galaxies</span><span class="p">[</span><span class="s1">&#39;centrals&#39;</span><span class="p">][</span><span class="n">Mask</span><span class="p">])</span><span class="o">/</span><span class="nb">float</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">galaxies</span><span class="p">[</span><span class="s1">&#39;centrals&#39;</span><span class="p">][</span><span class="n">Mask</span><span class="p">]))</span></div>
+  
+<div class="viewcode-block" id="Mock.hod"><a class="viewcode-back" href="../../code.html#bacco.Mock.hod">[docs]</a>    <span class="k">def</span> <span class="nf">hod</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">LogMmin</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">LogMmax</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span> <span class="n">NBin</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">SHAM_Cut</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">SHAM_GalProp</span><span class="o">=</span><span class="s1">&#39;MStell&#39;</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">HODfit</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Compute the HOD of a mock</span>
+<span class="sd">            Intput:</span>
+<span class="sd">                LogMmin: log10 of the Minimum halo mass of the HOD</span>
+<span class="sd">                LogMmax: log10 of the Maximum halo mass of the HOD</span>
+<span class="sd">                NBin: Number of bins of the HOD</span>
+<span class="sd">                SHAM_GalProp: SHAM propery (eg. Stellar mass) to select the galaxies</span>
+<span class="sd">                SHAM_Cut: cut in the SHAM propery, not value if &#39;n&#39; is given</span>
+<span class="sd">                n: cut in number density based on the SHAM_GalProp</span>
+<span class="sd">                HODfit: Fit the HOD and get the fitting parameters</span>
+<span class="sd">            Output: </span>
+<span class="sd">                HOD: Halo mass and average halo occupation</span>
+<span class="sd">                fit: (if HODfit == True) The HOD parameters.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">HOD</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">TypeOfMock</span> <span class="o">==</span> <span class="s1">&#39;hod&#39;</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">TypeOfMock</span> <span class="o">==</span> <span class="s1">&#39;HOD&#39;</span><span class="p">:</span> <span class="n">HOD</span><span class="p">[</span><span class="s1">&#39;HOD&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">statistics</span><span class="o">.</span><span class="n">compute_hod</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">galaxies</span><span class="p">[</span><span class="s1">&#39;m200c&#39;</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">Haloes</span><span class="p">[</span><span class="s1">&#39;m200c&#39;</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">galaxies</span><span class="p">[</span><span class="s1">&#39;centrals&#39;</span><span class="p">],</span> <span class="n">LogMmin</span><span class="o">=</span><span class="n">LogMmin</span><span class="p">,</span> <span class="n">LogMmax</span><span class="o">=</span><span class="n">LogMmax</span><span class="p">,</span> <span class="n">NBin</span><span class="o">=</span><span class="n">NBin</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">TypeOfMock</span> <span class="o">==</span> <span class="s1">&#39;sham&#39;</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">TypeOfMock</span> <span class="o">==</span> <span class="s1">&#39;SHAM&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">n</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span> <span class="n">SHAM_Cut</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Prop_n</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">SHAM_GalProp</span><span class="p">)</span>
+            <span class="n">Mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">galaxies</span><span class="p">[</span><span class="n">SHAM_GalProp</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">SHAM_Cut</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">HOD</span><span class="p">[</span><span class="s1">&#39;HOD&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">statistics</span><span class="o">.</span><span class="n">compute_hod</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">galaxies</span><span class="p">[</span><span class="s1">&#39;m200c&#39;</span><span class="p">][</span><span class="n">Mask</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">Haloes</span><span class="p">[</span><span class="s1">&#39;m200c&#39;</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">galaxies</span><span class="p">[</span><span class="s1">&#39;centrals&#39;</span><span class="p">][</span><span class="n">Mask</span><span class="p">],</span> <span class="n">LogMmin</span><span class="o">=</span><span class="n">LogMmin</span><span class="p">,</span> <span class="n">LogMmax</span><span class="o">=</span><span class="n">LogMmax</span><span class="p">,</span> <span class="n">NBin</span><span class="o">=</span><span class="n">NBin</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">HODfit</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span> <span class="n">HOD</span><span class="p">[</span><span class="s1">&#39;fit&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hod_fit</span><span class="p">(</span> <span class="n">HOD_mock</span> <span class="o">=</span> <span class="n">HOD</span><span class="p">[</span><span class="s1">&#39;HOD&#39;</span><span class="p">])</span>
+            <span class="k">except</span><span class="p">:</span> <span class="k">pass</span>
+        <span class="k">return</span> <span class="n">HOD</span> </div>
+  
+<div class="viewcode-block" id="Mock.hod_fit"><a class="viewcode-back" href="../../code.html#bacco.Mock.hod_fit">[docs]</a>    <span class="k">def</span> <span class="nf">hod_fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">LogMmin</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">LogMmax</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span> <span class="n">NBin</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">SHAM_Cut</span><span class="o">=-</span><span class="mi">10</span><span class="p">,</span> <span class="n">SHAM_GalProp</span><span class="o">=</span><span class="s1">&#39;MStell&#39;</span><span class="p">,</span> <span class="n">n_den</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">HOD_mock</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Fit a HOD to a mock class, or a hod funtion (see function above)</span>
+<span class="sd">            Intput:</span>
+<span class="sd">                LogMmin: log10 of the Minimum halo mass of the HOD</span>
+<span class="sd">                LogMmax: log10 of the Maximum halo mass of the HOD</span>
+<span class="sd">                NBin: Number of bins of the HOD</span>
+<span class="sd">                SHAM_GalProp: SHAM propery (eg. Stellar mass) to select the galaxies</span>
+<span class="sd">                SHAM_Cut: cut in the SHAM propery, not value if &#39;n&#39; is given</span>
+<span class="sd">                n: cut in number density based on the SHAM_GalProp</span>
+<span class="sd">                HOD_mock: dictionary with the mass, number of centrals and number of satellite of a halo array</span>
+<span class="sd">            Output: </span>
+<span class="sd">                5-Parameter fit and their errors</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">HOD_mock</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> <span class="n">HOD_mock</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hod</span><span class="p">(</span><span class="n">LogMmin</span><span class="o">=</span><span class="n">LogMmin</span><span class="p">,</span> <span class="n">LogMmax</span><span class="o">=</span><span class="n">LogMmax</span><span class="p">,</span> <span class="n">NBin</span><span class="o">=</span><span class="n">NBin</span><span class="p">,</span> <span class="n">SHAM_Cut</span><span class="o">=</span><span class="n">SHAM_Cut</span><span class="p">,</span> <span class="n">n_den</span><span class="o">=</span><span class="n">n_den</span><span class="p">,</span> <span class="n">SHAM_GalProp</span><span class="o">=</span><span class="s1">&#39;MStell&#39;</span><span class="p">)</span>
+        <span class="n">Cen_Param</span><span class="p">,</span> <span class="n">Cen_tErr</span> <span class="o">=</span> <span class="n">Fitting_Centrals</span><span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">HOD_mock</span><span class="p">[</span><span class="s1">&#39;Mh&#39;</span><span class="p">]),</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">HOD_mock</span><span class="p">[</span><span class="s1">&#39;Nc&#39;</span><span class="p">]),</span> <span class="n">HOD_mock</span><span class="p">[</span><span class="s1">&#39;Mh&#39;</span><span class="p">])</span>
+        <span class="n">Sat_Param</span><span class="p">,</span> <span class="n">Sat_tErr</span> <span class="o">=</span> <span class="n">Fitting_Satellites</span><span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">HOD_mock</span><span class="p">[</span><span class="s1">&#39;Mh&#39;</span><span class="p">]),</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">HOD_mock</span><span class="p">[</span><span class="s1">&#39;Ns&#39;</span><span class="p">]),</span> <span class="n">HOD_mock</span><span class="p">[</span><span class="s1">&#39;Mh&#39;</span><span class="p">])</span>
+        <span class="n">Cen_Err</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">Cen_tErr</span><span class="p">))</span>
+        <span class="n">Sat_Err</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">Sat_tErr</span><span class="p">))</span>
+        <span class="n">param</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">param</span><span class="p">[</span><span class="s1">&#39;Mmin&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">Cen_Param</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">param</span><span class="p">[</span><span class="s1">&#39;sigmaLogM&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">Cen_Param</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">param</span><span class="p">[</span><span class="s1">&#39;M1&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">Sat_Param</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">param</span><span class="p">[</span><span class="s1">&#39;Mcut&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">Sat_Param</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">param</span><span class="p">[</span><span class="s1">&#39;alpha&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">Sat_Param</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+        <span class="n">param</span><span class="p">[</span><span class="s1">&#39;err_Mmin&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">Cen_Err</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">param</span><span class="p">[</span><span class="s1">&#39;err_sigmaLogM&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">Cen_Err</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">param</span><span class="p">[</span><span class="s1">&#39;err_M1&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">Sat_Err</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">param</span><span class="p">[</span><span class="s1">&#39;err_Mcut&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">Sat_Err</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">param</span><span class="p">[</span><span class="s1">&#39;err_alpha&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">Sat_Err</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">param</span></div></div>
+    
+    
+<span class="k">def</span> <span class="nf">compute_wp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pi_max</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">rmin</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span> <span class="n">rmax</span> <span class="o">=</span> <span class="mi">150</span><span class="p">,</span> <span class="n">log_rmin</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">log_rmax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">nbin</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
+           <span class="n">method</span><span class="o">=</span><span class="s2">&quot;Corrfunc&quot;</span><span class="p">,</span> <span class="n">nthreads</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">SHAM_GalProp</span><span class="o">=</span><span class="s1">&#39;MStell&#39;</span><span class="p">,</span> <span class="n">SHAM_Cut</span><span class="o">=-</span><span class="mi">10</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">rbins</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Compute wp with halotools or Corrfunc.</span>
+<span class="sd">            Input: </span>
+<span class="sd">                TypeOfMock: Type of Mock, if HOD it will compute wp for all galaxies, if is SHAM only for a given subsample</span>
+<span class="sd">                pi_max: maximum value of pi. For Corrfunc it has to be &lt; box/3</span>
+<span class="sd">                rmin: minimum value of &#39;r&#39; were wp is measured, not valid if rbins is given</span>
+<span class="sd">                rmax: maximum value of &#39;r&#39; were wp is measured, not valid if rbins is given. It has to be &lt; box/3</span>
+<span class="sd">                nbins: number of bins of &#39;r&#39; array</span>
+<span class="sd">                method: Method to compute wp (eg. halotools, Corrfunc)</span>
+<span class="sd">                nthreads: number of threads</span>
+<span class="sd">                SHAM_GalProp: SHAM propery (eg. Stellar mass) to select the galaxies</span>
+<span class="sd">                SHAM_Cut: cut in the SHAM propery, not value if &#39;n&#39; is given</span>
+<span class="sd">                n: cut in number density based on the SHAM_GalProp</span>
+<span class="sd">                rbins: Array of float of leanght nbins+1. Edges of the &#39;r&#39; bins.</span>
+<span class="sd">                verbose: verbose</span>
+<span class="sd">            Output:</span>
+<span class="sd">                rbins_mid: middle points of the &#39;r&#39; bins</span>
+<span class="sd">                wp: value of wp</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">TypeOfMock</span> <span class="o">==</span> <span class="s1">&#39;hod&#39;</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">TypeOfMock</span> <span class="o">==</span> <span class="s1">&#39;HOD&#39;</span><span class="p">:</span> <span class="n">Mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">galaxies</span><span class="p">[</span><span class="s1">&#39;pos&#39;</span><span class="p">])</span> <span class="p">,</span><span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">TypeOfMock</span> <span class="o">==</span> <span class="s1">&#39;sham&#39;</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">TypeOfMock</span> <span class="o">==</span> <span class="s1">&#39;SHAM&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">n</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span> <span class="n">SHAM_Cut</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Prop_n</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">SHAM_GalProp</span><span class="p">,</span> <span class="n">verbose</span> <span class="o">=</span> <span class="n">verbose</span><span class="p">)</span>
+            <span class="n">Mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">galaxies</span><span class="p">[</span><span class="n">SHAM_GalProp</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">SHAM_Cut</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            
+        <span class="k">return</span> <span class="n">statistics</span><span class="o">.</span><span class="n">compute_wp</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">galaxies</span><span class="p">[</span><span class="s1">&#39;pos&#39;</span><span class="p">][</span><span class="n">Mask</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;BoxSize&#39;</span><span class="p">],</span> <span class="n">pi_max</span><span class="o">=</span><span class="n">pi_max</span><span class="p">,</span> 
+                                     <span class="n">rmin</span> <span class="o">=</span> <span class="n">rmin</span><span class="p">,</span> <span class="n">rmax</span> <span class="o">=</span> <span class="n">rmax</span><span class="p">,</span> <span class="n">nbin</span><span class="o">=</span><span class="n">nbin</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">,</span> <span class="n">nthreads</span><span class="o">=</span><span class="n">nthreads</span><span class="p">,</span> 
+                                     <span class="n">rbins</span><span class="o">=</span><span class="n">rbins</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>    
+    
+
+        
+
+<span class="c1">#### From here, all functions need to be re-tested</span>
+
+<span class="c1">#def EMERGE_parameters2(z=1):</span>
+    <span class="c1">#EMERGE_param = {}</span>
+    <span class="c1">#EMERGE_param[&#39;All_Gal&#39;] = {}</span>
+    <span class="c1">#EMERGE_param[&#39;All_Gal&#39;][&#39;z&#39;] = np.array([0.1, 0.5, 1., 2., 4., 8.])</span>
+    <span class="c1">#EMERGE_param[&#39;All_Gal&#39;][&#39;M1&#39;] = np.array([11.78, 11.86, 11.98, 11.99, 12.07, 12.10])</span>
+    <span class="c1">#EMERGE_param[&#39;All_Gal&#39;][&#39;eps_N&#39;] = np.array([.15, .18, .19, .19, .20, .24])</span>
+    <span class="c1">#EMERGE_param[&#39;All_Gal&#39;][&#39;beta&#39;] = np.array([1.78, 1.67, 1.53, 1.46, 1.36, 1.3])</span>
+    <span class="c1">#EMERGE_param[&#39;All_Gal&#39;][&#39;gamma&#39;] = np.array([.57, .58, .59, .59, .6, .6])</span>
+    <span class="c1">#EMERGE_param[&#39;All_Gal&#39;][&#39;M_sigma&#39;] = np.array([10.85, 10.8, 10.75, 10.7, 10.6, 10.4])</span>
+    <span class="c1">#EMERGE_param[&#39;All_Gal&#39;][&#39;sigma_0&#39;] = np.array([.16, .14, .12, .10, .06, .02])</span>
+    <span class="c1">#EMERGE_param[&#39;All_Gal&#39;][&#39;alpha&#39;] = np.array([1., .75, .6, .45, .35, .3])</span>
+
+    <span class="c1">#EMERGEz = {}</span>
+
+    <span class="c1">#if z &lt; EMERGE_param[&#39;All_Gal&#39;][&#39;z&#39;][0]:</span>
+        <span class="c1">#EMERGEz = {&#39;z&#39;: z,</span>
+                   <span class="c1">#&quot;M1&quot;: line(z, EMERGE_param[&#39;All_Gal&#39;][&#39;z&#39;][0], EMERGE_param[&#39;All_Gal&#39;][&#39;z&#39;][1], EMERGE_param[&#39;All_Gal&#39;][&#39;M1&#39;][0], EMERGE_param[&#39;All_Gal&#39;][&#39;M1&#39;][1]),</span>
+                   <span class="c1">#&quot;eps_N&quot;: line(z, EMERGE_param[&#39;All_Gal&#39;][&#39;z&#39;][0], EMERGE_param[&#39;All_Gal&#39;][&#39;z&#39;][1], EMERGE_param[&#39;All_Gal&#39;][&#39;eps_N&#39;][0], EMERGE_param[&#39;All_Gal&#39;][&#39;eps_N&#39;][1]),</span>
+                   <span class="c1">#&quot;beta&quot;: line(z, EMERGE_param[&#39;All_Gal&#39;][&#39;z&#39;][0], EMERGE_param[&#39;All_Gal&#39;][&#39;z&#39;][1], EMERGE_param[&#39;All_Gal&#39;][&#39;beta&#39;][0], EMERGE_param[&#39;All_Gal&#39;][&#39;beta&#39;][1]),</span>
+                   <span class="c1">#&quot;gamma&quot;: line(z, EMERGE_param[&#39;All_Gal&#39;][&#39;z&#39;][0], EMERGE_param[&#39;All_Gal&#39;][&#39;z&#39;][1], EMERGE_param[&#39;All_Gal&#39;][&#39;gamma&#39;][0], EMERGE_param[&#39;All_Gal&#39;][&#39;gamma&#39;][1]),</span>
+                   <span class="c1">#&quot;M_sigma&quot;: line(z, EMERGE_param[&#39;All_Gal&#39;][&#39;z&#39;][0], EMERGE_param[&#39;All_Gal&#39;][&#39;z&#39;][1], EMERGE_param[&#39;All_Gal&#39;][&#39;M_sigma&#39;][0], EMERGE_param[&#39;All_Gal&#39;][&#39;M_sigma&#39;][1]),</span>
+                   <span class="c1">#&quot;sigma_0&quot;: line(z, EMERGE_param[&#39;All_Gal&#39;][&#39;z&#39;][0], EMERGE_param[&#39;All_Gal&#39;][&#39;z&#39;][1], EMERGE_param[&#39;All_Gal&#39;][&#39;sigma_0&#39;][0], EMERGE_param[&#39;All_Gal&#39;][&#39;sigma_0&#39;][1]),</span>
+                   <span class="c1">#&quot;alpha&quot;: line(z, EMERGE_param[&#39;All_Gal&#39;][&#39;z&#39;][0], EMERGE_param[&#39;All_Gal&#39;][&#39;z&#39;][1], EMERGE_param[&#39;All_Gal&#39;][&#39;alpha&#39;][0], EMERGE_param[&#39;All_Gal&#39;][&#39;alpha&#39;][1])}</span>
+    <span class="c1">#elif z &gt; EMERGE_param[&#39;All_Gal&#39;][&#39;z&#39;][-1]:</span>
+        <span class="c1">#EMERGEz = {&#39;z&#39;: z,</span>
+                   <span class="c1">#&quot;M1&quot;: line(z, EMERGE_param[&#39;All_Gal&#39;][&#39;z&#39;][-2], EMERGE_param[&#39;All_Gal&#39;][&#39;z&#39;][-1], EMERGE_param[&#39;All_Gal&#39;][&#39;M1&#39;][-2], EMERGE_param[&#39;All_Gal&#39;][&#39;M1&#39;][-1]),</span>
+                   <span class="c1">#&quot;eps_N&quot;: line(z, EMERGE_param[&#39;All_Gal&#39;][&#39;z&#39;][-2], EMERGE_param[&#39;All_Gal&#39;][&#39;z&#39;][-1], EMERGE_param[&#39;All_Gal&#39;][&#39;eps_N&#39;][-2], EMERGE_param[&#39;All_Gal&#39;][&#39;eps_N&#39;][-1]),</span>
+                   <span class="c1">#&quot;beta&quot;: line(z, EMERGE_param[&#39;All_Gal&#39;][&#39;z&#39;][-2], EMERGE_param[&#39;All_Gal&#39;][&#39;z&#39;][-1], EMERGE_param[&#39;All_Gal&#39;][&#39;beta&#39;][-2], EMERGE_param[&#39;All_Gal&#39;][&#39;beta&#39;][-1]),</span>
+                   <span class="c1">#&quot;gamma&quot;: line(z, EMERGE_param[&#39;All_Gal&#39;][&#39;z&#39;][-2], EMERGE_param[&#39;All_Gal&#39;][&#39;z&#39;][-1], EMERGE_param[&#39;All_Gal&#39;][&#39;gamma&#39;][-2], EMERGE_param[&#39;All_Gal&#39;][&#39;gamma&#39;][-1]),</span>
+                   <span class="c1">#&quot;M_sigma&quot;: line(z, EMERGE_param[&#39;All_Gal&#39;][&#39;z&#39;][-2], EMERGE_param[&#39;All_Gal&#39;][&#39;z&#39;][-1], EMERGE_param[&#39;All_Gal&#39;][&#39;M_sigma&#39;][-2], EMERGE_param[&#39;All_Gal&#39;][&#39;M_sigma&#39;][-1]),</span>
+                   <span class="c1">#&quot;sigma_0&quot;: line(z, EMERGE_param[&#39;All_Gal&#39;][&#39;z&#39;][-2], EMERGE_param[&#39;All_Gal&#39;][&#39;z&#39;][-1], EMERGE_param[&#39;All_Gal&#39;][&#39;sigma_0&#39;][-2], EMERGE_param[&#39;All_Gal&#39;][&#39;sigma_0&#39;][-1]),</span>
+                   <span class="c1">#&quot;alpha&quot;: line(z, EMERGE_param[&#39;All_Gal&#39;][&#39;z&#39;][-2], EMERGE_param[&#39;All_Gal&#39;][&#39;z&#39;][-1], EMERGE_param[&#39;All_Gal&#39;][&#39;alpha&#39;][-2], EMERGE_param[&#39;All_Gal&#39;][&#39;alpha&#39;][-1])}</span>
+    <span class="c1">#else:</span>
+        <span class="c1">#EMERGEz = {&#39;z&#39;: z,</span>
+                   <span class="c1">#&quot;M1&quot;: np.interp(z, EMERGE_param[&#39;All_Gal&#39;][&#39;z&#39;], EMERGE_param[&#39;All_Gal&#39;][&#39;M1&#39;]),</span>
+                   <span class="c1">#&quot;eps_N&quot;: np.interp(z, EMERGE_param[&#39;All_Gal&#39;][&#39;z&#39;], EMERGE_param[&#39;All_Gal&#39;][&#39;eps_N&#39;]),</span>
+                   <span class="c1">#&quot;beta&quot;: np.interp(z, EMERGE_param[&#39;All_Gal&#39;][&#39;z&#39;], EMERGE_param[&#39;All_Gal&#39;][&#39;beta&#39;]),</span>
+                   <span class="c1">#&quot;gamma&quot;: np.interp(z, EMERGE_param[&#39;All_Gal&#39;][&#39;z&#39;], EMERGE_param[&#39;All_Gal&#39;][&#39;gamma&#39;]),</span>
+                   <span class="c1">#&quot;M_sigma&quot;: np.interp(z, EMERGE_param[&#39;All_Gal&#39;][&#39;z&#39;], EMERGE_param[&#39;All_Gal&#39;][&#39;M_sigma&#39;]),</span>
+                   <span class="c1">#&quot;sigma_0&quot;: np.interp(z, EMERGE_param[&#39;All_Gal&#39;][&#39;z&#39;], EMERGE_param[&#39;All_Gal&#39;][&#39;sigma_0&#39;]),</span>
+                   <span class="c1">#&quot;alpha&quot;: np.interp(z, EMERGE_param[&#39;All_Gal&#39;][&#39;z&#39;], EMERGE_param[&#39;All_Gal&#39;][&#39;alpha&#39;])}</span>
+
+    <span class="c1">#return EMERGEz</span>
+
+
+<span class="c1">#def epsilonMz2(M, z=1):</span>
+    <span class="c1">#EMERGEz = EMERGE_parameters(z)</span>
+    <span class="c1">#return 2*EMERGEz[&#39;eps_N&#39;]*((M / 10**EMERGEz[&#39;M1&#39;])**(-EMERGEz[&#39;beta&#39;]) + (M / 10**EMERGEz[&#39;M1&#39;])**(EMERGEz[&#39;gamma&#39;]))**-1</span>
+
+
+<span class="c1">#def epsilonMz(M, z=1):</span>
+    <span class="c1">#a = 1./(1+z)</span>
+    <span class="c1">#M0, M1, e0, e1, b0, b1, g0 = 11.339, 0.692, 0.05, 0.689, 3.344, -2.079, 0.966</span>
+    <span class="c1">##M0, M1, e0, e1, b0, b1, g0 = 11.85, 0.692, 0.01, 0.1, 5.344, -2.079, 1.5</span>
+    <span class="c1">## FOR Sn67 N300L100 simulation best parameters</span>
+    <span class="c1">#EMERGEz = {&#39;z&#39;: z,</span>
+               <span class="c1">#&quot;M1&quot;: M0 + M1*(1-a),</span>
+               <span class="c1">#&quot;eps_N&quot;: e0 + e1*(1-a),</span>
+               <span class="c1">#&quot;beta&quot;: b0 + b1*(1-a),</span>
+               <span class="c1">#&quot;gamma&quot;: g0}</span>
+    <span class="c1">#return 2*EMERGEz[&#39;eps_N&#39;]*((M / 10**EMERGEz[&#39;M1&#39;])**(-EMERGEz[&#39;beta&#39;]) + (M / 10**EMERGEz[&#39;M1&#39;])**(EMERGEz[&#39;gamma&#39;]))**-1</span>
+
+
+<span class="c1">#def Mock_Cv_JN(Sim, Target_HOD = None, Target_SHAM = None, wp_min=0.1,</span>
+               <span class="c1">#wp_max=10., xi_min=0.316, xi_max=10, pi_max=10, N_wp=21, N_xi=16,</span>
+               <span class="c1">#use_wp=True, use_xi_l0=True, use_xi_l2=True, use_xi_l4=False, nthreads=1,</span>
+               <span class="c1">#n_jn3 = 3, zsd=True, verbose = False):</span>
+    <span class="c1">#Nruns = n_jn3**3</span>
+    <span class="c1">#ngal = np.zeros((Nruns, 1))</span>
+    <span class="c1">#wp = np.zeros((Nruns, N_wp))</span>
+    <span class="c1">#xi_l0 = np.zeros((Nruns, N_xi))</span>
+    <span class="c1">#xi_l2 = np.zeros((Nruns, N_xi))</span>
+    <span class="c1">#xi_l4 = np.zeros((Nruns, N_xi))</span>
+    <span class="c1">#if Target_HOD is not None:</span>
+        <span class="c1">#target_Mmin, target_sigmaLogM, target_M1, target_Mcut, target_alpha, target_alphaC, target_alphaS = Target_HOD</span>
+        <span class="c1">#GalaxyMock = Mock(Sim, Mmin=10**target_Mmin, sigmaLogM=target_sigmaLogM, M1=10**target_M1, Mcut=10 ** target_Mcut, alpha=target_alpha, alpha_c=target_alphaC, alpha_s=target_alphaS, seed=None, zsd=zsd)</span>
+    <span class="c1">#elif Target_SHAM is not None:</span>
+        <span class="c1">#target_sigma_Mstell, target_ngal = Target_SHAM</span>
+        <span class="c1">#GalaxyMock = Mock(Sim, TypeOfMock = &#39;SHAM&#39;, sigma_Mstell = target_sigma_Mstell, seed=None, zsd=zsd)</span>
+
+    <span class="c1">#if Target_HOD is not None:</span>
+        <span class="c1">#if verbose: logger.info(&#39;   In HOD&#39;)</span>
+        <span class="c1">#wp_jn = GalaxyMock.wp_jackknife(pi_max=pi_max, rmin=wp_min, rmax=wp_max, nbin=N_wp, method=&quot;Corrfunc&quot;, random=None, n_jn3=n_jn3, nthreads=nthreads)</span>
+        <span class="c1">#xil_jn = GalaxyMock.multipoles_jackknife(rmin=xi_min, rmax=xi_max, nbin=N_xi, n_mubin = 10, random = None, method=&quot;Corrfunc&quot;, n_jn3=3, nthreads=nthreads, order=[0, 2, 4], logspace = False)</span>
+        <span class="c1">#wp    = wp_jn[&#39;wp_jn&#39;]</span>
+        <span class="c1">#xi_l0 = xil_jn[&#39;xi_l0_jn&#39;]</span>
+        <span class="c1">#xi_l2 = xil_jn[&#39;xi_l2_jn&#39;]</span>
+        <span class="c1">#xi_l4 = xil_jn[&#39;xi_l4_jn&#39;]</span>
+        <span class="c1">#ngal = wp_jn[&#39;N_jn&#39;]/(float(Sim.header[&#39;BoxSize&#39;]**3)*(Nruns-1.)/Nruns)</span>
+    <span class="c1">#elif Target_SHAM is not None:</span>
+        <span class="c1">#if verbose: logger.info(&#39;   In SHAM&#39;)</span>
+        <span class="c1">#wp_jn = GalaxyMock.wp_jackknife(pi_max=pi_max, rmin=wp_min, rmax=wp_max, nbin=N_wp, method=&quot;Corrfunc&quot;, random=None, n_jn3=n_jn3, nthreads=nthreads, n_den=target_ngal)</span>
+        <span class="c1">#xil_jn = GalaxyMock.multipoles_jackknife(rmin=xi_min, rmax=xi_max, nbin=N_xi, n_mubin = 10, random = None, method=&quot;Corrfunc&quot;, n_jn3=3, nthreads=nthreads, order=[0, 2, 4], SHAM_GalProp=&#39;MStell&#39;, n_den=target_ngal, logspace = False)</span>
+        <span class="c1">#wp    = wp_jn[&#39;wp_jn&#39;]</span>
+        <span class="c1">#xi_l0 = xil_jn[&#39;xi_l0_jn&#39;]</span>
+        <span class="c1">#xi_l2 = xil_jn[&#39;xi_l2_jn&#39;]</span>
+        <span class="c1">#xi_l4 = xil_jn[&#39;xi_l4_jn&#39;]</span>
+        <span class="c1">#ngal = wp_jn[&#39;N_jn&#39;]/(float(Sim.header[&#39;BoxSize&#39;]**3)*(Nruns-1.)/Nruns)</span>
+    <span class="c1">#GalaxyMock.cleanup()</span>
+    <span class="c1">#del GalaxyMock</span>
+    <span class="c1">#if verbose: logger.info(&#39;   Computing the matrix&#39;)</span>
+    <span class="c1">#nbin = 1+N_wp*use_wp+N_xi*use_xi_l0+N_xi*use_xi_l2+N_xi*use_xi_l4</span>
+    <span class="c1">#Cv = np.zeros(((nbin), (nbin)))</span>
+    <span class="c1">#Rv = np.zeros(((nbin), (nbin)))</span>
+    <span class="c1">#Vector = ngal[:,None]</span>
+    <span class="c1">## import ipdb; ipdb.set_trace()</span>
+
+    <span class="c1">#if use_wp:</span>
+        <span class="c1">#Vector = np.append(Vector, wp, axis=1)</span>
+    <span class="c1">#if use_xi_l0:</span>
+        <span class="c1">#Vector = np.append(Vector, xi_l0, axis=1)</span>
+    <span class="c1">#if use_xi_l2:</span>
+        <span class="c1">#Vector = np.append(Vector, xi_l2, axis=1)</span>
+    <span class="c1">#if use_xi_l4:</span>
+        <span class="c1">#Vector = np.append(Vector, xi_l4, axis=1)</span>
+
+    <span class="c1">#Vector_Mean = np.nanmean(Vector, axis=0)</span>
+    <span class="c1">#if verbose: logger.info(Vector_Mean)</span>
+    <span class="c1">#for i in range(nbin):</span>
+        <span class="c1">#for j in range(nbin):</span>
+            <span class="c1">#Cv[i][j] += np.sum((Vector[:, i]-Vector_Mean[i])*(Vector[:, j]-Vector_Mean[j]))</span>
+    <span class="c1">#Cv /= (Nruns)</span>
+    <span class="c1">#for i in range(nbin):</span>
+        <span class="c1">#for j in range(nbin):</span>
+            <span class="c1">#Rv[i][j] = Cv[i][j]/np.sqrt(Cv[i][i]*Cv[j][j])</span>
+    <span class="c1">#if verbose: logger.info(&#39;   Saving&#39;)</span>
+    <span class="c1">#d = {}</span>
+    <span class="c1">#d[&#39;vector&#39;] = Vector</span>
+    <span class="c1">#d[&#39;vector_mean&#39;] = Vector_Mean</span>
+    <span class="c1">#d[&#39;Cv&#39;] = Cv</span>
+    <span class="c1">#d[&#39;Cv_I&#39;] = np.linalg.inv(Cv)</span>
+    <span class="c1">#d[&#39;Rv&#39;] = Rv</span>
+    <span class="c1">#d[&#39;Prop_len&#39;] = np.array([1, N_wp, N_xi, N_xi], dtype=int)</span>
+    <span class="c1">#d[&#39;Prop_names&#39;] = [&#39;n_gal&#39;]</span>
+    <span class="c1">#if use_wp:</span>
+        <span class="c1">#d[&#39;Prop_names&#39;].append(&#39;wp&#39;)</span>
+    <span class="c1">#if use_xi_l0:</span>
+        <span class="c1">#d[&#39;Prop_names&#39;].append(&#39;xi_l0&#39;)</span>
+    <span class="c1">#if use_xi_l2:</span>
+        <span class="c1">#d[&#39;Prop_names&#39;].append(&#39;xi_l2&#39;)</span>
+    <span class="c1">#if use_xi_l4:</span>
+        <span class="c1">#d[&#39;Prop_names&#39;].append(&#39;xi_l4&#39;)</span>
+    <span class="c1">#d[&#39;n_samples&#39;] = Nruns</span>
+    <span class="c1">#if Target_HOD is not None:</span>
+        <span class="c1">#d[&#39;HOD_param&#39;] = [target_Mmin, target_sigmaLogM, target_M1,target_Mcut, target_alpha, target_alphaC, target_alphaS]</span>
+    <span class="c1">#elif Target_SHAM is not None:</span>
+        <span class="c1">#d[&#39;SHAM_param&#39;] = Target_SHAM</span>
+    <span class="c1">## d[&#39;Sim_Header&#39;] =</span>
+    <span class="c1">#d[&#39;Header&#39;] = copy.deepcopy(Sim.header)</span>
+    <span class="c1">#d[&#39;Header&#39;][&#39;Cosmology&#39;] = copy.deepcopy(Sim.Cosmology)</span>
+    <span class="c1">#if use_wp:</span>
+        <span class="c1">#d[&#39;Header&#39;][&#39;wp_min&#39;] = wp_min</span>
+        <span class="c1">#d[&#39;Header&#39;][&#39;wp_max&#39;] = wp_max</span>
+        <span class="c1">#d[&#39;Header&#39;][&#39;pi_max&#39;] = pi_max</span>
+    <span class="c1">#if use_xi_l0 or use_xi_l2 or use_xi_l4:</span>
+        <span class="c1">#d[&#39;Header&#39;][&#39;xi_min&#39;] = xi_min</span>
+        <span class="c1">#d[&#39;Header&#39;][&#39;xi_max&#39;] = xi_max</span>
+    <span class="c1">#d[&#39;x_axis&#39;] = np.array([[-99]])</span>
+    <span class="c1">#if use_wp: d[&#39;x_axis&#39;] = np.append(d[&#39;x_axis&#39;], wp_jn[&#39;r&#39;])</span>
+    <span class="c1">#if use_xi_l0: d[&#39;x_axis&#39;] = np.append(d[&#39;x_axis&#39;], xil_jn[&#39;r&#39;])</span>
+    <span class="c1">#if use_xi_l2: d[&#39;x_axis&#39;] = np.append(d[&#39;x_axis&#39;], xil_jn[&#39;r&#39;])</span>
+    <span class="c1">#if use_xi_l4: d[&#39;x_axis&#39;] = np.append(d[&#39;x_axis&#39;], xil_jn[&#39;r&#39;])</span>
+    <span class="c1">#return d</span>
+
+
+<span class="c1">#def Mock_Cv(Sim, Target_HOD = None, Target_SHAM = None, Nruns=1000, wp_min=-1., wp_max=1., xi_min=-0.5, xi_max=1., xil2_min = 1, xil2_max = 10, pi_max=10, N_wp=21, N_xi=16, use_wp=True, use_xi_l0=True, use_xi_l2=True, use_xi_l4=False, nthreads=1, sigma_ng = 0.05, zsd = True, verbose = False, paired = False, theory_mass_function = False, NoOrphans = False):</span>
+
+    <span class="c1">#ngal = np.zeros((Nruns, 1))</span>
+    <span class="c1">#wp = np.zeros((Nruns, N_wp))</span>
+    <span class="c1">#xi_l0 = np.zeros((Nruns, N_xi))</span>
+    <span class="c1">#xi_l2 = np.zeros((Nruns, N_xi))</span>
+    <span class="c1">#xi_l4 = np.zeros((Nruns, N_xi))</span>
+
+    <span class="c1">#for i in range(Nruns):</span>
+        <span class="c1">#if verbose: logger.info(&#39;In run %d&#39;%(i))</span>
+        <span class="c1">#if verbose: logger.info(&#39;   Running Mock&#39;)</span>
+        <span class="c1">#if paired:</span>
+            <span class="c1">#if Target_HOD is not None:</span>
+                <span class="c1">#target_Mmin, target_sigmaLogM, target_M1, target_Mcut, target_alpha, target_alphaC, target_alphaS = Target_HOD</span>
+                <span class="c1">#GalaxyMock = PairMock(Sim, Mmin=10**target_Mmin, sigmaLogM=target_sigmaLogM, M1=10**target_M1, Mcut=10 ** target_Mcut, alpha=target_alpha, alpha_c=target_alphaC, alpha_s=target_alphaS, seed=i, zsd=zsd, theory_mass_function = theory_mass_function)</span>
+            <span class="c1">#elif Target_SHAM is not None:</span>
+                <span class="c1">#target_sigma_Mstell, target_ngal = Target_SHAM</span>
+                <span class="c1">#GalaxyMock = PairMock(Sim, TypeOfMock = &#39;SHAM&#39;, sigma_Mstell = target_sigma_Mstell, seed=i, zsd=zsd, theory_mass_function = theory_mass_function, NoOrphans = NoOrphans)</span>
+            <span class="c1">#Header = Sim.sim[0].header</span>
+        <span class="c1">#else:</span>
+            <span class="c1">#if Target_HOD is not None:</span>
+                <span class="c1">#target_Mmin, target_sigmaLogM, target_M1, target_Mcut, target_alpha, target_alphaC, target_alphaS = Target_HOD</span>
+                <span class="c1">#GalaxyMock = Mock(Sim, Mmin=10**target_Mmin, sigmaLogM=target_sigmaLogM, M1=10**target_M1, Mcut=10 ** target_Mcut, alpha=target_alpha, alpha_c=target_alphaC, alpha_s=target_alphaS, seed=i, zsd=zsd, theory_mass_function = theory_mass_function)</span>
+            <span class="c1">#elif Target_SHAM is not None:</span>
+                <span class="c1">#target_sigma_Mstell, target_ngal = Target_SHAM</span>
+                <span class="c1">#GalaxyMock = Mock(Sim, TypeOfMock = &#39;SHAM&#39;, sigma_Mstell = target_sigma_Mstell, seed=i, zsd=zsd, theory_mass_function = theory_mass_function, NoOrphans = NoOrphans)</span>
+            <span class="c1">#Header = Sim.sim.header</span>
+        <span class="c1">##ngal[i] = [(GalaxyMock.galaxies[&#39;ngal&#39;][0]+GalaxyMock.galaxies[&#39;ngal&#39;][1])/float(Sim.header[&#39;BoxSize&#39;]**3)]</span>
+        <span class="c1">#if Target_HOD is not None:</span>
+            <span class="c1">#if verbose: logger.info(&#39;   In HOD&#39;)</span>
+            <span class="c1">#if paired:</span>
+                <span class="c1">#ngal[i] = [(len(GalaxyMock.mock[0].galaxies[&#39;pos&#39;])+len(GalaxyMock.mock[1].galaxies[&#39;pos&#39;]))/2./float(Header[&#39;BoxSize&#39;]**3)]</span>
+            <span class="c1">#else:</span>
+                <span class="c1">#ngal[i] = [len(GalaxyMock.galaxies[&#39;pos&#39;])/float(Header[&#39;BoxSize&#39;]**3)]</span>
+            <span class="c1">#if verbose: logger.info(&#39;   Running wp&#39;)</span>
+            <span class="c1">#wp_i = GalaxyMock.wp(pi_max=pi_max, rmin=wp_min, rmax=wp_max, nbin=N_wp, method=&quot;Corrfunc&quot;, random=None, seed=None, nthreads=nthreads, verbose=False)</span>
+            <span class="c1">#wp[i] = wp_i[&#39;wp&#39;]</span>
+            <span class="c1">#if verbose: logger.info(&#39;   Running xi_l&#39;)</span>
+            <span class="c1">#if use_xi_l0 or use_xi_l2 or use_xi_l4:</span>
+                <span class="c1">#xi_l = GalaxyMock.multipoles(order=[0, 2, 4], rmin=xi_min, rmax=xi_max, nbin=N_xi, method=&quot;Corrfunc&quot;, random=None, seed=None, nthreads=nthreads)</span>
+                <span class="c1">#xi_l0[i] = xi_l[&#39;xi_l0&#39;]</span>
+                <span class="c1">#xi_l2[i] = xi_l[&#39;xi_l2&#39;]</span>
+                <span class="c1">#xi_l4[i] = xi_l[&#39;xi_l4&#39;]</span>
+        <span class="c1">#elif Target_SHAM is not None:</span>
+            <span class="c1">#if verbose: logger.info(&#39;   In SHAM&#39;)</span>
+            <span class="c1">#ngal[i] = [target_ngal*np.random.normal(1,sigma_ng)] #CAREFULL, Random Error sigma_ng</span>
+            <span class="c1">#if verbose: logger.info(&#39;   Running wp&#39;)</span>
+            <span class="c1">#wp_i = GalaxyMock.wp(pi_max=pi_max, rmin=wp_min, rmax=wp_max, nbin=N_wp, method=&quot;Corrfunc&quot;, random=None, seed=None, nthreads=nthreads, n_den = target_ngal, verbose=False)</span>
+            <span class="c1">#wp[i] = wp_i[&#39;wp&#39;]</span>
+            <span class="c1">#if verbose: logger.info(&#39;   Running xi_l&#39;)</span>
+            <span class="c1">#if use_xi_l0 or use_xi_l2 or use_xi_l4:</span>
+                <span class="c1">#xi_l = GalaxyMock.multipoles(order=[0, 2, 4], rmin=xi_min, rmax=xi_max, nbin=N_xi, method=&quot;Corrfunc&quot;, random=None, seed=None, n_den = target_ngal, nthreads=nthreads)</span>
+                <span class="c1">#xi_l0[i] = xi_l[&#39;xi_l0&#39;]</span>
+                <span class="c1">#xi_l2[i] = xi_l[&#39;xi_l2&#39;]</span>
+                <span class="c1">#xi_l4[i] = xi_l[&#39;xi_l4&#39;]</span>
+        <span class="c1">#GalaxyMock.cleanup()</span>
+        <span class="c1">#del GalaxyMock</span>
+    <span class="c1">#if verbose: logger.info(&#39;   Computing the matrix&#39;)</span>
+    <span class="c1">#nbin = 1+N_wp*use_wp+N_xi*use_xi_l0+N_xi*use_xi_l2+N_xi*use_xi_l4</span>
+    <span class="c1">#Cv = np.zeros(((nbin), (nbin)))</span>
+    <span class="c1">#Rv = np.zeros(((nbin), (nbin)))</span>
+    <span class="c1">#Vector = ngal</span>
+    <span class="c1">#if use_wp:</span>
+        <span class="c1">#Vector = np.append(Vector, wp, axis=1)</span>
+    <span class="c1">#if use_xi_l0:</span>
+        <span class="c1">#Vector = np.append(Vector, xi_l0, axis=1)</span>
+    <span class="c1">#if use_xi_l2:</span>
+        <span class="c1">#Vector = np.append(Vector, xi_l2, axis=1)</span>
+    <span class="c1">#if use_xi_l4:</span>
+        <span class="c1">#Vector = np.append(Vector, xi_l4, axis=1)</span>
+
+    <span class="c1">#Vector_Mean = np.nanmean(Vector, axis=0)</span>
+    <span class="c1">#if verbose: logger.info(Vector_Mean)</span>
+    <span class="c1">#for i in range(nbin):</span>
+        <span class="c1">#for j in range(nbin):</span>
+            <span class="c1">#Cv[i][j] += np.sum((Vector[:, i]-Vector_Mean[i])*(Vector[:, j]-Vector_Mean[j]))</span>
+    <span class="c1">#Cv /= (Nruns)</span>
+    <span class="c1">#for i in range(nbin):</span>
+        <span class="c1">#for j in range(nbin):</span>
+            <span class="c1">#Rv[i][j] = Cv[i][j]/np.sqrt(Cv[i][i]*Cv[j][j])</span>
+    <span class="c1">#if verbose: logger.info(&#39;   Saving&#39;)</span>
+    <span class="c1">#d = {}</span>
+    <span class="c1">#d[&#39;vector&#39;] = Vector</span>
+    <span class="c1">#d[&#39;vector_mean&#39;] = Vector_Mean</span>
+    
+    <span class="c1">#d[&#39;Cv&#39;] = Cv</span>
+    <span class="c1">#d[&#39;Cv_I&#39;] = np.linalg.inv(Cv)</span>
+    
+    <span class="c1">#d[&#39;Cv_wp&#39;] = Cv[1:N_wp+1,1:N_wp+1]</span>
+    <span class="c1">#d[&#39;Cv_I_wp&#39;] = np.linalg.inv(d[&#39;Cv_wp&#39;])</span>
+    
+    <span class="c1">#if use_xi_l0:</span>
+        <span class="c1">#d[&#39;Cv_wp_xil0&#39;] = Cv[1:N_xi+N_wp+1,1:N_xi+N_wp+1]</span>
+        <span class="c1">#d[&#39;Cv_I_wp_xil0&#39;] = np.linalg.inv(d[&#39;Cv_wp_xil0&#39;])</span>
+    
+    <span class="c1">#if use_xi_l2:</span>
+        <span class="c1">#d[&#39;Cv_wp_xil0_xil2&#39;] = Cv[1:2*N_xi+N_wp+1,1:2*N_xi+N_wp+1]</span>
+        <span class="c1">#d[&#39;Cv_I_wp_xil0_xil2&#39;] = np.linalg.inv(d[&#39;Cv_wp_xil0_xil2&#39;])</span>
+        
+    <span class="c1">#if use_xi_l4:</span>
+        <span class="c1">#d[&#39;Cv_wp_xil0_xil2_xil4&#39;] = Cv[1:3*N_xi+N_wp+1,1:3*N_xi+N_wp+1]</span>
+        <span class="c1">#d[&#39;Cv_I_wp_xil0_xil2_xil4&#39;] = np.linalg.inv(d[&#39;Cv_wp_xil0_xil2_xil4&#39;])</span>
+    
+    <span class="c1">#d[&#39;Rv&#39;] = Rv</span>
+    <span class="c1">#d[&#39;Prop_len&#39;] = np.array([1, N_wp, N_xi, N_xi], dtype=int)</span>
+    <span class="c1">#d[&#39;Prop_names&#39;] = [&#39;n_gal&#39;]</span>
+    <span class="c1">#if use_wp:</span>
+        <span class="c1">#d[&#39;Prop_names&#39;].append(&#39;wp&#39;)</span>
+    <span class="c1">#if use_xi_l0:</span>
+        <span class="c1">#d[&#39;Prop_names&#39;].append(&#39;xi_l0&#39;)</span>
+    <span class="c1">#if use_xi_l2:</span>
+        <span class="c1">#d[&#39;Prop_names&#39;].append(&#39;xi_l2&#39;)</span>
+    <span class="c1">#if use_xi_l4:</span>
+        <span class="c1">#d[&#39;Prop_names&#39;].append(&#39;xi_l4&#39;)</span>
+    <span class="c1">#d[&#39;n_samples&#39;] = Nruns</span>
+    <span class="c1">#if Target_HOD is not None:</span>
+        <span class="c1">#d[&#39;HOD_param&#39;] = [target_Mmin, target_sigmaLogM, target_M1,target_Mcut, target_alpha, target_alphaC, target_alphaS]</span>
+    <span class="c1">#elif Target_SHAM is not None:</span>
+        <span class="c1">#d[&#39;SHAM_param&#39;] = Target_SHAM</span>
+    <span class="c1">## d[&#39;Sim_Header&#39;] =</span>
+    <span class="c1">#d[&#39;Header&#39;] = copy.deepcopy(Header)</span>
+    <span class="c1">#d[&#39;Header&#39;][&#39;Cosmology&#39;] = copy.deepcopy(Sim.Cosmology)</span>
+    <span class="c1">#if use_wp:</span>
+        <span class="c1">#d[&#39;Header&#39;][&#39;wp_min&#39;] = wp_min</span>
+        <span class="c1">#d[&#39;Header&#39;][&#39;wp_max&#39;] = wp_max</span>
+        <span class="c1">#d[&#39;Header&#39;][&#39;pi_max&#39;] = pi_max</span>
+    <span class="c1">#if use_xi_l0 or use_xi_l2 or use_xi_l4:</span>
+        <span class="c1">#d[&#39;Header&#39;][&#39;xi_min&#39;] = xi_min</span>
+        <span class="c1">#d[&#39;Header&#39;][&#39;xi_max&#39;] = xi_max</span>
+    <span class="c1">#d[&#39;x_axis&#39;] = np.array([[-99]])</span>
+    <span class="c1">#if use_wp: d[&#39;x_axis&#39;] = np.append(d[&#39;x_axis&#39;], wp_i[&#39;r&#39;])</span>
+    <span class="c1">#if use_xi_l0: d[&#39;x_axis&#39;] = np.append(d[&#39;x_axis&#39;], xi_l[&#39;r&#39;])</span>
+    <span class="c1">#if use_xi_l2: d[&#39;x_axis&#39;] = np.append(d[&#39;x_axis&#39;], xi_l[&#39;r&#39;])</span>
+    <span class="c1">#if use_xi_l4: d[&#39;x_axis&#39;] = np.append(d[&#39;x_axis&#39;], xi_l[&#39;r&#39;])</span>
+    <span class="c1">#return d</span>
+
+
+    <span class="c1">#def get_galaxies_alive(self, a = 1., b = 0.):</span>
+        <span class="c1">#alive = np.repeat(True, self.galaxies[&#39;pos&#39;].shape[0])</span>
+        
+        <span class="c1">#infall_snap = self.galaxies[&#39;infall_snap&#39;]</span>
+        <span class="c1">#msat = self.galaxies[&#39;mpeak&#39;]# + self.galaxies[&#39;galaxy_mass&#39;]</span>
+        <span class="c1">#mhost = self.galaxies[&#39;mfof&#39;]</span>
+
+        <span class="c1">#time_since_accretion = self.snaplist[&#39;age&#39;][infall_snap] - self.snaplist[&#39;age&#39;][np.max(infall_snap)]</span>
+        <span class="c1">#alive [self.galaxies[&#39;infall_snap&#39;] == 0] = False #No Ghost</span>
+        <span class="c1">#rand = np.random.random(len(self.galaxies[&#39;infall_snap&#39;]))</span>
+        <span class="c1">#mratio = msat/mhost</span>
+        <span class="c1">#mratio[mratio &gt; 1] = 1</span>
+        <span class="c1">#prob_distr = rand &gt; np.exp(-(a*(time_since_accretion-b)*mratio**1.6))</span>
+        
+        <span class="c1">#alive[prob_distr] = False</span>
+        <span class="c1">#alive[self.galaxies[&#39;central&#39;]] = True</span>
+        <span class="c1">#return alive</span>
+
+    <span class="c1">#def Age_Matching_original(self, sfr_model=&#39;guo2010a&#39;, useType=False, nwin=101):</span>
+        <span class="c1">#from halotools.empirical_models import conditional_abunmatch</span>
+        <span class="c1">#import deepdish as dd</span>
+
+        <span class="c1">#if sfr_model not in [&#39;guo2010a&#39;, &#39;delucia2006a&#39;, &#39;Henriques2015a&#39;, &#39;Henriques2015a_z0&#39;, &#39;Henriques2015a_z1&#39;]:</span>
+            <span class="c1">#logger.error(&quot;Model not accepted&quot;)</span>
+            <span class="c1">#raise ValueError(&quot;Model not accepted&quot;)</span>
+        <span class="c1">#try:</span>
+            <span class="c1">#Table = dd.io.load(os.path.dirname(os.path.abspath(__file__)) +</span>
+                               <span class="c1">#&#39;/../tests/testdata/SAM_tables/%s.hdf5&#39; % (sfr_model))</span>
+        <span class="c1">#except:</span>
+            <span class="c1">#logger.error(</span>
+                <span class="c1">#&quot;Not table, try runing: cd tests/testdata/SAM_tables &amp; python millimil.py %s&quot; % (sfr_model,))</span>
+            <span class="c1">#raise ValueError(&quot;Model not accepted&quot;)</span>
+        <span class="c1">#if useType:</span>
+            <span class="c1">#sam_type = Table[&#39;Type&#39;]</span>
+            <span class="c1">#mock_type = 1-self.galaxies[&#39;centrals&#39;].astype(int)</span>
+            <span class="c1">#halo_sfr = np.zeros(len(mock_type), dtype=np.float32)</span>
+            <span class="c1">#halo_ssfr = np.zeros(len(mock_type), dtype=np.float32)</span>
+            <span class="c1">#galaxy_mstar = Table[&#39;MStell&#39;]</span>
+            <span class="c1">#galaxy_sfr = Table[&#39;SFR&#39;]</span>
+            <span class="c1">#halo_sfr[mock_type == 0] = conditional_abunmatch(</span>
+                <span class="c1">#self.galaxies[&#39;MStell&#39;][mock_type == 0], self.galaxies[&#39;Mdot&#39;][mock_type == 0], galaxy_mstar[sam_type == 0], galaxy_sfr[sam_type == 0], nwin)</span>
+            <span class="c1">#halo_sfr[mock_type &gt; 0] = conditional_abunmatch(</span>
+                <span class="c1">#self.galaxies[&#39;MStell&#39;][mock_type &gt; 0], self.galaxies[&#39;Mdot&#39;][mock_type &gt; 0], galaxy_mstar[sam_type &gt; 0], galaxy_sfr[sam_type &gt; 0], nwin)</span>
+        <span class="c1">#else:</span>
+            <span class="c1">#galaxy_mstar = Table[&#39;MStell&#39;]</span>
+            <span class="c1">#galaxy_sfr = Table[&#39;SFR&#39;]</span>
+            <span class="c1">#halo_sfr = conditional_abunmatch(</span>
+                <span class="c1">#self.galaxies[&#39;MStell&#39;], self.galaxies[&#39;Mdot&#39;], galaxy_mstar, galaxy_sfr, nwin)</span>
+
+        <span class="c1">#self.galaxies[&#39;sfr&#39;] = halo_sfr</span>
+
+    <span class="c1">#def Age_Matching(self, sfr_model=&#39;guo2010a&#39;, useType=False, nwin=101):</span>
+        <span class="c1">#from halotools.empirical_models import conditional_abunmatch</span>
+        <span class="c1">#if sfr_model not in [&#39;guo2010a&#39;, &#39;delucia2006a&#39;, &#39;Henriques2015a&#39;, &#39;Henriques2015a_z0&#39;, &#39;Henriques2015a_z1&#39;]:</span>
+            <span class="c1">#logger.error(&quot;Model not accepted&quot;)</span>
+            <span class="c1">#raise ValueError(&quot;Model not accepted&quot;)</span>
+        <span class="c1">#try:</span>
+            <span class="c1">#import deepdish as dd</span>
+            <span class="c1">#Table = dd.io.load(os.path.dirname(os.path.abspath(__file__)) +</span>
+                               <span class="c1">#&#39;/../tests/testdata/SAM_tables/%s.hdf5&#39; % (sfr_model))</span>
+        <span class="c1">#except:</span>
+            <span class="c1">#logger.error(</span>
+                <span class="c1">#&quot;Not table, try runing: cd tests/testdata/SAM_tables &amp; python millimil.py %s&quot; % (sfr_model,))</span>
+            <span class="c1">#raise ValueError(&quot;Model not accepted&quot;)</span>
+        <span class="c1">#if useType:</span>
+            <span class="c1">#sam_type = Table[&#39;Type&#39;]</span>
+            <span class="c1">#mock_type = 1-self.galaxies[&#39;centrals&#39;].astype(int)</span>
+            <span class="c1">#halo_sfr = np.zeros(len(mock_type), dtype=np.float32)</span>
+            <span class="c1">#halo_ssfr = np.zeros(len(mock_type), dtype=np.float32)</span>
+
+            <span class="c1">#x = Table[&#39;Mh&#39;][sam_type == 0]</span>
+            <span class="c1">#y = np.log10(Table[&#39;SFR&#39;]/(10.**Table[&#39;MStell&#39;]+1e-10)+1e-15)[sam_type == 0]</span>
+            <span class="c1">#halo_ssfr[mock_type == 0] = conditional_abunmatch(np.log10(</span>
+                <span class="c1">#self.galaxies[&#39;m200c&#39;][mock_type == 0]+1e-10), self.galaxies[&#39;Mdot&#39;][mock_type == 0], x, y, nwin)</span>
+            <span class="c1">#x = Table[&#39;Mh&#39;][sam_type &gt; 0]</span>
+            <span class="c1">#y = np.log10(Table[&#39;SFR&#39;]/(10.**Table[&#39;MStell&#39;]+1e-10)+1e-15)[sam_type &gt; 0]</span>
+            <span class="c1">#halo_ssfr[mock_type &gt; 0] = conditional_abunmatch(np.log10(</span>
+                <span class="c1">#self.galaxies[&#39;m200c&#39;][mock_type &gt; 0]+1e-10), self.galaxies[&#39;Mdot&#39;][mock_type &gt; 0], x, y, nwin)</span>
+            <span class="c1">#halo_sfr = 10.**self.galaxies[&#39;MStell&#39;]*10**halo_ssfr</span>
+        <span class="c1">#else:</span>
+            <span class="c1">#x = Table[&#39;Mh&#39;]</span>
+            <span class="c1">#y = np.log10(Table[&#39;SFR&#39;]/(10.**Table[&#39;MStell&#39;]+1e-10)+1e-15)</span>
+            <span class="c1">#halo_ssfr = conditional_abunmatch(</span>
+                <span class="c1">#np.log10(self.galaxies[&#39;m200c&#39;]+1e-10), self.galaxies[&#39;Mdot&#39;], x, y, nwin)</span>
+            <span class="c1">#halo_sfr = 10.**self.galaxies[&#39;MStell&#39;]*10**halo_ssfr</span>
+
+        <span class="c1">#self.galaxies[&#39;sfr&#39;] = halo_sfr</span>
+
+    <span class="c1">#def SFR_quenching_EMERGE(self):</span>
+        <span class="c1">#tau_0 = 4.282</span>
+        <span class="c1">#tau_s = 0.363</span>
+        <span class="c1">#t_dyn = 0.1*(1./(self.Cosmology.hubble_z(self.header[&#39;Time&#39;])[0]*100/3.17098e-17/3.086e19))</span>
+        <span class="c1">#tau = t_dyn * tau_0 * \</span>
+            <span class="c1">#(10**(self.galaxies[&#39;MStell&#39;]-np.log10(self.header[&#39;HubbleParam&#39;])-10))**(-tau_s)</span>
+        <span class="c1">#lbt_now = self.Cosmology.lookback_time(self.header[&#39;Time&#39;])</span>
+        <span class="c1">#dt = np.zeros(len(self.galaxies[&#39;mpeak&#39;]), dtype=np.float32)</span>
+        <span class="c1">#for i in range(len(self.galaxies[&#39;mpeak&#39;])):</span>
+            <span class="c1">#dt[i] = abs(self.Cosmology.lookback_time(self.galaxies[&#39;peak_time&#39;][i]) - lbt_now)</span>
+        <span class="c1">## logger.info(dt,max(dt))</span>
+        <span class="c1">## logger.info(tau,max(tau))</span>
+        <span class="c1">#return np.array(dt &lt; tau).astype(int)</span>
+
+    <span class="c1">#def Compute_SFR_EMERGE(self):</span>
+
+        <span class="c1">#eps = epsilonMz(self.galaxies[&#39;mpeak&#39;] /</span>
+                        <span class="c1">#self.header[&#39;HubbleParam&#39;], z=1./self.header[&#39;Time&#39;]-1)</span>
+        <span class="c1">#dmdt = self.galaxies[&#39;mdot_at_mpeak&#39;]/self.header[&#39;HubbleParam&#39;]</span>
+        <span class="c1">#fb = self.header[&#39;OmegaBaryon&#39;]/self.header[&#39;Omega&#39;]</span>
+        <span class="c1">#logger.info(eps, max(eps))</span>
+        <span class="c1">#dt = np.zeros(len(self.galaxies[&#39;mpeak&#39;]), dtype=np.float32)</span>
+        <span class="c1">#for i in range(len(dt)):</span>
+            <span class="c1">#snap_mpeak = np.argmin(abs(self.galaxies[&#39;peak_time&#39;][i]-self.snaplist[&#39;a&#39;]))</span>
+            <span class="c1">#dt[i] = abs(self.snaplist[&#39;LBT&#39;][snap_mpeak] - self.snaplist[&#39;LBT&#39;][snap_mpeak-1])</span>
+        <span class="c1">#self.galaxies[&#39;dmdt_at_mpeak&#39;] = self.galaxies[&#39;mdot_at_mpeak&#39;]/dt</span>
+        <span class="c1">#self.galaxies[&#39;sfr&#39;] = eps*dmdt*fb*self.SFR_quenching_EMERGE()/dt/1e9  # Gyr -&gt; Yr</span>
+        <span class="c1">## self.galaxies[&#39;sfr&#39;][self.galaxies[&#39;len&#39;] &lt; self.galaxies[&#39;mpeak&#39;]/self.header[&#39;ParticleMass&#39;]/1e10) -2] = 0</span>
+        <span class="c1">#self.galaxies[&#39;sfr&#39;][self.galaxies[&#39;mdot_at_mpeak&#39;]</span>
+                                 <span class="c1">#&gt; 0.5*self.galaxies[&#39;mpeak&#39;]] = 0</span>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016, Raul E. Angulo
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

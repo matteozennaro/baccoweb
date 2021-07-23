@@ -1,0 +1,182 @@
+<!DOCTYPE HTML>
+<!--
+  Industrious by TEMPLATED
+  templated.co @templatedco
+  Released for free under the Creative Commons Attribution 3.0 license (templated.co/license)
+-->
+<html>
+
+<head>
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-163689805-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+
+    gtag('config', 'UA-163689805-1');
+  </script>
+
+  <title>BACCO - Data & Simulations</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+  <meta name="description" content="" />
+  <meta name="keywords" content="" />
+  <link rel="stylesheet" href="assets/css/main.css" />
+  <link rel="stylesheet" media="screen" href="https://fontlibrary.org/face/klaudia-and-berenika" type="text/css" />
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <script src="https://kit.fontawesome.com/fc01f3d3d3.js" crossorigin="anonymous"></script>
+</head>
+
+<body class="is-preload">
+
+  <!-- Header -->
+  <header id="header">
+    <a class="logo" href="index.html">BACCO</a>
+    <div id="pvt">
+      <a href="private.html"><i class="icon fa-lock">&nbsp;</i>login</a>
+    </div>
+    <nav>
+      <a href="#menu">Menu</a>
+    </nav>
+  </header>
+
+  <!-- Nav -->
+  <nav id="menu">
+    <ul class="links">
+      <li><a href="index.html">Home</a></li>
+      <!-- <li><a href="bacco.html">About</a></li> -->
+      <li><a href="people.html">People</a></li>
+      <li><a href="papers.html">Papers</a></li>
+      <li><a href="outreach.html">Outreach</a></li>
+      <li><a href="data.html">Data</a></li>
+      <li><a href="emulator.html">Emulator</a></li>
+      <li><a href="contacts.html">Contacts</a></li>
+      <li><a href="jobs.html">Job positions</a></li>
+    </ul>
+  </nav>
+
+  <!-- Heading -->
+  <div id="heading">
+    <h1>Data and simulations</h1>
+  </div>
+
+  <!-- Main -->
+  <section id="main" class="wrapper">
+    <div class="inner">
+      <div class="content">
+        <header>
+          <h2 style="font-family: 'BerenikaBold'; font-weight: bold; font-style: normal; ">The Three Rings</h2>
+        </header>
+        <p>
+          Narya, Nenya and Vilya are the <a href="https://en.wikipedia.org/wiki/Three_Rings">Three Rings</a>. These
+          three (paired-and-fixed, <a
+          href="https://ui.adsabs.harvard.edu/abs/2016MNRAS.462L...1A/abstract">Angulo & Pontzen, 2010</a> ) simulations
+          are the backbone of the bacco project. Each of them
+          represents a cube of the universe \(1440 h^{-1} \mathrm{Mpc}\) wide, containing \(4320^3\) cold matter
+          particles.
+        </p>
+        <p>
+          The BACCO simulations were carried out in the Summer of 2019 at <a
+            href="https://www.bsc.es/es/marenostrum/marenostrum">Marenostrum-IV</a> at the Barcelona Supercomputing Center
+          (BSC) in Spain. We employed an updated version of the L-Gadget3 N-body code in a hybrid distributed/shared memory
+          setup
+          with 8192 cores using 4096 MPI tasks. The run time was 7.2 million CPU hours, equivalent of 35 days of wall-clock
+          time.
+          The total storage required for all data products is about 80 TB.
+        </p>
+        <a href="images/nenya.png"><img src="images/nenya.png"
+            style="display: block; margin-left: auto; margin-right: auto; width: 80%;"></a>
+        <p>
+          Each simulation assumes a different cosmology, and the three cosmologies have been <a
+            href="https://ui.adsabs.harvard.edu/abs/2020arXiv200103176C">carefully chosen</a>: starting from these three
+          points in parameter space, we can create scaled simulations in any other cosmology (including those with
+          massive neutrinos, see <a href="https://ui.adsabs.harvard.edu/abs/2019MNRAS.489.5938Z">Zennaro et al, 2019</a>),
+          keeping the error to a minimum. So it is thanks to the Three Rings that we are able to use <a
+            href="https://ui.adsabs.harvard.edu/abs/2010MNRAS.405..143A">one (three) simulation to fit them all</a>!
+        </p>
+
+        <table>
+          <tr>
+            <th></th>
+            <th>Narya</th>
+            <th>Nenya</th>
+            <th>Vilya</th>
+          </tr>
+          <tr>
+            <td>\( \Omega_{\rm cdm} \)</td>
+            <td>\( 0.31 \)</td>
+            <td>\( 0.265 \)</td>
+            <td>\( 0.21 \)</td>
+          </tr>
+          <tr>
+            <td>\( \Omega_{\rm b} \)</td>
+            <td>\( 0.05 \)</td>
+            <td>\( 0.05 \)</td>
+            <td>\( 0.06 \)</td>
+          </tr>
+          <tr>
+            <td>\( h \)</td>
+            <td>\( 0.7 \)</td>
+            <td>\( 0.6 \)</td>
+            <td>\( 0.65 \)</td>
+          </tr>
+          <tr>
+            <td>\( n_{\rm s} \)</td>
+            <td>\( 1.01 \)</td>
+            <td>\( 1.01 \)</td>
+            <td>\( 0.92 \)</td>
+          </tr>
+          <tr>
+            <td>\( 10^9 A_{\rm s} \)</td>
+            <td>\( 1.8444 \)</td>
+            <td>\( 3.1802 \)</td>
+            <td>\( 4.1220 \)</td>
+          </tr>
+          <tr>
+            <td>\( \sigma_8 \)</td>
+            <td>\( 0.9 \)</td>
+            <td>\( 0.9 \)</td>
+            <td>\( 0.9 \)</td>
+          </tr>
+          <tr>
+            <td>\( M_\nu [\mathrm{eV}] \)</td>
+            <td>\( 0 \)</td>
+            <td>\( 0 \)</td>
+            <td>\( 0 \)</td>
+          </tr>
+          <tr>
+            <td>\( w_0 \)</td>
+            <td>\( -1 \)</td>
+            <td>\( -1 \)</td>
+            <td>\( -1 \)</td>
+          </tr>
+          <tr>
+            <td>\( w_a \)</td>
+            <td>\( 0 \)</td>
+            <td>\( 0 \)</td>
+            <td>\( 0 \)</td>
+          </tr>
+        </table>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer id="footer">
+    <div id="includedFooter"></div>
+
+    <!-- Scripts -->
+    <script src="assets/js/jquery.min.js"></script>
+    <script src="assets/js/browser.min.js"></script>
+    <script src="assets/js/breakpoints.min.js"></script>
+    <script src="assets/js/util.js"></script>
+    <script src="assets/js/main.js"></script>
+    <script> $(function () { $("#includedFooter").load("footer.html"); });</script>
+    <script> $(function () { $("#includedMenu").load("menu.html"); });</script>
+
+</body>
+
+</html>

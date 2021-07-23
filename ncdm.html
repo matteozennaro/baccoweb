@@ -1,0 +1,291 @@
+<!DOCTYPE HTML>
+<!--
+  Industrious by TEMPLATED
+  templated.co @templatedco
+  Released for free under the Creative Commons Attribution 3.0 license (templated.co/license)
+-->
+<html>
+  <head>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-163689805-1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() { dataLayer.push(arguments); }
+      gtag('js', new Date());
+
+      gtag('config', 'UA-163689805-1');
+    </script>
+
+    <title>The Complexity of the Dark Matter Sheet</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <meta name="description" content="" />
+    <meta name="keywords" content="" />
+    <link rel="stylesheet" href="assets/css/main.css" />
+    <script src="https://kit.fontawesome.com/fc01f3d3d3.js" crossorigin="anonymous"></script>
+    <!-- <script type="text/javascript" src="ZoomifyImageViewerFree-min.js"></script>
+        <script type="text/javascript"> Z.showImage("myContainer", "/home/bacco/images"); </script> -->
+  </head>
+  <body class="is-preload">
+
+    <!-- Header -->
+      <header id="header">
+        <a class="logo" href="index.html">BACCO</a>
+        <div id="pvt">
+          <a href="private.html"><i class="icon fa-lock">&nbsp;</i>login</a>
+        </div>
+        <nav>
+          <a href="#menu">Menu</a>
+        </nav>
+      </header>
+
+    <!-- Nav -->
+    <nav id="menu">
+      <ul class="links">
+        <li><a href="index.html">Home</a></li>
+        <!-- <li><a href="bacco.html">About</a></li> -->
+        <li><a href="people.html">People</a></li>
+        <li><a href="papers.html">Papers</a></li>
+        <li><a href="outreach.html">Outreach</a></li>
+        <li><a href="data.html">Data</a></li>
+        <li><a href="emulator.html">Emulator</a></li>
+        <li><a href="contacts.html">Contacts</a></li>
+        <li><a href="jobs.html">Job positions</a></li>
+      </ul>
+    </nav>
+
+    <!-- Heading -->
+      <div id="heading" >
+        <h1>The Complexity of the Dark Matter Sheet</h1>
+      </div>
+
+    <!-- Main -->
+      <section id="main" class="wrapper">
+        <div class="inner">
+          <div class="content">
+            <header>
+              <h2>The Nature of Dark Matter</h2>
+            </header>
+            <p>
+              There seems to be overwhleming evidence that most of the Universe
+              is made of invisible dark matter, but unfortunately we do not know much
+              about the concrete nature of it. It seems likely that dark matter
+              should have certain properties like a warmth (referring to the
+              thermal velocity dispersion), a self-interaction strength and a
+              quantum wavelength. All these properties could leave some
+              observable traces in our universe. For example, if dark matter is
+              warm, the density perturbations on small scales would be surpressed
+              through the free-streaming of dark matter. In this case fewer
+              small haloes and galaxies could have formed in our
+              Universe than if dark matter was colder. In principle, we could
+              detect such differences observationally. This requires precise
+              and reliable theoretical predictions.
+            </p>
+
+            <header>
+              <h2>Sheet + Release Simulations</h2>
+            </header>
+            <p>
+              We can predict the formation of structures by running large
+              cosmological simulations, for example the
+              <a href="https://wwwmpa.mpa-garching.mpg.de/galform/virgo/millennium/"> Milennium Simulation </a>.
+              Such simulations have typically been run with the N-body simulation
+              method. However, in universes with a surpression of small scale
+              structure (like warm dark matter) the N-body simulation method
+              produces large numbers of small
+              <a href="https://doi.org/10.1111/j.1365-2966.2007.12053.x">
+              numerical artefacts</a>. <br>
+              </p>
+              <p>
+               As an alternative, "sheet" simulations have been introduced by
+              <a href="https://doi.org/10.1093/mnras/stv2304">Hahn & Angulo (2016)</a>
+              and <a href="https://doi.org/10.1016/j.jcp.2016.05.048">Sousbie & Colombi (2016)</a>.
+              In these simulations the dark matter distribution is reconstructed to almost
+              perfect accuracy by interpolation of the
+              <a href="https://doi.org/10.1111/j.1365-2966.2012.21754.x">
+               dark matter sheet</a> in phase space, thereby showing incredibly
+              sharp density estimates and avoiding the artificial fragments of
+              N-body simulations. However, this comes at a price: the dark matter
+              sheet becomes incredibly
+              <a href="https://doi.org/10.5282/edoc.24445">complex</a>
+              inside of the dark matter haloes in the course of a simulation.
+              Therefore, the reconstruction becomes practically impossible in haloes,
+              leading to simulations that either have to be canceled early or
+              that give biased density estimates inside haloes. We could summarize the
+              situation in the following table:<br></p>
+              <p>
+                <div class="inner" style="width:60%;">
+                <table>
+                 <tr>
+                   <th>Simulation Method</th>
+                   <th>Outside Haloes</th>
+                   <th>Inside Haloes</th>
+                 </tr>
+                 <tr>
+                   <td>N-body</td>
+                   <td><span style="color:red">Artificial Fragmentation</span></td>
+                   <td><span style="color:blue">OK</span></td>
+                 </tr>
+                 <tr>
+                   <td>Sheet</td>
+                   <td><span style="color:blue">Perfect</a></td>
+                   <td><span style="color:red">Too Complex</a></td>
+                 </tr>
+                </table>
+                </div>
+              </p>
+              <p>
+              It seems clear that one could get a fully functional simulation
+              scheme by combining the best from both worlds. Therefore, we have
+              introduced in
+              <!--<a href="https://doi.org/10.1093/mnras/staa1468">
+              Stücker et al (2020)</a> -->
+              <a href="https://academic.oup.com/mnras/article/495/4/4943/5849009?guestAccessKey=92de97c9-a97d-4f54-8614-0c356b93690b">
+              Stücker et al (2020)</a>
+              the "Sheet + Release" simulation method.
+              In these simulations, initially all mass is traced through the
+              dark matter sheet reconstruction. However, in regions where the
+              sheet becomes too complex (mostly haloes) the method automatically
+              "releases" mass elements into a set of mass carrying particles that
+              behave like traditional N-body particles. Therefore,
+              "sheet + release" simulations can reliably follow the evolution
+              of the density field inside and outside of haloes.
+              Here an example of how it looks in practice for a hot dark matter simulation:<br>
+            </p>
+            <p>
+              <a href="images/ncdm/density_projection_schemes_labeled.png"><img src="images/ncdm/density_projection_schemes_labeled.png" width="100%"></a>
+            </p>
+
+            <header>
+              <h2>The halo mass function of non-cold dark matter Universes</h2>
+            </header>
+            <p>
+              In <a href="">Stücker et al (2021)</a> we present the first set
+              of reliable simulations of "non-cold" dark matter models --
+              run with the sheet + release scheme on the
+              <a href="https://www.bsc.es/marenostrum/marenostrum">MareNostrum</a>
+              super computer. With  "non-cold" dark matter we refer to any dark
+              matter model that has a small scale surpression
+              in the power spectrum. This includes the canonical "thermal relic"
+              warm dark matter, but also other dark matter candidates like
+              sterile neutrinos, ETHOS models, fuzzy dark matter and many more...
+              Here you can see two of these simulations tiled together, one "warmer"
+              simulation with a larger surpression scale ("1keV sharp" in the paper)
+              and one "colder" simulation with a smaller surpression scale
+              ("1.75keV sharp" in the paper):
+              <div class="inner">
+                <!-- <h2 align="center">Videos</h2> -->
+                <p align="center">
+                <!-- 560x315-->
+                  <iframe width="720" height="405" src="https://www.youtube.com/embed/7vUIFhvkdGg" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                  <!--<iframe src="WDMpage_files/uMBvgCYiUiI.html" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen="" width="560" height="315" frameborder="0"></iframe>-->
+                </p>
+              </div>
+            </p>
+
+            <p>
+              You can see, how the colder case exhibits many more small scale
+              objects than the warmer one. This can be quantified through
+              the halo mass function. We have measured the halo mass function
+              in dependence of two parameters which describe the supression of
+              the initial power spectrum (one describing the slope and one the
+              length scale of the cutoff) and we have come up with a parametric
+              description of the halo and subhalo mass function that can be
+              evaluated for almost any non-cold dark matter model! You can find
+              a short python code for evaluating them here on github:<br>
+              <a href="https://github.com/jstuecker/ncdm-mass-functions">
+              https://github.com/jstuecker/ncdm-mass-functions</a><br>
+              We hope that these simple, but robust predictions will facilitate
+              constraining dark matter for future observational studies. Futher,
+              we hope to motivate other researchers to use to use observations
+              not only to constrain the fiducial thermal relic warm dark matter
+              scenarios, but also other non-cold dark matter candidates.
+            </p>
+            <p>
+              <i>Jens Stücker -- in collaboration with Raul Angulo, Oliver Hahn and Simon White</i>
+            </p>
+
+            <div class="inner">
+              <h2 align="center">Images</h2>
+              <p align="center">
+                <a href="images/ncdm/hr_split_cubehelix.png"><img class="mySlides" src="images/ncdm/hr_split_cubehelix.png" alt="" style="display: block;" width="100%"></a>
+                <a href="images/ncdm/hr_zoomsplit_cubehelix.png"><img class="mySlides" src="images/ncdm/hr_zoomsplit_cubehelix.png" alt="" style="display: block;" width="100%"></a>
+                <a href="images/ncdm/rho_versus_cutoff.png"><img class="mySlides" src="images/ncdm/rho_versus_cutoff.png" alt="" style="display: block;" width="100%"></a>
+                <a href="images/ncdm/rho_sameslice_vs_nbody.png"><img class="mySlides" src="images/ncdm/rho_sameslice_vs_nbody.png" alt="" style="display: block;" width="66.5%"></a>
+              </p>
+              <p align="center">
+                <button class="w3-button w3-display-left" onclick="plusDivs(-1)">❮</button>
+                <button class="w3-button w3-display-right" onclick="plusDivs(+1)">❯</button>
+              </p>
+            </div>
+
+            <header>
+              <h2>Links & References</h2>
+            </header>
+            <p>
+              <ul>
+                <li><i>Simulating the complexity of the dark matter sheet I: numerical algorithms</i><br>
+                Stücker J., Hahn O., Angulo R. E., White S. D. M., 2020,
+                <!--<a href="https://doi.org/10.1093/mnras/staa1468">MNRAS, 495,4943</a>-->
+                <a href="https://academic.oup.com/mnras/article/495/4/4943/5849009?guestAccessKey=92de97c9-a97d-4f54-8614-0c356b93690b">MNRAS, 495,4943</a>
+                </li>
+                <li><i>Simulating the complexity of the dark matter sheet II: the halo mass function of non-cold dark matter models</i><br>
+                Stücker J., Angulo R. E., Hahn O., White S. D. M., 2021, arxiv <b>(*)</b> <br>
+                </li>
+                <li><a href="https://github.com/jstuecker/ncdm-mass-functions">
+                https://github.com/jstuecker/ncdm-mass-functions</a>
+                </li>
+                <li><i> Non-Halo Structures and their Effects on Gravitational Lensing</i><br>
+                Richardson T. R. G., Stücker J., Angulo R. E., Hahn O., 2021, <a href="https://arxiv.org/abs/2101.07806">arXiv:2101.07806</a>
+                </li>
+              </ul>
+              <b>(*)</b> <i>If you want to use any of the material on this page, please cite this paper.
+            </p>
+
+          </div>
+        </div>
+
+      </section>
+
+      <!-- Footer -->
+        <div id="includedFooter"></div>
+
+    <!-- Scripts -->
+      <script src="assets/js/jquery.min.js"></script>
+      <script src="assets/js/browser.min.js"></script>
+      <script src="assets/js/breakpoints.min.js"></script>
+      <script src="assets/js/util.js"></script>
+      <script src="assets/js/main.js"></script>
+      <script> $(function(){$("#includedFooter").load("footer.html");});</script>
+      <script> $(function(){$("#includedMenu").load("menu.html");});</script>
+      <script>
+        var slideIndex = 1;
+        showDivs(slideIndex);
+
+        function plusDivs(n) {
+          showDivs(slideIndex += n);
+        }
+
+        function currentDiv(n) {
+          showDivs(slideIndex = n);
+        }
+
+        function showDivs(n) {
+          var i;
+          var x = document.getElementsByClassName("mySlides");
+          var dots = document.getElementsByClassName("demo");
+          if (n > x.length) { slideIndex = 1 }
+          if (n < 1) { slideIndex = x.length }
+          for (i = 0; i < x.length; i++) {
+            x[i].style.display = "none";
+          }
+          for (i = 0; i < dots.length; i++) {
+            dots[i].className = dots[i].className.replace(" w3-white", "");
+          }
+          x[slideIndex - 1].style.display = "block";
+          dots[slideIndex - 1].className += " w3-white";
+        }
+      </script>
+
+  </body>
+</html>

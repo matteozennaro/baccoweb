@@ -1,0 +1,28 @@
+
+.. _bacco-installation:
+
+BACCO Installation
+====================
+
+Using Pip
+--------
+
+Eventually something like this:
+
+``pip install bacco``
+
+
+From the repository
+-------------------
+
+1. ``$ hg clone https://rangulo@bitbucket.org/rangulo/cosmologyscaler``
+2. ``$ cd cosmologyscaler/python``
+3. ``$ python setup.py install``
+
+Testing the installation
+------------------------
+
+.. note:: You need to download the test data from `here <https://bitbucket.org/rangulo/cosmologyscaler/downloads>`_.
+
+1. ``$ python -c 'import bacco; bacco.test()'``
+

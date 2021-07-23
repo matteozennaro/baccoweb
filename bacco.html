@@ -1,0 +1,199 @@
+<!DOCTYPE HTML>
+<!--
+  Industrious by TEMPLATED
+  templated.co @templatedco
+  Released for free under the Creative Commons Attribution 3.0 license (templated.co/license)
+-->
+<html>
+
+<head>
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-163689805-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+
+    gtag('config', 'UA-163689805-1');
+  </script>
+
+  <title>BACCO - About</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+  <meta name="description" content="" />
+  <meta name="keywords" content="" />
+  <link rel="stylesheet" href="assets/css/main.css" />
+  <script src="https://kit.fontawesome.com/fc01f3d3d3.js" crossorigin="anonymous"></script>
+</head>
+
+<body class="is-preload">
+
+  <!-- Header -->
+  <header id="header">
+    <a class="logo" href="index.html">BACCO</a>
+    <div id="pvt">
+      <a href="private.html"><i class="icon fa-lock">&nbsp;</i>login</a>
+    </div>
+    <nav>
+      <a href="#menu">Menu</a>
+    </nav>
+  </header>
+
+  <!-- Nav -->
+  <nav id="menu">
+    <ul class="links">
+      <li><a href="index.html">Home</a></li>
+      <!-- <li><a href="bacco.html">About</a></li> -->
+      <li><a href="people.html">People</a></li>
+      <li><a href="papers.html">Papers</a></li>
+      <li><a href="outreach.html">Outreach</a></li>
+      <li><a href="data.html">Data</a></li>
+      <li><a href="emulator.html">Emulator</a></li>
+      <li><a href="contacts.html">Contacts</a></li>
+      <li><a href="jobs.html">Job positions</a></li>
+    </ul>
+  </nav>
+
+  <!-- Heading -->
+  <div id="heading">
+    <h1>The BACCO project</h1>
+  </div>
+
+  <!-- Main -->
+  <section id="main" class="wrapper">
+    <div class="inner">
+      <div class="content">
+        <header>
+          <h2>The idea</h2>
+        </header>
+        <p>
+          A new generation of <b>galaxy surveys</b> will soon start measuring the spatial distribution of millions of
+          galaxies over a broad range of redshifts, offering an imminent opportunity to discover new physics. A detailed
+          comparison of these measurements with theoretical models of galaxy clustering may reveal a new fundamental
+          particle, a breakdown of General Relativity, or a hint on the nature of cosmic acceleration.
+        </p>
+        <p>
+          Despite a significant progress in the analytic treatment of structure formation in recent years, traditional
+          clustering models still suffer from large uncertainties. This limits cosmological analyses to a very
+          restricted range of scales and statistics, which will be one of the main obstacles to reach a comprehensive
+          exploitation of future surveys.
+          With BACCO we propose to develop a novel simulation-based approach to predict galaxy clustering. Combining
+          recent advances in computational cosmology, from cosmological N-body calculations to physically-motivated
+          galaxy formation models, we will develop a <b>unified framework</b> to directly predict the positions and
+          velocity of individual dark matter structures and galaxies as function of cosmological and astrophysical
+          parameters.
+        </p>
+        <p>
+          In this formulation, galaxy clustering will be a prediction of a set of physical assumptions in a given
+          cosmological setting. The new theoretical framework will be <b>flexible, accurate and fast</b>: it will
+          provide predictions for any clustering statistic, down to scales 100 times smaller than in state-of-the-art
+          perturbation--theory--based models, and in less than 1 minute of CPU time. These advances will enable major
+          improvements in future cosmological constraints, which will significantly increase the overall power of future
+          surveys <b>maximising our potential to discover new physics</b>.
+        </p>
+        <p>
+          The bacco project, whose PI is Raúl Angulo, has been awarded a <a
+            href="https://cordis.europa.eu/project/id/716151">ERC starting grant</a>.
+        </p>
+      </div>
+    </div>
+
+    <div class="inner">
+      <div class="content">
+        <header>
+          <h2>Many ingredients...</h2>
+        </header>
+        <h3>Cosmology</h3>
+        <p>
+          A <b>comprehensive and powerful cosmological calculator</b>: set the parameters of your cosmological model, including
+          massive neutrinos and dynamical dark energy, and start getting theoretical predictions for many possible
+          observables. BACCO's cosmology class features a wrapper to call <a href="https://camb.info/">camb</a> and <a
+            href="https://github.com/lesgourg/class_public">class</a>, implementations of methods to compute nonlinear
+          quantities with perturbation theory or halofit for correlations functions, power spectra and bispectra, many
+          models of mass functions, bias-mass and halo concentration-mass relations. Moreover, it integrates redshift
+          space models accounting both for bulk motions and small-scale velocity dispersions.
+        </p>
+        <h3>Simulations</h3>
+        <p>
+          A lean version of Gadget, LG3, which allows us to create large simulations while keeping computing tame and RAM
+          usage under control. Moreover, by computing many halo properties on the fly and by storing data in HDF5
+          format, we make the loading and analysis on simulations a simple and efficient task. See also the <a
+            href="data.html">data</a> page!
+        </p>
+        <h3>Mocks</h3>
+        <p>
+          How faithfully can we reproduce the properties of galaxies? Thanks to all the properties computed on-the-fly
+          by our versiong of LG3, we have access to a wealth of information on the structures and substractures of our
+          simulation. This enables us to produce state-of-the-art galaxy samples through subhalo abundance matching
+          techinques, with much freedom to vary which physical quantities to match. Moreover, among the outputs of our
+          simulations, we also store the entire merging history, making it easy to run semi-analytical models on the
+          outputs of our simulations.
+        </p>
+        <h3>Neutrinos</h3>
+        <p>
+          Nowadays, a thorough implementation of the effects of massive neutrinos is fundamental in order to achieve the
+          precision required by forthcoming cosmological observations. We payed extra-care in <a
+            href="https://ui.adsabs.harvard.edu/abs/2019MNRAS.489.5938Z/abstract">implementing neutrino effects</a> in
+          bacco, and we assumed the <a
+            href="https://ui.adsabs.harvard.edu/abs/2013MNRAS.428.3375A/abstract">quasi-nonlinear Fourier space
+            implementation</a> of neutrinos in LG3.
+        </p>
+        <h3>Baryons</h3>
+        <p>
+          We cannot hope to push our predictions to small scales if we do not model the effects of baryons on the
+          matter distribution! Bacco features a <a
+            href="https://ui.adsabs.harvard.edu/abs/2019arXiv191108471A/abstract">custom-made revised and efficient
+            implementation</a> of the baryon-correction model, in which dark matter particles of each halo are
+          rearranged, according to some physically motivated prescriptions, to reproduce the density profile of the
+          galaxy, hot gas and expelled gas. Thanks to this method, the dark matter distribution can be let relax and
+          adapt to the presence of the baryon components, obtaining results in very good agreement with hydro-dynamical
+          simulations.
+        </p>
+        <h3>Bayesian analysis</h3>
+        <p>
+          A new method to accurately reconstruct the shape of the multi-dimensional posterior distribution is one of the
+          fundamental parts of bacco. This answers the need of modern cosmology for reconstructing the posterior
+          distribution of the free parameters of the model while being very efficient in terms of number of likelihood
+          evaluations needed. Therefore BACCO includes a <a
+            href="https://ui.adsabs.harvard.edu/abs/2019arXiv191208806P/abstract">likelihood emulator</a> constructed
+          with an iterative process, with the possibility of accounting for noise in the adopted theoretical models.
+        </p>
+        <h3>Visualization</h3>
+        <p>
+          Sometimes abstracting things and considering their statistical properties is just not enough: we are still
+          speaking of objects that do exist in the universe around us! For both scientific and dissemination purposes
+          it's important to visualize the matter density fields and appreciate their spatial distribution and the
+          complexity of the cosmic web!
+        </p>
+      </div>
+    </div>
+
+    <div class="inner">
+      <div class="content">
+        <header>
+          <h2>...a comprehensive approach</h2>
+        </header>
+        <p>
+          We concentrate all of this in a single python library that will eventually be made public!
+        </p>
+      </div>
+    </div>
+  </section>
+  </section>
+
+  <!-- Footer -->
+  <footer id="footer">
+    <div id="includedFooter"></div>
+
+    <!-- Scripts -->
+    <script src="assets/js/jquery.min.js"></script>
+    <script src="assets/js/browser.min.js"></script>
+    <script src="assets/js/breakpoints.min.js"></script>
+    <script src="assets/js/util.js"></script>
+    <script src="assets/js/main.js"></script>
+    <script> $(function () { $("#includedFooter").load("footer.html"); });</script>
+    <script> $(function () { $("#includedMenu").load("menu.html"); });</script>
+
+</body>
+
+</html>

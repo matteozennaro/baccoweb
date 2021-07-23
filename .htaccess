@@ -1,0 +1,11 @@
+<Files private.html>
+
+AuthUserFile /var/www/vhosts/bacco.dipc.org/.htpasswd
+
+AuthName "Please, login!"
+
+AuthType basic
+
+Require valid-user
+
+</Files>

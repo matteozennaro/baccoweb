@@ -1,0 +1,81 @@
+
+.. _bacco-code:
+
+Documentation for the Code
+**************************
+
+.. automodule:: bacco
+   :members:
+
+
+Cosmology Class
+=========================
+
+.. autoclass:: bacco.Cosmology
+   :members:
+
+Simulation Class
+=========================
+
+.. autoclass:: bacco.Simulation
+   :members:
+
+Baryons Class
+=========================
+
+.. autoclass:: bacco.Baryons
+   :members:
+
+Visualization Class
+=========================
+
+.. autoclass:: bacco.Visualization
+   :members:
+
+Mock Class
+=========================
+
+.. autoclass:: bacco.Mock
+   :members:
+
+Scaler Class
+=========================
+
+.. autoclass:: bacco.Scaler
+   :members:
+
+Statistics Class
+=========================
+
+.. automodule:: bacco.statistics
+   :members:
+
+
+Likelihood Class
+=========================
+
+.. autoclass:: bacco.Sampler
+   :members:
+
+Lightcone Class
+=========================
+
+.. autoclass:: bacco.Lightcone
+   :members:
+
+
+Utils
+=========================
+
+.. automodule:: bacco.utils
+   :members:
+
+
+
+
+
+
+
+This is something I want to say that is not in the docstring.
+
+.. automodule:

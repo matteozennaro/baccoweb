@@ -1,0 +1,431 @@
+<!DOCTYPE HTML>
+<!--
+  Industrious by TEMPLATED
+  templated.co @templatedco
+  Released for free under the Creative Commons Attribution 3.0 license (templated.co/license)
+-->
+<html>
+  <head>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-163689805-1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() { dataLayer.push(arguments); }
+      gtag('js', new Date());
+
+      gtag('config', 'UA-163689805-1');
+    </script>
+
+    <title>BACCO - Emulator</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <meta name="description" content="" />
+    <meta name="keywords" content="" />
+    <link rel="stylesheet" href="assets/css/main.css" />
+    <script src="https://kit.fontawesome.com/fc01f3d3d3.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+      .rcorners {
+        border-radius: 25px;
+        border: 2px solid rgb(12, 97, 224);
+        padding: 20px;
+        width: 100%;
+        font-size: x-large;
+        text-align: center;
+      }
+
+      .mynote {
+        background-color: rgb(82, 161, 230, 0.623);
+        border: 2px solid rgba(12, 97, 224);
+        border-radius: 5px;
+        padding: 10px;
+      }
+
+      .mywarning {
+        background-color: rgba(231, 105, 112, 0.623);
+        border: 2px solid rgb(224, 12, 40);
+        border-radius: 5px;
+        padding: 10px;
+      }
+    </style>
+  </head>
+  <body class="is-preload">
+
+    <!-- Header -->
+      <header id="header">
+        <a class="logo" href="index.html">BACCO</a>
+        <div id="pvt">
+          <a href="private.html"><i class="icon fa-lock">&nbsp;</i>login</a>
+        </div>
+        <nav>
+          <a href="#menu">Menu</a>
+        </nav>
+      </header>
+
+    <!-- Nav -->
+    <nav id="menu">
+      <ul class="links">
+        <li><a href="index.html">Home</a></li>
+        <!-- <li><a href="bacco.html">About</a></li> -->
+        <li><a href="people.html">People</a></li>
+        <li><a href="papers.html">Papers</a></li>
+        <li><a href="outreach.html">Outreach</a></li>
+        <li><a href="data.html">Data</a></li>
+        <li><a href="emulator.html">Emulator</a></li>
+        <li><a href="contacts.html">Contacts</a></li>
+        <li><a href="jobs.html">Job positions</a></li>
+      </ul>
+    </nav>
+
+    <!-- Heading -->
+      <div id="heading" >
+        <h1>Emulators</h1>
+      </div>
+
+    <!-- Main -->
+      <section id="main" class="wrapper">
+        <div class="inner">
+          <div class="content">
+            <p>
+              The <b>bacco emulators</b> provide predictions for the mass power spectrum in a wide range of cosmologies,
+              at redshifts from 0 to 1.5. It has been calibrated using 800 different cosmologies in a 8-dimensional
+              parameter space that spans ~10σ around Planck's best-fit constraints. For each of these points, we rescaled
+              one of the three <a href="data.html">main bacco simulations</a>, using in each case the simulation that
+              is expected to minimize the rescaling error (as explained in
+              <a href="https://ui.adsabs.harvard.edu/abs/2020arXiv200103176C">this paper by Contreras et al, 2020</a>).
+              Thanks to recent improvements of the rescaling algorithm (<a
+              href="https://ui.adsabs.harvard.edu/abs/2019MNRAS.489.5938Z">Zennaro et al, 2019</a>; <a
+              href="https://ui.adsabs.harvard.edu/abs/2020arXiv200103176C">Contreras et al, 2020</a>),
+              we have been able to extend our parameter
+              space also to dynamical dark energy and massive neutrinos.
+            </p>
+
+            <p>
+              If you want to read more on how this emulator was built, <a
+              href="https://ui.adsabs.harvard.edu/abs/2020arXiv200406245A/abstract">here</a> is the
+              paper where we present it.
+            </p>
+
+            <p>
+              In this page you can
+              <ul>
+                <li><a href="#installation">find installation instructions</a></li>
+                <li><a href="#usage">find out about usage and examples</a></li>
+                <li><a href="#credit">find the appropriate way to credit our work</a></li>
+              </ul>
+            </p>
+
+            <hr>
+
+            <div id="installation">
+              <h2>Installation</h2>
+              <p>
+                The bacco emulator package can be used with two different types
+                of emulator: a gaussian process and a neural network. After
+                installing the package, the actual emulator object
+                will be automatically downloaded at runtime (only at first
+                usage).
+              </p>
+              <p>
+                Please, be aware that the first time you will load the <b>gaussian
+                process</b> emulator, baccoemu will download approximately 2.6 GB
+                to your system; it will also require at least 4.5 GB of available
+                RAM to run. If you plan to use the gaussian process, please
+                check that your machine satisfies these requirements.
+              </p>
+              <p>
+                On the other hand the <b>neural network</b> emulator only requires
+                a few MB (both of disk and RAM).
+              </p>
+              <p>
+                There are two ways of installing the bacco emulator.
+              </p>
+              <h3><b>Install from PyPI</b></h3>
+              <p>
+                This is the simplest way of installing the bacco emulator. You
+                will just need to execute
+              <pre><code class="prettyprint">
+  pip install baccoemu [--user]
+              </code></pre>
+              </p>
+              <p>
+                If you already have the bacco emulator installed with PyPI, and
+                you want to make sure it is the <b>latest available version</b>,
+                please add <code class="prettyprint">--upgrade</code> to the line
+                above.
+              </p>
+              <h3><b>Install from repository</b></h3>
+              <p>
+                You can also retrieve the bacco emulator by cloning it from its
+                <a href="https://bitbucket.org/rangulo/baccoemu/src/master/">public repository</a>.
+                This will create the folder <code>baccoemu</code>.
+              </p>
+              <p>
+                In this folder you can install the emulator by executing
+                <pre><code class="prettyprint">
+  pip install . [--user]
+                </code></pre>
+              </p>
+              <h3><b>For both installation procedures</b></h3>
+              <div class="mywarning">
+                <b>Warning:</b>
+                the bacco emulator only works in a
+                Python 3 environment; the data file at its core cannot
+                be unpickled by Python 2.x; in case your <code>pip</code>
+                command doesn't link to a Python 3 pip executable, please
+                modify the line above accordingly (e.g. with <code>pip3</code>).
+              </div>
+              <p></p>
+              <div class="mynote">
+                <b>Note:</b>
+                if you are in a virtual environment (or if you are logged in as a system
+                administrator), you can drop the <code>--user</code> option.
+              </div>
+              <p></p>
+              <div class="mynote">
+                <b>Note:</b> the bacco emulator depends on some external packages,
+                namely
+                <ul style="margin-top: 0; margin-bottom: 0; padding-top: 0; padding-bottom: 0;">
+                  <li>numpy</li>
+                  <li>sklearn</li>
+                  <li>GPy</li>
+                  <li>keras</li>
+                  <li>tensorflow</li>
+                  <li>matplotlib</li>
+                  <li>scipy</li>
+                  <li>camb</li>
+                  <li>progressbar2</li>
+                </ul>
+                The installation process will automatically try to install them
+                if they are not already present.
+              </div>
+            </div>
+
+            <hr>
+
+            <div id="usage">
+              <h2>Usage and examples</h2>
+              From the bacco emulator you can get:
+              <li><a href='ratio'>the nonlinear-to-linear ratio</a></li>
+              <li><a href='lin'>the linear prediction</a></li>
+              <li><a href='nl'>the nonlinear (emulated) prediction</a></li>
+              All these refer to the cold matter power spectrum.
+              <br><br>
+              A full documentation of all functions is available
+              <a href="baccoemu_docs/index.html">here</a>.
+              <br><br>
+              <h3 id="ratio"><b>Nonlinear-to-linear ratio</b></h3>
+              <p>
+                The bacco emulator primarily returns the non-linear to linear ratio of the
+                cold matter (cdm + baryons) power spectrum,
+              </p>
+              <p>
+                \( Q(k, a; \boldsymbol{p}) = \dfrac{P_{\rm nl}(k, a; \boldsymbol{p})}{P_{\rm lin}(k, a; \boldsymbol{p})} \)
+              </p>
+              <p>
+                where \(a\) is the expansion factor and \( \boldsymbol{p} \) is a set of cosmological parameters.
+              </p>
+              <p>
+                The three fundamental steps to obtain it are:
+                <ul>
+                  <li>importing the bacco emulator</li>
+                  <span><code class="prettyprint">
+  import baccoemu
+                  </code></span>
+                  <li>loading the emulator in memory (by default you will load the gaussian process, which will occupy
+                    approx. 4.5 GB of your RAM; you can load a much lighter emulator build with a neural network specifying
+                    <code class="prettyprint">emu_type='nn'</code> instead) <a href="baccoemu_docs/index.html#baccoemu.load_emu"><i class="fas fa-external-link-alt"></i> docs</a></li>
+                  <span><code class="prettyprint">
+  emulator = baccoemu.load_emu(emu_type='gp')
+                  </code></span>
+                  <li>evaluating the emulator at a given point in parameter space <a href="baccoemu_docs/index.html#baccoemu.eval_emu"><i class="fas fa-external-link-alt"></i> docs</a>
+                  </li>
+                  <span><code class="prettyprint">
+  Q = baccoemu.eval_emu(params, emulator=emulator)
+                  </code></span>
+                </ul>
+              </p>
+              <p>
+                Note that <code class="prettyprint">params</code> is a 9 element dictionary,
+                composed of 8 cosmological parameters and the expansion factor.
+                The expected keywords of the parameters (along with the ranges
+                within which they are defined) are:
+              </p>
+              <p>
+                <ul>
+                <li>\( \Omega_m \in [0.23, 0.4] \), keyword: <code>'omega_matter'</code> - note that this refers to <b>cold matter</b> (cdm + baryons),</li>
+                <li>\( \sigma_8 \in [0.73, 0.9] \), keyword:<code>'sigma8'</code> - note that this refers to <b>cold matter</b> (cdm + baryons),</li>
+                <li>\(\Omega_b \in [0.04, 0.06] \), keyword:<code>'omega_baryon'</code>,</li>
+                <li>\(n_s \in [0.92, 1.01] \), keyword:<code>'ns'</code>,</li>
+                <li>\(h \in [0.6, 0.8] \), keyword:<code>'hubble'</code>,</li>
+                <li>\(M_\nu \in [0.0, 0.4] \,\, \mathrm{eV} \), keyword:<code>'neutrino_mass'</code>,</li>
+                <li>\(w_0 \in [-1.15, -0.85] \), keyword:<code>'w0'</code>,</li>
+                <li>\(w_a \in [-0.3, 0.3] \), keyword:<code>'wa'</code>,</li>
+                <li>\(a \in [0.4, 1] \), keyword:<code>'expfactor'</code>.</li>
+                </ul>
+              </p>
+              <p>
+                Please note that the ratio returned by the function
+                <code class="prettyprint">eval_emu()</code> corresponds to the
+                wavenumbers stored in
+                <code class="prettyprint">emulator['k']</code>.
+              </p>
+              <h3 id="lin"><b>Linear power spectrum</b></h3>
+              <p>
+                While the nonlinear to linear ratio is the actual emulated quantity,
+                and can be applied by the user to any linear power spectrum, we
+                also provide a easy and quick way to directly access the linear and
+                nonlinear dark matter power spectra.
+              </p>
+              <p>
+                The linear power spectrum is obtained evaluating
+                <a href="https://camb.info/">camb</a> at the same position in
+                parameter space defined by <code>params</code>.
+                To do so (<a href="baccoemu_docs/index.html#baccoemu.linear_pk"><i class="fas fa-external-link-alt"></i> docs</a>):
+              </p>
+              <pre><code>
+  k, pk = baccoemu.linear_pk(params, k=None)
+              </code></pre>
+              <p>
+                In this case, the user can specify the requested wavemodes by
+                passing a vector to the keyword argument <code>k</code>. If
+                this is <code>None</code>, the wavemodes used by camb are
+                returned.
+              </p>
+              <h3 id="nl"><b>Nonlinear power spectrum</b></h3>
+              <p>
+                The nonlinear power spectrum is obtained by calling
+                camb internally to get the linear spectrum and subsequently applying
+                the nonlinear-to-linear ratio. The user just needs to
+                execute (<a href="baccoemu_docs/index.html#baccoemu.nonlinear_pk"><i class="fas fa-external-link-alt"></i> docs</a>):
+              </p>
+              <pre><code>
+  k, pk = baccoemu.nonlinear_pk(params, k=None, emulator=emulator)
+              </code></pre>
+              <p>
+                Also this function accepts a wavemode vector.
+                In the case <code>k=None</code> the wavemodes used to build
+                the emulator are returned.
+              </p>
+              <p>
+                A comprehensive example is therefore
+                <pre><code class="prettyprint">
+  import matplotlib.pyplot as plt
+  import numpy as np
+  from baccoemu import load_emu, eval_emu, linear_pk, nonlinear_pk
+
+
+  params = {
+      'omega_matter'  :  0.315,
+      'sigma8'        :  0.83,
+      'omega_baryon'  :  0.05,
+      'ns'            :  0.96,
+      'hubble'        :  0.67,
+      'neutrino_mass' :  0.0,
+      'w0'            : -1.0,
+      'wa'            :  0.0,
+      'expfactor'     :  1
+  }
+
+  # to load the gaussian process
+  emulator = load_emu()
+  # or, for the neural network
+  # emulator = load_emu(emu_type='nn')
+
+  Q = eval_emu(params, emulator=emulator)
+
+  print('# k        Q(k)')
+  for _k, _Q in zip(emulator['k'], Q):
+      print('{:.5f}    {:.5f}'.format(_k, _Q))
+
+  k = emulator['k']
+
+  k, pk = linear_pk(params, k=k)
+  k, pknl = nonlinear_pk(params, k=k, emulator=emulator)
+
+  plt.loglog(k, pk, label='linear')
+  plt.loglog(k, pknl, label='emulated nonlinear')
+  plt.xlabel(r'$k \, [h \, \mathrm{Mpc}^{-1}]$')
+  plt.ylabel(r'$P(k) \, [h^{-3} \, \mathrm{Mpc}^{3}]$')
+  plt.legend()
+  plt.show()
+                </code></pre>
+              </p>
+            </div>
+
+            <hr>
+
+            <div id="credit">
+              <h2>How to reference the BACCO emulator</h2>
+              <p>
+                If you use this emulator, please cite the presentation paper as
+                <pre><code>
+  @ARTICLE{2020arXiv200406245A,
+       author = {{Angulo}, Raul E. and {Zennaro}, Matteo and {Contreras}, Sergio and
+         {Aric{\`o}}, Giovanni and {Pellejero-Iba{\~n}ez}, Marcos and
+         {St{\"u}cker}, Jens},
+        title = "{The BACCO Simulation Project: Exploiting the full power of large-scale structure for cosmology}",
+      journal = {arXiv e-prints},
+     keywords = {Astrophysics - Cosmology and Nongalactic Astrophysics, Astrophysics - Astrophysics of Galaxies},
+         year = 2020,
+        month = apr,
+          eid = {arXiv:2004.06245},
+        pages = {arXiv:2004.06245},
+archivePrefix = {arXiv},
+       eprint = {2004.06245},
+ primaryClass = {astro-ph.CO},
+       adsurl = {https://ui.adsabs.harvard.edu/abs/2020arXiv200406245A},
+      adsnote = {Provided by the SAO/NASA Astrophysics Data System}
+}
+                </code></pre>
+              </p>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+    <!-- Footer -->
+      <div id="includedFooter"></div>
+
+    <!-- Scripts -->
+      <script src="assets/js/jquery.min.js"></script>
+      <script src="assets/js/browser.min.js"></script>
+      <script src="assets/js/breakpoints.min.js"></script>
+      <script src="assets/js/util.js"></script>
+      <script src="assets/js/main.js"></script>
+      <script> $(function(){$("#includedFooter").load("footer.html");});</script>
+      <script> $(function(){$("#includedMenu").load("menu.html");});</script>
+
+      <script>
+      var slideIndex = 1;
+      showDivs(slideIndex);
+
+      function plusDivs(n) {
+        showDivs(slideIndex += n);
+      }
+
+      function currentDiv(n) {
+        showDivs(slideIndex = n);
+      }
+
+      function showDivs(n) {
+        var i;
+        var x = document.getElementsByClassName("mySlides");
+        var dots = document.getElementsByClassName("demo");
+        if (n > x.length) {slideIndex = 1}
+        if (n < 1) {slideIndex = x.length}
+        for (i = 0; i < x.length; i++) {
+          x[i].style.display = "none";
+        }
+        for (i = 0; i < dots.length; i++) {
+          dots[i].className = dots[i].className.replace(" w3-white", "");
+        }
+        x[slideIndex-1].style.display = "block";
+        dots[slideIndex-1].className += " w3-white";
+      }
+      </script>
+
+  </body>
+</html>

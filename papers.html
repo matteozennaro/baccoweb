@@ -1,0 +1,465 @@
+<!DOCTYPE HTML>
+<!--
+  Industrious by TEMPLATED
+  templated.co @templatedco
+  Released for free under the Creative Commons Attribution 3.0 license (templated.co/license)
+-->
+<html>
+
+<head>
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-163689805-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+
+    gtag('config', 'UA-163689805-1');
+  </script>
+
+  <title>BACCO - Papers</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+  <meta name="description" content="" />
+  <meta name="keywords" content="" />
+  <link rel="stylesheet" href="assets/css/main.css" />
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <script src="https://kit.fontawesome.com/fc01f3d3d3.js" crossorigin="anonymous"></script>
+
+  <style>
+    .TextWrapRight {
+      float: right;
+      margin: 10pt;
+    }
+    .TextWrapLeft {
+      float: left;
+      margin: 10pt;
+    }
+  </style>
+</head>
+
+<body class="is-preload">
+
+  <!-- Header -->
+  <header id="header">
+    <a class="logo" href="index.html">BACCO</a>
+    <div id="pvt">
+      <a href="private.html"><i class="icon fa-lock">&nbsp;</i>login</a>
+    </div>
+    <nav>
+      <a href="#menu">Menu</a>
+    </nav>
+  </header>
+
+  <!-- Nav -->
+  <nav id="menu">
+    <ul class="links">
+      <li><a href="index.html">Home</a></li>
+      <!-- <li><a href="bacco.html">About</a></li> -->
+      <li><a href="people.html">People</a></li>
+      <li><a href="papers.html">Papers</a></li>
+      <li><a href="outreach.html">Outreach</a></li>
+      <li><a href="data.html">Data</a></li>
+      <li><a href="emulator.html">Emulator</a></li>
+      <li><a href="contacts.html">Contacts</a></li>
+      <li><a href="jobs.html">Job positions</a></li>
+    </ul>
+  </nav>
+
+  <!-- Heading -->
+  <div id="heading">
+    <h1>Research lines & Papers</h1>
+  </div>
+
+  <!-- Main -->
+  <section id="main" class="wrapper">
+    <div class="inner">
+      <p><a href="#papers"><i class="fas fa-angle-down"></i> click here to go directly to our list of publications</a></p>
+      <div class="content">
+        <header>
+          <h2>Our latest research</h2>
+          <hr>
+
+          <h3>Tidal response of structure formation</h3>
+          <p><a href="https://ui.adsabs.harvard.edu/abs/2020arXiv200306427S"><i class="fas fa-angle-right"></i> go to paper</a></p>
+          <p>
+            In cosmology we typically make simulation boxes of some finite size and then use periodical boundary conditions to fill
+            in what happens beyond the box. However, this neglects contributions to this boxy patch of the universe from larger
+            scales. The lowest order of these “missing” contributions can be described by a local over-density and an external tidal
+            field.
+          </p>
+          <p>
+            We have developed “anisotropic separate universe simulations” which can incorporate such tidal fields (and/or
+            overdensities) into the evolution of the background of a simulation. You can imagine that our initially cubic box now
+            gets deformed through the tidal field into a cuboid shape over time. Thereby we simulate a truly anisotropic
+            mini-universe which has different expansion rates in different directions (described by a Hubble tensor instead of a
+            single Hubble parameter)!
+          </p>
+            <a href="images/halos_distorted.png"><img src="images/halos_distorted.png" style="display: block; margin-left: auto; margin-right: auto; width: 80%;"></a>
+          <p>
+            These simulations can serve as an excellent testing laboratory for what tidal fields do to the structures in our
+            universe. For example we find that haloes get stretched along the same direction where the tidal field expands the
+            mini-universe the strongest – and squashed in the other directions. However, haloes get stretched/squashed less than the
+            universe overall! Further we measure to high accuracy the response function, which quantifies the impact of the tidal
+            field onto the three dimensional power spectrum. In the future this simulation technique could be used to quantify the
+            intrinsic alignment of galaxies due to tidal fields, and therefore help interpret weak lensing surveys. The scheme is
+            simple and general and could easily be incorporated into state of the art hydrodynamic simulations.
+          </p>
+
+          <hr>
+
+          <h3>3% accurate scaling over a large parameter space</h3>
+          <p><a href="https://ui.adsabs.harvard.edu/abs/2020arXiv200103176C"><i class="fas fa-angle-right"></i> go to paper</a></a></p>
+          <p>
+            It has been 15 years since the Millennium simulation was complete. It was the result of the collaboration of many people
+            and require to run in a large cluster for 350.000 CPU-hours. Today, running a simulation of similar characteristics can
+            be done by small groups in a small cluster, but still is computationally expensive and require a considerable amount of
+            disk space.
+          </p>
+          <p>
+            This computational limitation can challenge the run of many different simulations. In particular, running many
+            simulations with different cosmologies is sometimes necessary when studying cosmology from galaxy clustering. To deal
+            with this, Angulo & White 2010 develop a method to 'recycle' dark matter simulations. Their algorithm 'rescale' a dark
+            matter simulation from its original cosmology to a different target cosmology in a matter of seconds.
+          </p>
+          <p>
+            This technique opens a series of opportunities to study cosmology using N-Body simulation. By running only a small set
+            of simulations, we can scale them to other cosmologies so it can cover a huge cosmological parameter-space. The
+            advantages compare to the traditional method (running tens of simulations in a narrow parameter-space) are that we can
+            focus our computational resources and run larger and higher resolved N-Body simulations instead of many of them,
+            increasing the statistics, the precision and the variety of the mocks we can run over these scaled simulations.
+            In Contreras et al. 2020, we expand the scaling method, test its accuracy over a range of cosmological parameter > 10σ
+            above Planck predictions and present a proof of concept of the constraining power of cosmological parameter using galaxy
+            clustering. We find that this updated version of the scaling algorithm can achieve a 3% precision on the power spectrum
+            of matter, haloes and subhaloes, as is shown in the figure below. We extend this test to z=1 and redshift space finding
+            the same precision.
+          </p>
+          <a href="images/Fig6v3.png"><img src="images/Fig6v3.png"
+              style="display: block; margin-left: auto; margin-right: auto; width: 80%;"></a>
+          <p>
+            This is the first of a series of papers that aim to show the constraining of cosmological parameters from the clustering
+            of galaxies of the Universe. In the next papers, we will present an improved way to do mocks with the subhalo abundance
+            matching technique (SHAM), show the accuracy of the scaling technique with the multipoles of the correlation function
+            and the additional constraining power we get from it and test our method on real data.
+            Figure 1: The ratio between the power spectra of scaled and target simulations in real space. The target cosmologies
+            adopt Nenya cosmologies varying one cosmological parameter at a time, as indicated in the label of each figure. The
+            eight columns, from left to right, show changes in σ8, Ωm, Ωb, ns, h, Mν, w0, and wa. The light shaded region highlights
+            a 3% discrepancy. The top row displays results for dark matter, whereas middle and bottom rows do so for haloes with a
+            number density of \(3.16 \times 10^{-3} \, h^3 \, \mathrm{Mpc}^{-3}\) selected according to their mass,
+            and subhaloes with a number density of \(10^{-2}
+            h^3 \, \mathrm{Mpc}^{-3}\) selected according to their peak maximum circular velocity (Vpeak). The dark shaded region shows the region
+            where Poisson shot-noise is above than 80% of the power spectrum amplitude.
+          </p>
+
+          <hr>
+
+          <h3>Emulating likelihoods</h3>
+          <p><a href="https://ui.adsabs.harvard.edu/abs/2019arXiv191208806P"><i class="fas fa-angle-right"></i> go to paper</a></p>
+          <p>
+            Stop assuming, for a second, that you have problems with your theory. Now, let’s say you are super happy with your
+            beloved theoretical model and want to compare with some data. There is some trouble though. Even though you put all of
+            your affection into developing this model, it is still very computationally slow (eg. 4 hours each evaluation for a
+            given set of parameters) and it has some intrinsic noise in its estimations. Do not worry, nobody is perfect. You can
+            still do parameter constraints with it.
+          </p>
+          <a href="images/iter_emulator.png"><img src="images/iter_emulator.png" style="display: block; margin-left: auto; margin-right: auto; width: 80%;"></a>
+          <p>
+            In this work, we developed a methodology based on an iterative Gaussian emulation of the target likelihood function to
+            be able to perform posterior parameters constraints with such kind of models.
+            The basic idea is very simple. First, try to have a rough idea of how the posterior distribution looks like (it does not
+            matter if it does not look anything like the real one at this stage), by having some model evaluations on the parameter
+            space.
+          </p>
+          <p>
+            Second, interpolate via a Gaussian process to the points of parameter space you might be interested in. This
+            interpolation is likely to be very fast unless you already have lots of initial evaluated points (which would be
+            surprising if your model takes 4 hours to compute).
+            Third, find where is the point in parameter space that maximizes your likelihood function from this fancy interpolation
+            and evaluate your terribly slow model there. Finding this point should also be fast since you are not evaluating your
+            theoretical model.
+          </p>
+          <p>
+            Lastly, redo the Gaussian process interpolation with the new evaluated point. This last point has made your emulation of
+            the likelihood more accurate because you have one more point to do the emulation, right?
+            Then, why not iterating this process until the emulation stops changing because there is no new information in the last
+            suggested points for evaluation? In the paper, we show examples of how this works up to 9 dimensions for a galaxy
+            clustering kind of likelihood.
+          </p>
+          <p>
+            Spoiler alert, if you decide to do this, you might gain a factor of 100 less needed evaluations compared to an MCMC. Now
+            it does not seem as if your model is too computationally heavy to do science with it, does it?
+          </p>
+
+          <hr>
+
+          <h3>Adding baryon physics to dark matter simulations</h3>
+          <p><a href="https://ui.adsabs.harvard.edu/abs/2019arXiv191108471A"><i class="fas fa-angle-right"></i> go to paper</a></p>
+          <a href="images/baryons.png"><img src="images/baryons.png" class="TextWrapLeft" width="35%"></a>
+          <p>
+            Do you need the distribution of dark matter and gas in multiple realizations of the universe, but you lack the million
+            CPU hours and the thousand of cores required to run hundreds of magneto-hydrodynamical simulations? Do you happen to
+            have in your family hard-disk, among the pictures of the holiday in Andalucia and the videos of your cousin's wedding, a
+            N-body simulation? Maybe the techniques described in this paper can make your day.
+          </p>
+          <p>
+            We show how using a single gravity-only simulation, we are able to reproduce the three-dimensional total mass density
+            field of 7 of the
+            state-of-the-art magneto-hydrodynamical simulations, to better than 1%! To achieve this result, we combine the cosmology
+            scaling with a baryon correction model. In brief, the latter one decompose the density profiles of the halos of your
+            simulation in different components: a central galaxy, gravitationally bound and ejected gas, and of course dark matter
+            (see the Figure). These components are first analitically computed as a function of halo mass and concentration, and
+            afterwards all the single particles are displaced accordingly. The whole process take tipically few seconds in a
+            laptop*!
+          </p>
+          <p>
+            You can now compute your matter power spectrum, and have a minute to watch again the video of your cousin's wedding
+            without worring about the baryonic effects.
+          </p>
+          <p>
+            *(the BACCO team does not guarantee a timescale of the method inferior to 1 minute when applied to simulations with
+            trillion particles and gigaparsec boxes.)
+          </p>
+
+          <hr>
+
+          <h3>Adding neutrinos to \( \Lambda \)CDM simulations</h3>
+          <p><a href="https://ui.adsabs.harvard.edu/abs/2019MNRAS.489.5938Z"><i class="fas fa-angle-right"></i> go to paper</a></p>
+          <div>
+            <a href="images/scale_nus.png"><img src="images/scale_nus.png" class="TextWrapRight" width="35%"></a>
+            <p>Let's say you have a \(\Lambda\)CDM simulation, large size, high mass resolution, but no neutrinos. Should you spend
+              the same computation time (or even more) to rerun it including massive neutrinos? And which neutrino mass should you
+              choose?
+            </p>
+            <p>
+              With the techinque we presented in this paper, you can apply a transformation of times and lengths to the objects in
+              your simulated cube that enable you to add the effect of an arbitrary mass neutrino component in post procssing. The
+              idea is rooted in the "cosmology rescaling" method that was presented in <a
+              href="https://ui.adsabs.harvard.edu/abs/2010MNRAS.405..143A/abstract">Angulo & White (2010)</a>.
+            </p>
+            <p>
+              The effect of massive neutrinos, on scales within the neutrino free-streaming length, closely corresponds to looking at a
+              massless neutrino cosmology at an earlier time. This justifies the use of the scaling technique, provided, as we do in
+              this paper, that we correct with an ad-hoc displacement field the large and intermediate scales. The result is pretty
+              nice, as you can see in the figure!
+            </p>
+            <p>
+              Note that to get this effect not only is it necessary to correct for large scales, but one should also displace in-halo
+              particles to account for the different concentrations halos of the same mass have in different cosmologies. We did it
+              following the same technique explained in <a href="https://ui.adsabs.harvard.edu/abs/2020arXiv200103176C">Contreras
+              et al. (2019)</a>.
+            </p>
+            <p>At the end of the day, with this method we can reproduce any neutrino cosmology, with neutrino mass
+              \(M_\nu < 0.3 \, \mathrm{eV}\)
+              with an accuracy of
+              <ul>
+                <li>\(1\%\) on all scales \(k < 1 \, h \, \mathrm{Mpc}^{-1}\) for the matter power spectrum</li>
+                <li>\(1\%\) for all mass bins with \(M < 10^{15} \, h^{-1} \, \mathrm{M}_\odot \) for the halo mass function</li>
+                <li>\(5\%\) for the subhalo (galaxy-like) redshift-space monopole and quadrupole of the 2-point correlation
+                  function</li>
+              </ul>
+            </p>
+          </div>
+
+          <hr>
+
+          <h3>The build-up of strongly barred galaxies in the TNG100 simulation</h3>
+          <p><a href="https://ui.adsabs.harvard.edu/abs/2019arXiv190800547R"><i class="fas fa-angle-right"></i> go to paper</a></p>
+          <p>
+            Bar structures are seen in more than one-third of disc galaxies observed today. We know now that they could play an
+            important role in the evolution of the disc galaxies. Some studies (e.g. Gavazzi et. al. 2015, Spinoso et al., 2017)
+            have pointed out that stellar bars could suppress star formation in the inner part of the galaxy and possible in the
+            entire galaxy. Indeed, some differences are found in barred disc galaxies in comparison with disc galaxies without a
+            bar. Barred galaxies host older populations of stars, with a smaller content of gas whereas unbarred disc galaxies are
+            still forming stars and contain younger stars (e.g., Masters et al. 2012).
+          </p>
+          <p>
+            In this paper, we explore the evolution and buildup of the strongly barred galaxies using the cosmological
+            hydrodynamical simulation TNG100. We find similar differences between strongly barred galaxies and unbarred galaxies at
+            z=0: The majority of barred galaxies are quenched, whereas unbarred galaxies continue to be active on the main sequence
+            of star-forming galaxies.
+          </p>
+          <a href="images/barevol.png"><img src="images/barevol.png" style="display: block; margin-left: auto; margin-right: auto; width: 80%;"></a>
+          <p>
+            To understand these differences, we analyse the evolution of strongly barred disc galaxies at z=0 and compare them to
+            the ones of unbarred disc galaxies. The figure below shows an example of the evolution of a disc galaxy with a strong
+            bar at z=0. The surface density maps of the stellar, gas and star-forming gas components and summarise our findings
+            The disc is formed early accompanied by episodes of high star formation rates for strongly barred galaxies. On the
+            contrary, unbarred galaxies formed their disc later in time with a more gradual star formation history. We also find
+            that supermassive black holes have already grown to their final masses when the bar is forming, suggesting a possible
+            connection between the black hole and bar formation. To investigate in more detail about this connection, we are
+            currently analysing the properties of barred galaxies in the TNG50 simulation, which is a highest resolution
+            cosmological hydrodynamical simulation designed to look in detail the structures of the galaxies.
+          </p>
+
+        </header>
+      </div>
+      <div class="content">
+        <header id='papers'>
+          <h2>The publications of the bacco group</h2>
+        </header>
+        <ul>
+          <!-- use this in nasa ads, when searching 716151: <li>%A, <b>%T</b>, %U</li> \n -->
+          <li>Hernández-Monteagudo, Carlos, Chaves-Montero, Jonás, Angulo, Raúl E., and Aricò, Giovanni, <b>Tomographic
+              constraints on gravity from angular redshift fluctuations in the late Universe</b>, <a
+              href="https://ui.adsabs.harvard.edu/abs/2021MNRAS.503L..62H">2021MNRAS.503L..62H</a></li>
+          <li>Hernández-Monteagudo, Carlos, Chaves-Montero, Jonás, and Angulo, Raúl E., <b>Density weighted angular redshift
+              fluctuations: a new cosmological observable</b>, <a
+              href="https://ui.adsabs.harvard.edu/abs/2021MNRAS.503L..56H">2021MNRAS.503L..56H</a></li>
+          <li>Aricò, Giovanni, Angulo, Raul E., Hernández-Monteagudo, Carlos, Contreras, Sergio, and Zennaro, Matteo,
+            <b>Simultaneous modelling of matter power spectrum and bispectrum in the presence of baryons</b>, <a
+              href="https://ui.adsabs.harvard.edu/abs/2021MNRAS.503.3596A">2021MNRAS.503.3596A</a></li>
+          <li>Habouzit, Mélanie, Li, Yuan, Somerville, Rachel S., Genel, Shy, Pillepich, Annalisa, Volonteri, Marta, Davé, Romeel,
+            Rosas-Guevara, Yetli, McAlpine, Stuart, Peirani, Sébastien, Hernquist, Lars, Anglés-Alcázar, Daniel, Reines, Amy,
+            Bower, Richard, Dubois, Yohan, Nelson, Dylan, Pichon, Christophe, and Vogelsberger, Mark, <b>Supermassive black holes
+              in cosmological simulations I: M<SUB>BH</SUB> - M<SUB>⋆</SUB> relation and black hole mass function</b>, <a
+              href="https://ui.adsabs.harvard.edu/abs/2021MNRAS.503.1940H">2021MNRAS.503.1940H</a></li>
+          <li>Chaves-Montero, Jonás, Hernández-Monteagudo, Carlos, Angulo, Raúl E., and Emberson, J. D., <b>Measuring the
+              evolution of intergalactic gas from z = 0 to 5 using the kinematic Sunyaev-Zel'dovich effect</b>, <a
+              href="https://ui.adsabs.harvard.edu/abs/2021MNRAS.503.1798C">2021MNRAS.503.1798C</a></li>
+          <li>Stücker, Jens, Schmidt, Andreas S., White, Simon D. M., Schmidt, Fabian, and Hahn, Oliver, <b>Measuring the tidal
+              response of structure formation: anisotropic separate universe simulations using TREEPM</b>, <a
+              href="https://ui.adsabs.harvard.edu/abs/2021MNRAS.503.1473S">2021MNRAS.503.1473S</a></li>
+          <li>Knebe, Alexander, Lopez-Cano, Daniel, Avila, Santiago, Favole, Ginevra, Stevens, Adam R. H., Gonzalez-Perez,
+            Violeta, Reyes-Peraza, Guillermo, Yepes, Gustavo, Chuang, Chia-Hsun, and Kitaura, Francisco-Shu, <b>UNITSIM-Galaxies:
+              data release and clustering of emission-line galaxies</b>, <a
+              href="https://ui.adsabs.harvard.edu/abs/2021arXiv210313088K">2021arXiv210313088K</a></li>
+          <li>Ondaro-Mallea, Lurdes, Angulo, Raul E., Zennaro, Matteo, Contreras, Sergio, and Aricò, Giovanni, <b>Non-universality
+              of the mass function: dependence on the growth rate and power spectrum shape</b>, <a
+              href="https://ui.adsabs.harvard.edu/abs/2021arXiv210208958O">2021arXiv210208958O</a></li>
+          <li>Zennaro, Matteo, Angulo, Raul E., Pellejero-Ibáñez, Marcos, Stücker, Jens, Contreras, Sergio, and Aricò, Giovanni,
+            <b>The BACCO simulation project: biased tracers in real space</b>, <a
+              href="https://ui.adsabs.harvard.edu/abs/2021arXiv210112187Z">2021arXiv210112187Z</a></li>
+          <li>Favole, Ginevra, Montero-Dorta, Antonio D., Artale, M. Celeste, Contreras, Sergio, Zehavi, Idit, and Xu, Xiaoju,
+            <b>SHAM through the lens of a hydrodynamical simulation</b>, <a
+              href="https://ui.adsabs.harvard.edu/abs/2021arXiv210110733F">2021arXiv210110733F</a></li>
+          <li>Richardson, T. R. G., Stücker, J., Angulo, R. E., and Hahn, O., <b>Non-Halo Structures and their Effects on
+              Gravitational Lensing</b>, <a href="https://ui.adsabs.harvard.edu/abs/2021arXiv210107806R">2021arXiv210107806R</a>
+          </li>
+          <li>Correa, Carlos M., Paz, Dante J., Sánchez, Ariel G., Ruiz, Andrés N., Padilla, Nelson D., and Angulo, Raúl E.,
+            <b>Redshift-space effects in voids and their impact on cosmological tests. Part I: the void size function</b>, <a
+              href="https://ui.adsabs.harvard.edu/abs/2021MNRAS.500..911C">2021MNRAS.500..911C</a></li>
+          <li>Michaux, Michaël, Hahn, Oliver, Rampf, Cornelius, and Angulo, Raul E., <b>Accurate initial conditions for
+              cosmological N-body simulations: minimizing truncation and discreteness errors</b>, <a
+              href="https://ui.adsabs.harvard.edu/abs/2021MNRAS.500..663M">2021MNRAS.500..663M</a></li>
+          <li>Contreras, Sergio, Angulo, Raul, and Zennaro, Matteo, <b>A flexible subhalo abundance matching model for galaxy
+              clustering in redshift space</b>, <a
+              href="https://ui.adsabs.harvard.edu/abs/2020arXiv201206596C">2020arXiv201206596C</a></li>
+          <li>Pellejero-Ibañez, Marcos, Angulo, Raul E., Aricó, Giovanni, Zennaro, Matteo, Contreras, Sergio, and Stücker, Jens,
+            <b>Cosmological parameter estimation via iterative emulation of likelihoods</b>, <a
+              href="https://ui.adsabs.harvard.edu/abs/2020MNRAS.499.5257P">2020MNRAS.499.5257P</a></li>
+          <li>Contreras, S., Angulo, R. E., Zennaro, M., Aricò, G., and Pellejero-Ibañez, M., <b>3 per cent-accurate predictions
+              for the clustering of dark matter, haloes, and subhaloes, over a wide range of cosmologies and scales</b>, <a
+              href="https://ui.adsabs.harvard.edu/abs/2020MNRAS.499.4905C">2020MNRAS.499.4905C</a></li>
+          <li>Aricò, Giovanni, Angulo, Raul E., Contreras, Sergio, Ondaro-Mallea, Lurdes, Pellejero-Ibañez, Marcos, and Zennaro,
+            Matteo, <b>The BACCO Simulation Project: A baryonification emulator with Neural Networks</b>, <a
+              href="https://ui.adsabs.harvard.edu/abs/2020arXiv201115018A">2020arXiv201115018A</a></li>
+          <li>Renneby, Malin, Henriques, Bruno M. B., Hilbert, Stefan, Nelson, Dylan, Vogelsberger, Mark, Angulo, Raúl E.,
+            Springel, Volker, and Hernquist, Lars, <b>Joint galaxy-galaxy lensing and clustering constraints on galaxy
+              formation</b>, <a href="https://ui.adsabs.harvard.edu/abs/2020MNRAS.498.5804R">2020MNRAS.498.5804R</a></li>
+          <li>Rodriguez, Facundo, Montero-Dorta, Antonio D., Angulo, Raul E., Artale, M. Celeste, and Merchán, Manuel, <b>The
+              scaling relations and clustering properties of central and satellite galaxies</b>, <a
+              href="https://ui.adsabs.harvard.edu/abs/2020arXiv201100014R">2020arXiv201100014R</a></li>
+          <li>Stücker, Jens, Hahn, Oliver, Angulo, Raul E., and White, Simon D. M., <b>Simulating the complexity of the dark
+              matter sheet I: numerical algorithms</b>, <a
+              href="https://ui.adsabs.harvard.edu/abs/2020MNRAS.495.4943S">2020MNRAS.495.4943S</a></li>
+          <li>Aricò, Giovanni, Angulo, Raul E., Hernández-Monteagudo, Carlos, Contreras, Sergio, Zennaro, Matteo,
+            Pellejero-Ibañez, Marcos, and Rosas-Guevara, Yetli, <b>Modelling the large-scale mass density field of the universe as
+              a function of cosmology and baryonic physics</b>, <a
+              href="https://ui.adsabs.harvard.edu/abs/2020MNRAS.495.4800A">2020MNRAS.495.4800A</a></li>
+          <li>Izquierdo-Villalba, David, Bonoli, Silvia, Dotti, Massimo, Sesana, Alberto, Rosas-Guevara, Yetli, and Spinoso,
+            Daniele, <b>From galactic nuclei to the halo outskirts: tracing supermassive black holes across cosmic history and
+              environments</b>, <a href="https://ui.adsabs.harvard.edu/abs/2020MNRAS.495.4681I">2020MNRAS.495.4681I</a></li>
+          <li>Kitaura, Francisco-Shu, Balaguera-Antolínez, Andrés, Sinigaglia, Francesco, and Pellejero-Ibáñez, Marcos, <b>The
+              cosmic web connection to the dark matter halo distribution through gravity</b>, <a
+              href="https://ui.adsabs.harvard.edu/abs/2020arXiv200511598K">2020arXiv200511598K</a></li>
+          <li>Contreras, Sergio, Angulo, Raul, and Zennaro, Matteo, <b>A flexible modelling of galaxy assembly bias</b>, <a
+              href="https://ui.adsabs.harvard.edu/abs/2020arXiv200503672C">2020arXiv200503672C</a></li>
+          <li>Angulo, Raul E., Zennaro, Matteo, Contreras, Sergio, Aricò, Giovanni, Pellejero-Ibañez, Marcos, and Stücker, Jens,
+            <b>The BACCO Simulation Project: Exploiting the full power of large-scale structure for cosmology</b>, <a
+              href="https://ui.adsabs.harvard.edu/abs/2020arXiv200406245A">2020arXiv200406245A</a></li>
+          <li>Pellejero-Ibañez, Marcos, Balaguera-Antolínez, Andres, Kitaura, Francisco-Shu, Angulo, Raúl E., Yepes, Gustavo,
+            Chuang, Chia-Hsun, Reyes-Peraza, Guillermo, Autefage, Mathieu, Vakili, Mohammadjavad, and Zhao, Cheng, <b>The bias of
+              dark matter tracers: assessing the accuracy of mapping techniques</b>, <a
+              href="https://ui.adsabs.harvard.edu/abs/2020MNRAS.493..586P">2020MNRAS.493..586P</a></li>
+          <li>Balaguera-Antolínez, A., Kitaura, Francisco-Shu, Pellejero-Ibáñez, M., Lippich, Martha, Zhao, Cheng, Sánchez, Ariel
+            G., Dalla Vecchia, Claudio, Angulo, Raúl E., and Crocce, Martín, <b>One simulation to have them all: performance of
+              the Bias Assignment Method against N-body simulations</b>, <a
+              href="https://ui.adsabs.harvard.edu/abs/2020MNRAS.491.2565B">2020MNRAS.491.2565B</a></li>
+          <li>Rosas-Guevara, Yetli, Bonoli, Silvia, Dotti, Massimo, Zana, Tommaso, Nelson, Dylan, Pillepich, Annalisa, Ho, Luis
+            C., Izquierdo-Villalba, David, Hernquist, Lars, and Pakmor, Rüediger, <b>The buildup of strongly barred galaxies in
+              the TNG100 simulation</b>, <a href="https://ui.adsabs.harvard.edu/abs/2020MNRAS.491.2547R">2020MNRAS.491.2547R</a>
+          </li>
+          <li>Zennaro, Matteo, Angulo, Raúl E., Aricò, Giovanni, Contreras, Sergio, and Pellejero-Ibáñez, Marcos, <b>How to add
+              massive neutrinos to your ΛCDM simulation - extending cosmology rescaling algorithms</b>, <a
+              href="https://ui.adsabs.harvard.edu/abs/2019MNRAS.489.5938Z">2019MNRAS.489.5938Z</a></li>
+          <li>Izquierdo-Villalba, David, Angulo, Raul E., Orsi, Alvaro, Hurier, Guillaume, Vilella-Rojo, Gonzalo, Bonoli, Silvia,
+            López-Sanjuan, Carlos, Alcaniz, Jailson, Cenarro, Javier, Cristóbal-Hornillos, David, Dupke, Renato, Ederoclite,
+            Alessandro, Hernández-Monteagudo, Carlos, Marín-Franch, Antonio, Moles, Mariano, Mendes de Oliveira, Claudia, Sodré,
+            Laerte, Varela, Jesús, and Vázquez Ramió, Héctor, <b>J-PLUS: Synthetic galaxy catalogues with emission lines for
+              photometric surveys</b>, <a href="https://ui.adsabs.harvard.edu/abs/2019A&A...631A..82I">2019A&A...631A..82I</a>
+          </li>
+          <li>Jara-Toro, Rafael A., Pino, Gustavo A., Glowacki, David R., Shannon, Robin J., and Martinez-Nunez, Emilio,
+            <b>Enhancing automated reaction discovery with boxed molecular dynamics in energy space</b>, <a
+              href="https://ui.adsabs.harvard.edu/abs/2019arXiv191001349J">2019arXiv191001349J</a></li>
+          <li>Misra, Arijit, Preußler, Stefan, Zhou, Linjie, and Schneider, Thomas, <b>Nonlinearity- and dispersion- less
+              integrated optical time magnifier based on a high-Q SiN microring resonator</b>, <a
+              href="https://ui.adsabs.harvard.edu/abs/2019NatSR...914277M">2019NatSR...914277M</a></li>
+          <li>Izquierdo-Villalba, David, Bonoli, Silvia, Spinoso, Daniele, Rosas-Guevara, Yetli, Henriques, Bruno M. B., and
+            Hernández-Monteagudo, Carlos, <b>The build-up of pseudo-bulges in a hierarchical universe</b>, <a
+              href="https://ui.adsabs.harvard.edu/abs/2019MNRAS.488..609I">2019MNRAS.488..609I</a></li>
+          <li>Smith, Robert E. and Angulo, Raul E., <b>Precision modelling of the matter power spectrum in a Planck-like
+              Universe</b>, <a href="https://ui.adsabs.harvard.edu/abs/2019MNRAS.486.1448S">2019MNRAS.486.1448S</a></li>
+          <li>Padilla, N., Contreras, S., Zehavi, I., Baugh, C. M., and Norberg, P., <b>The effect of assembly bias on
+              redshift-space distortions</b>, <a
+              href="https://ui.adsabs.harvard.edu/abs/2019MNRAS.486..582P">2019MNRAS.486..582P</a></li>
+          <li>Correa, Carlos M., Paz, Dante J., Padilla, Nelson D., Ruiz, Andrés N., Angulo, Raúl E., and Sánchez, Ariel G.,
+            <b>Non-fiducial cosmological test from geometrical and dynamical distortions around voids</b>, <a
+              href="https://ui.adsabs.harvard.edu/abs/2019MNRAS.485.5761C">2019MNRAS.485.5761C</a></li>
+          <li>Misra, Arijit, Preußler, Stefan, Zhou, Linjie, and Schneider, Thomas, <b>Dispersionless time-lens with an integrated
+              silicon nitride ring resonator</b>, <a
+              href="https://ui.adsabs.harvard.edu/abs/2019SPIE10921E..1OM">2019SPIE10921E..1OM</a></li>
+          <li>Contreras, S., Zehavi, I., Padilla, N., Baugh, C. M., Jiménez, E., and Lacerna, I., <b>The evolution of assembly
+              bias</b>, <a href="https://ui.adsabs.harvard.edu/abs/2019MNRAS.484.1133C">2019MNRAS.484.1133C</a></li>
+          <li>Artale, M. Celeste, Zehavi, Idit, Contreras, Sergio, and Norberg, Peder, <b>The impact of assembly bias on the halo
+              occupation in hydrodynamical simulations</b>, <a
+              href="https://ui.adsabs.harvard.edu/abs/2018MNRAS.480.3978A">2018MNRAS.480.3978A</a></li>
+          <li>Renneby, Malin, Hilbert, Stefan, and Angulo, Raúl E., <b>Halo mass and weak galaxy-galaxy lensing profiles in
+              rescaled cosmological N-body simulations</b>, <a
+              href="https://ui.adsabs.harvard.edu/abs/2018MNRAS.479.1100R">2018MNRAS.479.1100R</a></li>
+          <li>Tian, Yuan, Li, Xiangyu, Zhu, Yongqiang, and Xia, Ruihua, <b>Optimal capacity allocation of multiple energy storage
+              considering microgrid cost</b>, <a
+              href="https://ui.adsabs.harvard.edu/abs/2018JPhCS1074a2126T">2018JPhCS1074a2126T</a></li>
+          <li>Chaves-Montero, Jonás, Angulo, Raúl E., and Hernández-Monteagudo, Carlos, <b>The effect of photometric redshift
+              uncertainties on galaxy clustering and baryonic acoustic oscillations</b>, <a
+              href="https://ui.adsabs.harvard.edu/abs/2018MNRAS.477.3892C">2018MNRAS.477.3892C</a></li>
+          <li>Lacerna, I., Contreras, S., González, R. E., Padilla, N., and Gonzalez-Perez, V., <b>Galactic conformity measured in
+              semi-analytic models</b>, <a href="https://ui.adsabs.harvard.edu/abs/2018MNRAS.475.1177L">2018MNRAS.475.1177L</a>
+          </li>
+          <li>Hurier, G. and Angulo, R. E., <b>Measuring the hydrostatic mass bias in galaxy clusters by combining
+              Sunyaev-Zel'dovich and CMB lensing data</b>, <a
+              href="https://ui.adsabs.harvard.edu/abs/2018A&A...610L...4H">2018A&A...610L...4H</a></li>
+          <li>Zehavi, Idit, Contreras, Sergio, Padilla, Nelson, Smith, Nicholas J., Baugh, Carlton M., and Norberg, Peder, <b>The
+              Impact of Assembly Bias on the Galaxy Content of Dark Matter Halos</b>, <a
+              href="https://ui.adsabs.harvard.edu/abs/2018ApJ...853...84Z">2018ApJ...853...84Z</a></li>
+          <li>Schimmelpfennig, B. and Peyerimhoff, S. D., <b>Ab initio calculation of Auger spectra for carbon monoxide</b>, <a
+              href="https://ui.adsabs.harvard.edu/abs/1996CPL...253..377S">1996CPL...253..377S</a></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <div id="includedFooter"></div>
+
+  <!-- Scripts -->
+  <script src="assets/js/jquery.min.js"></script>
+  <script src="assets/js/browser.min.js"></script>
+  <script src="assets/js/breakpoints.min.js"></script>
+  <script src="assets/js/util.js"></script>
+  <script src="assets/js/main.js"></script>
+  <script> $(function () { $("#includedFooter").load("footer.html"); });</script>
+  <script> $(function () { $("#includedMenu").load("menu.html"); });</script>
+
+</body>
+
+</html>

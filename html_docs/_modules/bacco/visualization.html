@@ -1,0 +1,1259 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>bacco.visualization &mdash; bacco 0.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> bacco
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../quickstart.html">QuickStart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../code.html">Code</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">bacco</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>bacco.visualization</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for bacco.visualization</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Implementation of the &#39;Simulation&#39; class and helper functions</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="p">(</span><span class="n">division</span><span class="p">,</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">absolute_import</span><span class="p">)</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Visualization&quot;</span><span class="p">]</span>
+
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">os.path</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">copy</span>
+
+<span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">config</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">cosmology</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">utils</span>
+<span class="kn">from</span> <span class="nn">.utils</span> <span class="k">import</span> <span class="n">cached_property</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;bacco.sims&#39;</span><span class="p">)</span>
+
+<span class="n">N_TYPE</span> <span class="o">=</span> <span class="mi">6</span>
+
+
+<span class="c1">#### some matrix math</span>
+
+<span class="c1"># see</span>
+<span class="c1"># https://github.com/g-truc/glm/blob/master/glm/ext/matrix_transform.inl</span>
+
+
+<span class="k">def</span> <span class="nf">np_get_kmesh</span><span class="p">(</span><span class="n">npix</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">real</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span> 
+    <span class="sd">&quot;&quot;&quot; construct a uniform mesh of kvectors (for usage with np.fft.fftn)</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters:</span>
+<span class="sd">    ----------</span>
+<span class="sd">    npix : sequence of integer</span>
+<span class="sd">        Number of pixels in each dimension</span>
+<span class="sd">    L :  float</span>
+<span class="sd">        Size of the domain (in real space) - typically the boxsize</span>
+<span class="sd">    real : bool</span>
+<span class="sd">        Set to true for usage with np.fft.rfftn</span>
+<span class="sd">    </span>
+<span class="sd">    Returns:</span>
+<span class="sd">    ----------</span>
+<span class="sd">    knd : (npix[0], npix[1], ..., len(npix)) array of k-vectors</span>
+<span class="sd">    </span>
+<span class="sd">    Example:</span>
+<span class="sd">    ----------</span>
+<span class="sd">    k = np_get_kmesh((128,128,128), 10., real=False)</span>
+<span class="sd">    =&gt; (128,128,128,3) array</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="n">ndim</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">npix</span><span class="p">)</span>
+    
+    <span class="n">L</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">npix</span><span class="p">)</span> <span class="o">*</span> <span class="n">L</span>
+    
+    <span class="n">k1d</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">ndim</span><span class="p">):</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">i</span> <span class="o">==</span> <span class="n">ndim</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">&amp;</span> <span class="n">real</span><span class="p">:</span>  <span class="c1"># last dim can have different shape in real fft</span>
+            <span class="n">k1d</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fftfreq</span><span class="p">(</span><span class="n">npix</span><span class="p">[</span><span class="n">i</span><span class="p">])[</span><span class="mi">0</span><span class="p">:(</span><span class="n">npix</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">//</span><span class="mi">2</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">npix</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">/</span> <span class="n">L</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">k1d</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fftfreq</span><span class="p">(</span><span class="n">npix</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">*</span> <span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">npix</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">/</span> <span class="n">L</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+
+    <span class="c1">#k1d  = np.fft.fftfreq(npix) * (2*np.pi * npix) / L</span>
+    <span class="n">knd</span>  <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="o">*</span><span class="n">k1d</span><span class="p">,</span> <span class="n">indexing</span><span class="o">=</span><span class="s1">&#39;ij&#39;</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;f4&quot;</span><span class="p">)</span>
+    <span class="n">knd</span>  <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">rollaxis</span><span class="p">(</span><span class="n">knd</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">ndim</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># bring into shape [npix,npix,...,ndim]</span>
+    
+    <span class="k">return</span> <span class="n">knd</span>
+
+<span class="k">def</span> <span class="nf">np_convolve_gaussian</span><span class="p">(</span><span class="n">rho</span><span class="p">,</span> <span class="n">ndim</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">L</span><span class="o">=</span><span class="mf">1.</span><span class="p">,</span> <span class="n">expand</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Convolves rho with a Gaussian in Fourier Space</span>
+<span class="sd">    </span>
+<span class="sd">    rho can be a single field or a collection of 1D-3D fields where</span>
+<span class="sd">    the first dimension corresponds to the number of layers. E.g. for ndim=2</span>
+<span class="sd">    rho has the shape (nlayers, npix_x, npix_y) or just (npix_x, npix_y).</span>
+<span class="sd">    Each layer can be convolved with the same kernel (sigma is scalar) or</span>
+<span class="sd">    with an individual kernel (sigma has length (nlayers)). Further one can</span>
+<span class="sd">    switch between periodic and non-periodic convolutions by zero-padding the </span>
+<span class="sd">    convolution domain by a factor expand (None or 0. -&gt; periodic convolution)</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters:</span>
+<span class="sd">    ----------</span>
+<span class="sd">    rho : the input field of shape (nlayers, npix_x, ... npix_ndim) or </span>
+<span class="sd">           (npix_x, ... npix_ndim)</span>
+<span class="sd">    ndim : the number of dimensions of a field (can be between 1 and 3)</span>
+<span class="sd">    sigma : the kernel size, can be scalar or have shape (nlayers,)</span>
+<span class="sd">    L : physical size of each dimension can be scalar or of shape (ndim,)</span>
+<span class="sd">    expand : relative extension for zero-padding for non-periodic convolutions</span>
+<span class="sd">              periodic -&gt; set to None or 0.</span>
+<span class="sd">              nonperiodic -&gt; set to 0.5 for being safe of making no erros by doubling</span>
+<span class="sd">                 the domain, or to something smaller for saving memory and time</span>
+<span class="sd">              mixture -&gt; you can also give an array of shape (ndim,) which specifies a</span>
+<span class="sd">                 different padding in each dimension</span>
+<span class="sd">    Returns:</span>
+<span class="sd">    ----------</span>
+<span class="sd">    rhosmooth : same shape as rho, but smoothed      </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="n">nlayers</span> <span class="o">=</span> <span class="n">rho</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="o">-</span><span class="n">ndim</span><span class="p">]</span>
+    
+    <span class="k">if</span> <span class="n">expand</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span> <span class="c1"># calculate padding for non-periodic convolutions</span>
+        <span class="n">inshape</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">rho</span><span class="p">)</span>
+        <span class="n">inpix</span> <span class="o">=</span> <span class="n">inshape</span><span class="p">[</span><span class="o">-</span><span class="n">ndim</span><span class="p">:]</span>
+
+        <span class="c1"># calculate padding </span>
+        <span class="n">padpix</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">expand</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">inpix</span><span class="p">))))</span>
+        <span class="n">padall</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="mi">0</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">nlayers</span><span class="p">))</span> <span class="o">+</span> <span class="n">padpix</span>
+
+        <span class="n">pad</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">([</span><span class="n">padall</span><span class="p">,</span> <span class="n">padall</span><span class="p">])</span>
+        
+        <span class="c1"># Correct the L values</span>
+        <span class="n">Lfac</span> <span class="o">=</span> <span class="mf">1.</span> <span class="o">+</span> <span class="mf">2.</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">(</span><span class="n">padpix</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">inpix</span><span class="p">)</span>
+        <span class="n">L</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">L</span><span class="p">)</span> <span class="o">*</span> <span class="n">Lfac</span>
+        
+        <span class="n">inshape</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">rho</span><span class="p">)</span>
+        <span class="n">rho</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">pad</span><span class="p">(</span><span class="n">rho</span><span class="p">,</span> <span class="n">pad</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;constant&quot;</span><span class="p">,</span> <span class="n">constant_values</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">pad</span> <span class="o">=</span> <span class="kc">None</span>
+        
+    <span class="n">npix</span> <span class="o">=</span> <span class="n">rho</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="n">ndim</span><span class="p">:]</span>
+    
+    <span class="n">sigma</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">nlayers</span><span class="p">)</span> <span class="o">*</span> <span class="n">sigma</span>
+    <span class="n">sigma</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">sigma</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="n">nlayers</span><span class="p">)</span> <span class="o">+</span> <span class="p">[</span><span class="mi">1</span><span class="p">,]</span><span class="o">*</span><span class="n">ndim</span><span class="p">)</span>
+        
+    <span class="n">rhok</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">rfftn</span><span class="p">(</span><span class="n">rho</span><span class="p">,</span> <span class="n">npix</span><span class="p">)</span>
+    
+    <span class="n">k</span> <span class="o">=</span> <span class="n">np_get_kmesh</span><span class="p">(</span><span class="n">npix</span><span class="p">,</span> <span class="n">L</span><span class="o">=</span><span class="n">L</span><span class="p">,</span> <span class="n">real</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">kabs2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">square</span><span class="p">(</span><span class="n">k</span><span class="p">),</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">kernelk</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">kabs2</span><span class="o">*</span><span class="p">(</span><span class="n">sigma</span><span class="o">**</span><span class="mi">2</span><span class="o">/</span><span class="mf">2.</span><span class="p">))</span>
+
+    <span class="n">rhosmoothk</span> <span class="o">=</span> <span class="n">rhok</span> <span class="o">*</span> <span class="n">kernelk</span>
+    
+    <span class="n">rhosmooth</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">irfftn</span><span class="p">(</span><span class="n">rhosmoothk</span><span class="p">,</span> <span class="n">npix</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">pad</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">rhosmooth</span> <span class="o">=</span> <span class="n">rhosmooth</span><span class="p">[</span><span class="o">...</span><span class="p">,</span><span class="n">pad</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span><span class="mi">0</span><span class="p">]:</span><span class="o">-</span><span class="n">pad</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span><span class="n">pad</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">]:</span><span class="o">-</span><span class="n">pad</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]]</span>
+    
+    <span class="k">return</span> <span class="n">rhosmooth</span>
+
+<span class="k">def</span> <span class="nf">normalize</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns a vector divided by its absolute value&quot;&quot;&quot;</span>
+    
+    <span class="n">xabs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">x</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">x</span> <span class="o">/</span> <span class="n">xabs</span><span class="p">[</span><span class="o">...</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span>
+
+<span class="k">def</span> <span class="nf">matrix_look_at</span><span class="p">(</span><span class="n">eye</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mf">0.</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">),</span> <span class="n">lookat</span><span class="o">=</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span><span class="mf">0.</span><span class="p">,</span><span class="mf">0.</span><span class="p">),</span> <span class="n">up</span><span class="o">=</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span><span class="mf">1.</span><span class="p">,</span><span class="mf">0.</span><span class="p">),</span> <span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Creates a rotation/translation matrix in homogeneous coordinates</span>
+<span class="sd">    </span>
+<span class="sd">    This function creates a projection matrix which rotates/translates</span>
+<span class="sd">    the coordinate system so that an object (lookat) is focused from</span>
+<span class="sd">    the camera position (eye)</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters:</span>
+<span class="sd">    ----------</span>
+<span class="sd">    eye : (3 component) location of the camera</span>
+<span class="sd">    lookat : (3 component) location the camera is looking at</span>
+<span class="sd">    up : (3 component) the y-direction in the image</span>
+<span class="sd">    </span>
+<span class="sd">    Returns:</span>
+<span class="sd">    ----------</span>
+<span class="sd">    res : (4,4) projection matrix (homogeneous coordinates)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">eye</span><span class="p">,</span> <span class="n">lookat</span><span class="p">,</span> <span class="n">up</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">((</span><span class="n">eye</span><span class="p">,</span> <span class="n">lookat</span><span class="p">,</span> <span class="n">up</span><span class="p">))</span>
+    
+    <span class="n">f</span> <span class="o">=</span> <span class="n">normalize</span><span class="p">(</span><span class="n">lookat</span> <span class="o">-</span> <span class="n">eye</span><span class="p">)</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">normalize</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">up</span><span class="p">,</span> <span class="n">f</span><span class="p">))</span>
+    <span class="n">u</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span>
+    
+    <span class="n">res</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">((</span><span class="mf">1.</span><span class="p">,</span><span class="mf">1.</span><span class="p">,</span><span class="mf">1.</span><span class="p">,</span><span class="mf">1.</span><span class="p">)))</span>
+    
+    <span class="n">res</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">3</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">s</span>
+    <span class="n">res</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">3</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">u</span>
+    <span class="n">res</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">3</span><span class="p">,</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">f</span>
+    <span class="n">res</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">eye</span><span class="p">)</span>
+    <span class="n">res</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">eye</span><span class="p">)</span>
+    <span class="n">res</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">eye</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="n">res</span><span class="o">.</span><span class="n">T</span>
+    
+<span class="c1"># https://github.com/g-truc/glm/blob/master/glm/ext/matrix_clip_space.inl</span>
+<span class="k">def</span> <span class="nf">matrix_perspective</span><span class="p">(</span><span class="n">angle</span><span class="o">=</span><span class="mf">1.</span><span class="p">,</span> <span class="n">znear</span><span class="o">=</span><span class="mf">0.0001</span><span class="p">,</span> <span class="n">zfar</span><span class="o">=</span><span class="mf">1.</span><span class="p">,</span> <span class="n">aspect</span><span class="o">=</span><span class="mf">1.</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Creates a perspective matrix in homogeneous coordinates</span>
+<span class="sd">    </span>
+<span class="sd">    The projection matrix will make things which are farther away appear</span>
+<span class="sd">    smaller and closer things bigger</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters:</span>
+<span class="sd">    ----------</span>
+<span class="sd">    angle : opening angle of the projection</span>
+<span class="sd">    znear : close clipping plane</span>
+<span class="sd">    zfar : far away clipping plane</span>
+<span class="sd">    aspect : aspect ratio of the camera image</span>
+<span class="sd">    </span>
+<span class="sd">    Returns:</span>
+<span class="sd">    ----------</span>
+<span class="sd">    res : (4,4) projection matrix (homogeneous coordinates)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">assert</span> <span class="n">znear</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;invalid value </span><span class="si">%g</span><span class="s2"> &quot;</span> <span class="o">%</span> <span class="n">znear</span>
+    <span class="k">assert</span> <span class="n">zfar</span> <span class="o">&gt;</span> <span class="n">znear</span><span class="p">,</span> <span class="s2">&quot;invalid value for zFar </span><span class="si">%g</span><span class="s2"> (zNear = )&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">zfar</span><span class="p">,</span> <span class="n">znear</span><span class="p">)</span>
+    
+    <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">zfar</span><span class="o">/</span><span class="n">znear</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">7.</span><span class="p">,</span> <span class="s2">&quot;please decrease ratio of cliping boundaries (because of float precision!)&quot;</span>
+    
+    <span class="n">tanHalfFovy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">tan</span><span class="p">(</span><span class="n">angle</span> <span class="o">/</span> <span class="mf">2.</span><span class="p">)</span>
+    
+    <span class="n">res</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">((</span><span class="mf">1.</span><span class="o">/</span><span class="p">(</span><span class="n">aspect</span> <span class="o">*</span> <span class="n">tanHalfFovy</span><span class="p">),</span> <span class="mf">1.</span><span class="o">/</span><span class="n">tanHalfFovy</span><span class="p">,</span> <span class="n">zfar</span> <span class="o">/</span> <span class="p">(</span><span class="n">zfar</span> <span class="o">-</span> <span class="n">znear</span><span class="p">),</span> <span class="mf">0.</span><span class="p">)))</span>
+    <span class="n">res</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="p">(</span><span class="n">zfar</span> <span class="o">*</span> <span class="n">znear</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">zfar</span> <span class="o">-</span> <span class="n">znear</span><span class="p">)</span>
+    <span class="n">res</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.</span>
+    
+    <span class="k">return</span> <span class="n">res</span>
+
+<span class="k">def</span> <span class="nf">matrix_perspective_lookat</span><span class="p">(</span><span class="n">eye</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mf">0.</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">),</span> <span class="n">lookat</span><span class="o">=</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span><span class="mf">0.</span><span class="p">,</span><span class="mf">0.</span><span class="p">),</span> <span class="n">up</span><span class="o">=</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span><span class="mf">1.</span><span class="p">,</span><span class="mf">0.</span><span class="p">),</span> 
+                              <span class="n">angle</span><span class="o">=</span><span class="mf">1.</span><span class="p">,</span> <span class="n">znear</span><span class="o">=</span><span class="mf">0.0001</span><span class="p">,</span> <span class="n">zfar</span><span class="o">=</span><span class="mf">1.</span><span class="p">,</span> <span class="n">aspect</span><span class="o">=</span><span class="mf">1.</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Chains a projection matrix &quot;lookat&quot; with a perspective projection</span>
+<span class="sd">    </span>
+<span class="sd">    See matrix_perspective (defines position/directions) and matrix_look_at </span>
+<span class="sd">    (defines camera angle and clipping) for detailled explanations:</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters:</span>
+<span class="sd">    ----------</span>
+<span class="sd">    eye : (3 component) location of the camera</span>
+<span class="sd">    lookat : (3 component) location the camera is looking at</span>
+<span class="sd">    up : (3 component) the y-direction in the image</span>
+<span class="sd">    angle : opening angle of the projection</span>
+<span class="sd">    znear : close clipping plane</span>
+<span class="sd">    zfar : far away clipping plane</span>
+<span class="sd">    aspect : aspect ratio of the camera image</span>
+<span class="sd">    </span>
+<span class="sd">    Returns:</span>
+<span class="sd">    ----------</span>
+<span class="sd">    res : (4,4) projection matrix (homogeneous coordinates)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">m1</span> <span class="o">=</span> <span class="n">matrix_look_at</span><span class="p">(</span><span class="n">lookat</span><span class="o">=</span><span class="n">lookat</span><span class="p">,</span> <span class="n">eye</span><span class="o">=</span><span class="n">eye</span><span class="p">,</span> <span class="n">up</span><span class="o">=</span><span class="n">up</span><span class="p">)</span>
+    <span class="n">m2</span> <span class="o">=</span> <span class="n">matrix_perspective</span><span class="p">(</span><span class="n">angle</span><span class="o">=</span><span class="n">angle</span><span class="p">,</span> <span class="n">znear</span><span class="o">=</span><span class="n">znear</span><span class="p">,</span> <span class="n">zfar</span><span class="o">=</span><span class="n">zfar</span><span class="p">,</span> <span class="n">aspect</span><span class="o">=</span><span class="n">aspect</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">m2</span><span class="p">,</span> <span class="n">m1</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">matrix_translation</span><span class="p">(</span><span class="n">dx</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Creates a translation matrix in homogeneous coordinates&quot;&quot;&quot;</span>
+    <span class="n">m</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">((</span><span class="mf">1.</span><span class="p">,</span><span class="mf">1.</span><span class="p">,</span><span class="mf">1.</span><span class="p">,</span><span class="mf">1.</span><span class="p">)))</span>
+    <span class="n">m</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">3</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">dx</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="n">m</span>
+
+<span class="k">def</span> <span class="nf">matrix_ortho</span><span class="p">(</span><span class="n">left</span><span class="o">=-</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">right</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">top</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">bottom</span><span class="o">=-</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">znear</span><span class="o">=</span><span class="mf">0.</span><span class="p">,</span> <span class="n">zfar</span><span class="o">=</span><span class="mf">1.</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Creates an orthogonal distortion in homogeneous coordinates</span>
+<span class="sd">    </span>
+<span class="sd">    This is mostly a rescaling and translation</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters:</span>
+<span class="sd">    ----------</span>
+<span class="sd">    left, right, top, bottom : float, screen boundaries</span>
+<span class="sd">    znear, zfar : float near and far clipping planes</span>
+<span class="sd">    </span>
+<span class="sd">    Returns:</span>
+<span class="sd">    ----------</span>
+<span class="sd">    res : (4,4) projection matrix (homogeneous coordinates)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">((</span><span class="mf">1.</span><span class="o">/</span><span class="p">(</span><span class="n">right</span><span class="o">-</span><span class="n">left</span><span class="p">),</span><span class="mf">1.</span><span class="o">/</span><span class="p">(</span><span class="n">top</span><span class="o">-</span><span class="n">bottom</span><span class="p">),</span><span class="mf">1.</span> <span class="o">/</span> <span class="p">(</span><span class="n">zfar</span> <span class="o">-</span> <span class="n">znear</span><span class="p">),</span> <span class="mf">1.</span><span class="p">))</span>
+    
+    <span class="n">res</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span>  <span class="o">-</span> <span class="p">(</span><span class="n">right</span> <span class="o">+</span> <span class="n">left</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">right</span> <span class="o">-</span> <span class="n">left</span><span class="p">)</span>
+    <span class="n">res</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span> <span class="p">(</span><span class="n">top</span> <span class="o">+</span> <span class="n">bottom</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">top</span> <span class="o">-</span> <span class="n">bottom</span><span class="p">)</span>
+    <span class="n">res</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span> <span class="n">znear</span> <span class="o">/</span> <span class="p">(</span><span class="n">zfar</span> <span class="o">-</span> <span class="n">znear</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">apply_matrix</span><span class="p">(</span><span class="n">pos</span><span class="p">,</span> <span class="n">mat</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Applies a matrix(4,4) in homogeneous coordinates to a 3-vector</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters:</span>
+<span class="sd">    ----------</span>
+<span class="sd">    pos : 3 vector (normal coordinates)</span>
+<span class="sd">    mat : 4 matrix (homogeneous coordinates)</span>
+<span class="sd">    </span>
+<span class="sd">    Returns:</span>
+<span class="sd">    ----------</span>
+<span class="sd">    res : (3,) vector (normal coordinates)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">pos</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">pos</span><span class="p">)</span>
+    <span class="n">posx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">pos</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="mi">4</span><span class="p">,))</span>
+    <span class="n">posx</span><span class="p">[</span><span class="o">...</span><span class="p">,:</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">pos</span>
+    <span class="n">posx</span><span class="p">[</span><span class="o">...</span><span class="p">,</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.</span>
+    
+    <span class="n">posx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">mat</span><span class="p">,</span> <span class="n">posx</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="n">posx</span><span class="p">[</span><span class="o">...</span><span class="p">,:</span><span class="mi">3</span><span class="p">]</span> <span class="o">/</span> <span class="n">posx</span><span class="p">[</span><span class="o">...</span><span class="p">,</span><span class="mi">3</span><span class="p">]</span>
+
+<span class="k">def</span> <span class="nf">spherical_smoothing</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">smooth_fac</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">lmax_calc</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">smoothingpow</span><span class="o">=</span><span class="mf">1.</span><span class="p">,</span> <span class="n">useexpmethod</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="kn">import</span> <span class="nn">pyshtools</span> <span class="k">as</span> <span class="nn">psh</span>
+    
+    <span class="c1"># use smoothingpow to get functions with delta-peaks smoother</span>
+    
+    <span class="n">pixels</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span>
+    
+    <span class="c1"># choose a method depending on the inputdata shape</span>
+    <span class="c1"># note that the best one is GLQ (has twice the frequency range)</span>
+    <span class="k">if</span> <span class="n">pixels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">pixels</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+        <span class="n">method</span> <span class="o">=</span> <span class="s2">&quot;DH&quot;</span>
+        <span class="n">expmethod</span> <span class="o">=</span> <span class="s2">&quot;DH&quot;</span>
+    <span class="k">elif</span> <span class="n">pixels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">2</span><span class="o">*</span><span class="n">pixels</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+        <span class="n">method</span> <span class="o">=</span> <span class="s2">&quot;DH&quot;</span>
+        <span class="n">expmethod</span> <span class="o">=</span> <span class="s2">&quot;DH2&quot;</span>
+    <span class="k">elif</span> <span class="n">pixels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">2</span><span class="o">*</span><span class="n">pixels</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+        <span class="n">method</span> <span class="o">=</span> <span class="s2">&quot;GLQ&quot;</span>
+        <span class="n">expmethod</span> <span class="o">=</span> <span class="s2">&quot;GLQ&quot;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Wrong pixel format&quot;</span><span class="p">)</span>
+        
+    <span class="k">if</span> <span class="n">useexpmethod</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">expmethod</span> <span class="o">=</span> <span class="n">useexpmethod</span>
+    
+    
+    <span class="n">sh</span> <span class="o">=</span> <span class="n">psh</span><span class="o">.</span><span class="n">SHGrid</span><span class="o">.</span><span class="n">from_array</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">T</span><span class="o">**</span><span class="n">smoothingpow</span><span class="p">,</span> <span class="n">grid</span><span class="o">=</span><span class="n">method</span><span class="p">)</span>
+    <span class="n">clm</span> <span class="o">=</span> <span class="n">sh</span><span class="o">.</span><span class="n">expand</span><span class="p">()</span>
+    
+    <span class="k">if</span> <span class="n">smooth_fac</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="p">(</span><span class="n">smooth_fac</span> <span class="o">&gt;=</span> <span class="mf">1.</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">lmax_calc</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;Please only give smoot_fac or lmax_cal to limit the frequency domain&quot;</span>
+        <span class="n">lmax_calc</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">clm</span><span class="o">.</span><span class="n">lmax</span> <span class="o">/</span> <span class="n">smooth_fac</span><span class="p">)</span>
+    
+    <span class="n">g</span> <span class="o">=</span> <span class="n">clm</span><span class="o">.</span><span class="n">expand</span><span class="p">(</span><span class="n">expmethod</span><span class="p">,</span> <span class="n">lmax_calc</span><span class="o">=</span><span class="n">lmax_calc</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="n">g</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">T</span> <span class="o">**</span> <span class="p">(</span><span class="mf">1.</span><span class="o">/</span><span class="n">smoothingpow</span><span class="p">)</span>
+
+
+
+<span class="k">def</span> <span class="nf">qtets_image</span><span class="p">(</span><span class="n">pos</span><span class="p">,</span> <span class="n">projection</span><span class="p">,</span> <span class="n">npix</span><span class="o">=</span><span class="p">(</span><span class="mi">512</span><span class="p">,</span><span class="mi">512</span><span class="p">),</span> <span class="n">boxsize</span><span class="o">=</span><span class="mf">0.</span><span class="p">,</span> <span class="n">maxngrid</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">nthreads</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Draws (resampled interpolated) particles using a projection matrix</span>
+<span class="sd">    </span>
+<span class="sd">    This function use the sheet interpolation to create interpolated</span>
+<span class="sd">    pseudo particles which are binned to an image. The parameters</span>
+<span class="sd">    control projection, refinement, weighting, binning and wrapping</span>
+<span class="sd">      </span>
+<span class="sd">    Important Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    pos : numpy array of float 32 with shape (npart, 3)</span>
+<span class="sd">        input positions which are assumed to be sorted (unless ids given)</span>
+<span class="sd">    projection : numpy array of float 32 with shape (4,4) </span>
+<span class="sd">        matrix that is used to project the positions to the image</span>
+<span class="sd">        plane (which goes from [-0.5,0.5] in x and y and [0,1] in z for</span>
+<span class="sd">        distance clipping). Best to use functions to define it</span>
+<span class="sd">    npix : tuple with 2 ints of form (npix_x, npix_y)</span>
+<span class="sd">        defines x and y pixel resolution </span>
+<span class="sd">    boxsize : float</span>
+<span class="sd">        boxsize (used for periodic wrapping -- to [-L/2, L/2])</span>
+<span class="sd">    wrapto : tuple with 3 floats of form (x, y, z)</span>
+<span class="sd">        (if boxsize &gt; 0.) the wrapping is done sothat (x,y,z) is the</span>
+<span class="sd">        center of the box (note that no shift is applied). Usually you </span>
+<span class="sd">        should use wrapto = lookat (or eye) when using a lookat matrix</span>
+<span class="sd">    maxngrid : integer</span>
+<span class="sd">        maximum resampled particles per tet per dimension (in the default</span>
+<span class="sd">        deposit mode the number of resampled particles is set exactly to </span>
+<span class="sd">        this)</span>
+<span class="sd">    nthreads: integer</span>
+<span class="sd">        number of openmp threads</span>
+<span class="sd">        </span>
+<span class="sd">    Advanced Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    ndeposit : int32 array of length npart to specify the deposit depth</span>
+<span class="sd">        for each tet (limitted to maxngrid)</span>
+<span class="sd">    fade : tuple of two float32 arrays of form tuple(ri, fi)</span>
+<span class="sd">        ri specifies a set of distances and fi specifies the weight </span>
+<span class="sd">        particles at each distance should be multiplied with</span>
+<span class="sd">    spherical : boolean</span>
+<span class="sd">        set to True to use equirectangular projection</span>
+<span class="sd">    rclip : tuple of two float32 (rnear, rfar)</span>
+<span class="sd">        clipping boundaries in case of spherical projection (ignored </span>
+<span class="sd">        otherwise)</span>
+<span class="sd">    mass : a single float or an array of npart float32</span>
+<span class="sd">        particle mass(es) used for weighting</span>
+<span class="sd">    ids : numpy array of npart int64 values</span>
+<span class="sd">        if specified these will be used for sorting the positions</span>
+<span class="sd">    usecic : boolean</span>
+<span class="sd">        set to True if you want a cic binning (otherwise ngp)</span>
+<span class="sd">    verbose : int</span>
+<span class="sd">        verbosity (can be 0 for no output or higher)</span>
+<span class="sd">    </span>
+<span class="sd">    Experimental Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    don&#39;t use these for now, look into qtets.imagenew for more information</span>
+<span class="sd">    </span>
+<span class="sd">    Example</span>
+<span class="sd">    ----------</span>
+<span class="sd">    Typically you want to call this function in the following manner</span>
+<span class="sd">    proj = matrix_perspective_lookat(...)</span>
+<span class="sd">    myim = vi.qtets_image(pos, proj, npix=.., boxsize=.., wrapto=..,</span>
+<span class="sd">                          maxngrid=4, nthreads=4)</span>
+<span class="sd">    where npix and maxngrid are the main quality parameters. Make sure</span>
+<span class="sd">    that pos and proj are float32 arrays with the correct shapes.</span>
+<span class="sd">    More advanced features are best interfaced through the Visualization</span>
+<span class="sd">    class below</span>
+<span class="sd">    </span>
+<span class="sd">    ToDo:</span>
+<span class="sd">    ----------</span>
+<span class="sd">    catch errors with wrong shapes</span>
+<span class="sd">    catch error for int32 ids</span>
+<span class="sd">    simplify code for checking input</span>
+<span class="sd">    </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="c1"># note that the exception handling is done by the c function itself</span>
+    <span class="c1"># this function is only here to provide a docstring</span>
+    
+    <span class="kn">from</span> <span class="nn">.qtets</span> <span class="k">import</span> <span class="n">qtets</span>
+    
+    <span class="k">return</span> <span class="n">qtets</span><span class="o">.</span><span class="n">imagenew</span><span class="p">(</span><span class="n">pos</span><span class="o">=</span><span class="n">pos</span><span class="p">,</span> <span class="n">projection</span><span class="o">=</span><span class="n">projection</span><span class="p">,</span> <span class="n">npix</span><span class="o">=</span><span class="n">npix</span><span class="p">,</span> 
+                          <span class="n">boxsize</span><span class="o">=</span><span class="n">boxsize</span><span class="p">,</span> <span class="n">maxngrid</span><span class="o">=</span><span class="n">maxngrid</span><span class="p">,</span> <span class="n">nthreads</span><span class="o">=</span><span class="n">nthreads</span><span class="p">,</span> 
+                          <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">qtets_resample</span><span class="p">(</span><span class="n">pos</span><span class="p">,</span> <span class="n">ngrid</span><span class="p">,</span> <span class="n">boxsize</span><span class="o">=</span><span class="mf">0.</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">ids</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">boundaries</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">qperiodic</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">ntrheads</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="kn">import</span> <span class="nn">bacco.qtets</span> <span class="k">as</span> <span class="nn">qtets</span>
+    <span class="k">return</span> <span class="n">qtets</span><span class="o">.</span><span class="n">spline_resample</span><span class="p">(</span><span class="n">pos</span><span class="o">=</span><span class="n">cpos</span><span class="p">,</span> <span class="n">ngrid</span><span class="o">=</span><span class="n">ngrid</span><span class="p">,</span> <span class="n">ndim</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">boxsize</span><span class="o">=</span><span class="n">boxsize</span><span class="p">,</span> <span class="n">ids</span><span class="o">=</span><span class="n">ids</span><span class="p">,</span> <span class="n">boundaries</span><span class="o">=</span><span class="n">boundaries</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="n">order</span><span class="p">,</span> 
+                                 <span class="n">qperiodic</span><span class="o">=</span><span class="n">qperiodic</span><span class="p">,</span> <span class="n">nthreads</span><span class="o">=</span><span class="n">nthreads</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">show_image</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">80</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">colormap</span><span class="o">=</span><span class="s1">&#39;inferno&#39;</span><span class="p">,</span> <span class="n">closefig</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+    <span class="kn">from</span> <span class="nn">matplotlib.colors</span> <span class="k">import</span> <span class="n">LogNorm</span>
+
+    <span class="k">if</span> <span class="n">colormap</span> <span class="o">==</span> <span class="s1">&#39;inferno&#39;</span><span class="p">:</span>
+        <span class="n">colormap</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">cm</span><span class="o">.</span><span class="n">inferno</span>
+    <span class="k">if</span> <span class="n">colormap</span> <span class="o">==</span> <span class="s1">&#39;viridis&#39;</span><span class="p">:</span>
+        <span class="n">colormap</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">cm</span><span class="o">.</span><span class="n">viridis</span>
+    <span class="k">if</span> <span class="n">colormap</span> <span class="o">!=</span> <span class="s1">&#39;viridis&#39;</span> <span class="ow">and</span> <span class="n">colormap</span> <span class="o">!=</span> <span class="s1">&#39;inferno&#39;</span><span class="p">:</span>
+        <span class="n">colormap</span> <span class="o">=</span> <span class="n">colormap</span>
+
+    <span class="c1">#if verbose is None:</span>
+    <span class="c1">#    verbose = config[&quot;verbose&quot;]</span>
+
+    <span class="n">data</span> <span class="o">+=</span> <span class="mf">1e-9</span>
+    <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">/</span><span class="nb">float</span><span class="p">(</span><span class="n">dpi</span><span class="p">),</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">/</span><span class="nb">float</span><span class="p">(</span><span class="n">dpi</span><span class="p">)),</span> <span class="n">dpi</span><span class="o">=</span><span class="n">dpi</span><span class="p">,</span> <span class="n">frameon</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">data</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">data</span><span class="p">))</span>
+    
+    <span class="k">if</span> <span class="n">vmin</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">vmin</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">vmax</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">vmax</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        
+    <span class="c1">#extent=(0,1,1,0),</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">colormap</span><span class="p">,</span> <span class="n">norm</span><span class="o">=</span><span class="n">LogNorm</span><span class="p">(</span><span class="n">vmin</span><span class="o">=</span><span class="n">vmin</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="n">vmax</span><span class="p">),</span> <span class="n">origin</span><span class="o">=</span><span class="s2">&quot;lower&quot;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">([])</span>  <span class="c1"># remove xticks</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">([])</span>  <span class="c1"># remove yticks</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s1">&#39;off&#39;</span><span class="p">)</span>     <span class="c1"># hide axis</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">subplots_adjust</span><span class="p">(</span><span class="n">bottom</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">top</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">left</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">right</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">wspace</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">hspace</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># streches the image and removes margins</span>
+
+    <span class="c1">#if label is not None: fig.text(0.05,0.9,label, size=50,color=&#39;y&#39;)</span>
+    <span class="k">if</span> <span class="n">label</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span> <span class="n">fig</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="mf">0.03</span><span class="p">,</span><span class="mf">0.93</span><span class="p">,</span><span class="n">label</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">40</span><span class="p">,</span><span class="n">color</span><span class="o">=</span><span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="n">bbox</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">facecolor</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">filename</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span>  <span class="n">dpi</span><span class="o">=</span><span class="n">dpi</span><span class="p">,</span> <span class="n">pad_inches</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">transparent</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">if</span><span class="p">(</span><span class="n">closefig</span><span class="p">):</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+        
+<span class="k">class</span> <span class="nc">CameraPath</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;This class mostly defines a list of projections</span>
+<span class="sd">    </span>
+<span class="sd">    It is experimental so far and has to be refined a lot. The idea</span>
+<span class="sd">    is that one defines a motion through the methods of this class</span>
+<span class="sd">    and then it sets the correct projection of a visualisation object</span>
+<span class="sd">    through set_projection(frame)&quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">angle</span><span class="o">=</span><span class="mf">1.</span><span class="p">,</span> <span class="n">zclip</span><span class="o">=</span><span class="p">(</span><span class="mf">1e-2</span><span class="p">,</span> <span class="mf">1.</span><span class="p">),</span> <span class="n">up</span><span class="o">=</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span><span class="mf">1.</span><span class="p">,</span><span class="mf">0.</span><span class="p">)):</span>
+        <span class="c1"># These things we usually keep constant</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">zclip</span> <span class="o">=</span> <span class="n">zclip</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">angle</span> <span class="o">=</span> <span class="n">angle</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">up</span> <span class="o">=</span> <span class="n">up</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">motion_type</span> <span class="o">=</span> <span class="kc">None</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">_nframes</span> <span class="o">=</span> <span class="mi">0</span>
+        
+    <span class="k">def</span> <span class="nf">set_rotate_around</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">phi</span><span class="p">,</span> <span class="n">r</span><span class="o">=</span><span class="mf">1.</span><span class="p">,</span> <span class="n">lookat</span><span class="o">=</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span><span class="mf">0.</span><span class="p">,</span><span class="mf">0.</span><span class="p">),</span> <span class="n">e1</span><span class="o">=</span><span class="p">(</span><span class="mf">1.</span><span class="p">,</span><span class="mf">0.</span><span class="p">,</span><span class="mf">0.</span><span class="p">),</span> <span class="n">e2</span><span class="o">=</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span><span class="mf">0.</span><span class="p">,</span><span class="mf">1.</span><span class="p">),</span> <span class="n">up</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>        
+        <span class="bp">self</span><span class="o">.</span><span class="n">motion_type</span> <span class="o">=</span> <span class="s2">&quot;rotation&quot;</span>
+        
+        <span class="k">if</span> <span class="n">up</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">up</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">up</span>
+            
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isscalar</span><span class="p">(</span><span class="n">phi</span><span class="p">):</span>
+            <span class="n">phi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">2.</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="n">phi</span><span class="p">,</span> <span class="n">endpoint</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">ups</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">up</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">phi</span><span class="p">)[</span><span class="o">...</span><span class="p">,</span><span class="kc">None</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lookats</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">lookat</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">phi</span><span class="p">)[</span><span class="o">...</span><span class="p">,</span><span class="kc">None</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">eyes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">lookat</span><span class="p">)</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">r</span><span class="p">)[</span><span class="o">...</span><span class="p">,</span><span class="kc">None</span><span class="p">]</span><span class="o">*</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">e1</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">phi</span><span class="p">)[</span><span class="o">...</span><span class="p">,</span><span class="kc">None</span><span class="p">]</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">e2</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">phi</span><span class="p">)[</span><span class="o">...</span><span class="p">,</span><span class="kc">None</span><span class="p">])</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">_nframes</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">phi</span><span class="p">)</span>
+        
+    <span class="k">def</span> <span class="nf">set_move_straight</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ti</span><span class="p">,</span> <span class="n">x0</span><span class="o">=</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span><span class="mf">0.</span><span class="p">,</span><span class="mf">0.</span><span class="p">),</span> <span class="n">v</span><span class="o">=</span><span class="p">(</span><span class="mf">1.</span><span class="p">,</span><span class="mf">0.</span><span class="p">,</span><span class="mf">0.</span><span class="p">),</span> <span class="n">up</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>        
+        <span class="bp">self</span><span class="o">.</span><span class="n">motion_type</span> <span class="o">=</span> <span class="s2">&quot;straight&quot;</span>
+        
+        <span class="k">if</span> <span class="n">up</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">up</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">up</span>
+        
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isscalar</span><span class="p">(</span><span class="n">ti</span><span class="p">):</span>
+            <span class="n">ti</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">ti</span><span class="p">,</span> <span class="n">endpoint</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        
+        <span class="n">xi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">x0</span><span class="p">)</span> <span class="o">+</span> <span class="n">ti</span><span class="p">[</span><span class="o">...</span><span class="p">,</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">ups</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">up</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">xi</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">eyes</span> <span class="o">=</span> <span class="n">xi</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lookats</span> <span class="o">=</span> <span class="n">xi</span> <span class="o">+</span> <span class="n">v</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">_nframes</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">xi</span><span class="p">)</span>
+    
+    <span class="k">def</span> <span class="nf">_get_cam</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">lookats</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">eyes</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">ups</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            
+    <span class="k">def</span> <span class="nf">get_nframes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nframes</span>
+    
+    <span class="k">def</span> <span class="nf">apply_projection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vis</span><span class="p">,</span> <span class="n">i</span><span class="p">):</span>
+        <span class="c1">#assert type(vis) == Visualization, &quot; weird type: &quot;, type(vis)</span>
+        <span class="k">assert</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_nframes</span><span class="p">(),</span> <span class="s2">&quot;frame </span><span class="si">%d</span><span class="s2"> is not defined (nframes=</span><span class="si">%d</span><span class="s2">)&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">get_nframes</span><span class="p">())</span> 
+        
+        <span class="n">lookat</span><span class="p">,</span> <span class="n">eye</span><span class="p">,</span> <span class="n">up</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_cam</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+        
+        <span class="n">aspect</span> <span class="o">=</span> <span class="n">vis</span><span class="o">.</span><span class="n">_npix</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">vis</span><span class="o">.</span><span class="n">_npix</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        
+        <span class="n">vis</span><span class="o">.</span><span class="n">set_perspective_projection</span><span class="p">(</span><span class="n">eye</span><span class="o">=</span><span class="n">eye</span><span class="p">,</span> <span class="n">lookat</span><span class="o">=</span><span class="n">lookat</span><span class="p">,</span> <span class="n">up</span><span class="o">=</span><span class="n">up</span><span class="p">,</span> 
+                                       <span class="n">angle</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">angle</span><span class="p">,</span> <span class="n">zclip</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">zclip</span><span class="p">,</span> <span class="n">aspect</span><span class="o">=</span><span class="n">aspect</span><span class="p">)</span>   
+
+<div class="viewcode-block" id="Visualization"><a class="viewcode-back" href="../../code.html#bacco.Visualization">[docs]</a><span class="k">class</span> <span class="nc">Visualization</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Visualization class</span>
+<span class="sd">    </span>
+<span class="sd">    in principle this should simply take a simulation object</span>
+<span class="sd">    and offer several methods to visualize the simulattion simply</span>
+<span class="sd">    </span>
+<span class="sd">    since the simulation objects are not working for generic </span>
+<span class="sd">    cases, right now the current default usage is to provide</span>
+<span class="sd">    an (idsorted) position array and the boxsize</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">simulation</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">npix</span><span class="o">=</span><span class="p">[</span><span class="mi">128</span><span class="p">,</span> <span class="mi">128</span><span class="p">],</span> <span class="n">boxsize</span> <span class="o">=</span> <span class="mf">0.</span><span class="p">):</span>
+
+        <span class="k">if</span> <span class="n">simulation</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sim_times</span> <span class="o">=</span> <span class="p">[]</span>
+
+            <span class="k">if</span> <span class="n">simulation</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">!=</span> <span class="s2">&quot;Simulation&quot;</span> <span class="ow">and</span> <span class="nb">type</span><span class="p">(</span><span class="n">simulation</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="nb">list</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Simulation provided is not a bacco.Simulation class</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">simulation</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">list</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">sim</span> <span class="ow">in</span> <span class="n">simulation</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">sim</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">!=</span> <span class="s2">&quot;Simulation&quot;</span><span class="p">:</span>
+                            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Simulation list provided is not a bacco.Simulation class&quot;</span><span class="p">)</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">sim_times</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sim</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;Time&#39;</span><span class="p">])</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_simulation</span> <span class="o">=</span> <span class="n">simulation</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_boxsize</span> <span class="o">=</span> <span class="n">simulation</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;BoxSize&#39;</span><span class="p">]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_simulation</span> <span class="o">=</span> <span class="n">simulation</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_boxsize</span> <span class="o">=</span> <span class="n">simulation</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;BoxSize&#39;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">boxsize</span> <span class="o">&gt;</span> <span class="mf">0.</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_boxsize</span> <span class="o">=</span> <span class="n">boxsize</span>
+
+            <span class="n">end</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;...done in </span><span class="si">{0:.3}</span><span class="s2"> s&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">end</span> <span class="o">-</span> <span class="n">start</span><span class="p">))</span>
+            
+            <span class="bp">self</span><span class="o">.</span><span class="n">_pos</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_pos</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">pos</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_boxsize</span> <span class="o">=</span> <span class="n">boxsize</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">_npix</span> <span class="o">=</span> <span class="n">npix</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_projection</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">((</span><span class="mf">1.</span><span class="p">,</span><span class="mf">1.</span><span class="p">,</span><span class="mf">1.</span><span class="p">,</span><span class="mf">1.</span><span class="p">)))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_spherical</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_rclip</span> <span class="o">=</span> <span class="kc">None</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">_rbins</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_rfac</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_fade</span> <span class="o">=</span> <span class="kc">None</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">_wrapto</span> <span class="o">=</span> <span class="p">(</span><span class="mf">0.</span><span class="p">,</span><span class="mf">0.</span><span class="p">,</span><span class="mf">0.</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">_mixed_tetnb</span><span class="o">=</span><span class="kc">False</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_extsize</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_boxsize</span>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">desc</span> <span class="o">=</span> <span class="s2">&quot;Visulazation class </span><span class="se">\n</span><span class="s2"> sim_times </span><span class="si">{0}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sim_times</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">desc</span>
+    
+    <span class="k">def</span> <span class="nf">get_pos</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pos</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">simulation</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">idsort</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">simulation</span><span class="o">.</span><span class="n">dm</span><span class="p">[</span><span class="s1">&#39;ids&#39;</span><span class="p">])</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_pos</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">simulation</span><span class="o">.</span><span class="n">dm</span><span class="p">[</span><span class="s1">&#39;pos&#39;</span><span class="p">][</span><span class="n">idsort</span><span class="p">]</span>
+                
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pos</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;need a definition of pos&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pos</span>
+        
+    <span class="k">def</span> <span class="nf">set_pos</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pos</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_pos</span> <span class="o">=</span> <span class="n">pos</span>
+    
+    <span class="k">def</span> <span class="nf">set_projection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">projection</span><span class="p">,</span> <span class="n">spherical</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">wrapto</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_projection</span> <span class="o">=</span> <span class="n">projection</span>
+        
+        <span class="k">if</span> <span class="n">spherical</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_spherical</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">spherical</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">wrapto</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_wrapto</span> <span class="o">=</span> <span class="n">wrapto</span>
+            
+    <span class="k">def</span> <span class="nf">set_ortho_projection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">eye</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mf">0.</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">),</span> <span class="n">lookat</span><span class="o">=</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span><span class="mf">0.</span><span class="p">,</span><span class="mf">0.</span><span class="p">),</span> <span class="n">up</span><span class="o">=</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span><span class="mf">1.</span><span class="p">,</span><span class="mf">0.</span><span class="p">),</span> 
+                             <span class="n">width</span><span class="o">=</span><span class="mf">1.</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">zclip</span><span class="o">=</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span><span class="mf">1.</span><span class="p">),</span> <span class="n">wrapto</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="c1">#left=-0.5, right=0.5, top=0.5, bottom=-0.5,</span>
+        <span class="k">if</span> <span class="n">height</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">height</span> <span class="o">=</span> <span class="n">width</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_npix</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_npix</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">left</span> <span class="o">=</span> <span class="o">-</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">width</span>
+        <span class="n">right</span> <span class="o">=</span> <span class="mf">0.5</span><span class="o">*</span><span class="n">width</span>
+        <span class="n">bottom</span> <span class="o">=</span> <span class="o">-</span><span class="mf">0.5</span><span class="o">*</span><span class="n">height</span>
+        <span class="n">top</span> <span class="o">=</span> <span class="mf">0.5</span><span class="o">*</span><span class="n">height</span>
+        
+        <span class="n">m1</span> <span class="o">=</span> <span class="n">matrix_look_at</span><span class="p">(</span><span class="n">eye</span><span class="o">=</span><span class="n">eye</span><span class="p">,</span> <span class="n">lookat</span><span class="o">=</span><span class="n">lookat</span><span class="p">,</span> <span class="n">up</span><span class="o">=</span><span class="n">up</span><span class="p">)</span>
+        <span class="n">m2</span> <span class="o">=</span> <span class="n">matrix_ortho</span><span class="p">(</span><span class="n">left</span><span class="o">=</span><span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="o">=</span><span class="n">right</span><span class="p">,</span> <span class="n">top</span><span class="o">=</span><span class="n">top</span><span class="p">,</span> <span class="n">bottom</span><span class="o">=</span><span class="n">bottom</span><span class="p">,</span> <span class="n">znear</span><span class="o">=</span><span class="n">zclip</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">zfar</span><span class="o">=</span><span class="n">zclip</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_projection</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">m2</span><span class="p">,</span> <span class="n">m1</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="n">wrapto</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">wrapto</span> <span class="o">=</span> <span class="n">lookat</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_wrapto</span> <span class="o">=</span> <span class="n">wrapto</span>
+
+<div class="viewcode-block" id="Visualization.set_perspective_projection"><a class="viewcode-back" href="../../code.html#bacco.Visualization.set_perspective_projection">[docs]</a>    <span class="k">def</span> <span class="nf">set_perspective_projection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">eye</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mf">0.</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">),</span> <span class="n">lookat</span><span class="o">=</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span><span class="mf">0.</span><span class="p">,</span><span class="mf">0.</span><span class="p">),</span> <span class="n">up</span><span class="o">=</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span><span class="mf">1.</span><span class="p">,</span><span class="mf">0.</span><span class="p">),</span> <span class="n">angle</span><span class="o">=</span><span class="mf">1.</span><span class="p">,</span> <span class="n">zclip</span><span class="o">=</span><span class="p">(</span><span class="mf">1e-4</span><span class="p">,</span> <span class="mf">1.</span><span class="p">),</span> <span class="n">aspect</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">wrapto</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Sets the projection matrix to a planar perspective lookat projection\n&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">aspect</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">aspect</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_npix</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_npix</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">_projection</span> <span class="o">=</span> <span class="n">matrix_perspective_lookat</span><span class="p">(</span><span class="n">eye</span><span class="o">=</span><span class="n">eye</span><span class="p">,</span> <span class="n">lookat</span><span class="o">=</span><span class="n">lookat</span><span class="p">,</span> <span class="n">up</span><span class="o">=</span><span class="n">up</span><span class="p">,</span>
+                                                     <span class="n">angle</span><span class="o">=</span><span class="n">angle</span><span class="p">,</span> <span class="n">znear</span><span class="o">=</span><span class="n">zclip</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">zfar</span><span class="o">=</span><span class="n">zclip</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">aspect</span><span class="o">=</span><span class="n">aspect</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">_spherical</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="k">if</span> <span class="n">wrapto</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">wrapto</span> <span class="o">=</span> <span class="n">lookat</span>
+            
+        <span class="bp">self</span><span class="o">.</span><span class="n">_wrapto</span> <span class="o">=</span> <span class="n">wrapto</span></div>
+        
+    <span class="n">set_perspective_projection</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">+=</span> <span class="n">matrix_perspective_lookat</span><span class="o">.</span><span class="vm">__doc__</span>
+    
+<div class="viewcode-block" id="Visualization.set_spherical_projection"><a class="viewcode-back" href="../../code.html#bacco.Visualization.set_spherical_projection">[docs]</a>    <span class="k">def</span> <span class="nf">set_spherical_projection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">eye</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mf">0.</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">),</span> <span class="n">lookat</span><span class="o">=</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span><span class="mf">0.</span><span class="p">,</span><span class="mf">0.</span><span class="p">),</span> <span class="n">up</span><span class="o">=</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span><span class="mf">1.</span><span class="p">,</span><span class="mf">0.</span><span class="p">),</span> <span class="n">rclip</span><span class="o">=</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span><span class="mf">1.</span><span class="p">),</span> <span class="n">wrapto</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Sets up a spherical projection</span>
+<span class="sd">        </span>
+<span class="sd">        Sets up a spherical projection and defines the camera position/direction </span>
+<span class="sd">        through a look_at matrix as in matrix_lookat</span>
+<span class="sd">        </span>
+<span class="sd">        rclip : tuple with 2 entries (rnear, rfar)</span>
+<span class="sd">             inner / outer clipping boundary</span>
+<span class="sd">        </span>
+<span class="sd">        --- matrix_lookat ---</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        
+        <span class="n">m1</span> <span class="o">=</span> <span class="n">matrix_look_at</span><span class="p">(</span><span class="n">eye</span><span class="o">=</span><span class="n">eye</span><span class="p">,</span> <span class="n">lookat</span><span class="o">=</span><span class="n">lookat</span><span class="p">,</span> <span class="n">up</span><span class="o">=</span><span class="n">up</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">_spherical</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_rclip</span> <span class="o">=</span> <span class="n">rclip</span> 
+        
+        <span class="c1"># switch axes in a way that the camera perspective is more intuitive controllable</span>
+        <span class="n">matswitch</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">4</span><span class="p">,</span><span class="mi">4</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+        <span class="n">matswitch</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.</span>
+
+        <span class="n">matswitch</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">,]</span> <span class="o">=</span> <span class="mf">1.</span>
+        <span class="n">matswitch</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,]</span> <span class="o">=</span> <span class="mf">1.</span>
+        <span class="n">matswitch</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">,]</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1.</span>
+            
+        <span class="bp">self</span><span class="o">.</span><span class="n">_projection</span> <span class="o">=</span>  <span class="n">np</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">matswitch</span><span class="p">,</span> <span class="n">m1</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="n">wrapto</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">wrapto</span> <span class="o">=</span> <span class="n">eye</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">_wrapto</span> <span class="o">=</span> <span class="n">wrapto</span></div>
+        
+    <span class="n">set_spherical_projection</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">+=</span> <span class="n">matrix_look_at</span><span class="o">.</span><span class="vm">__doc__</span>
+    
+<div class="viewcode-block" id="Visualization.set_smoothing"><a class="viewcode-back" href="../../code.html#bacco.Visualization.set_smoothing">[docs]</a>    <span class="k">def</span> <span class="nf">set_smoothing</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rbins</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">rfac</span><span class="o">=</span><span class="mf">1.</span><span class="p">,</span> <span class="n">extsize</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">nbrfac</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;set an adaptive smoothing</span>
+<span class="sd">        </span>
+<span class="sd">        Set smoothing with number of rbins different kernel _fadesizes</span>
+<span class="sd">        rbins can be an array or an integer (recommended) rfac is</span>
+<span class="sd">        a constant factor which multiplies the smoothig size -- </span>
+<span class="sd">        this is normalized to the mean particle separation.</span>
+<span class="sd">        </span>
+<span class="sd">        extsize : set this if boxsize is not the size of the drawn</span>
+<span class="sd">            Lagrangian region &quot;&quot;&quot;</span>
+        
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isscalar</span><span class="p">(</span><span class="n">rbins</span><span class="p">):</span>
+            <span class="n">rbins</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">logspace</span><span class="p">(</span><span class="o">-</span><span class="mf">3.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">rbins</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">),</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">0.</span><span class="p">)</span>
+        <span class="c1">#if (rbins is not None) &amp; (extsize is not None):</span>
+        <span class="c1">#    rbins /= (extsize/self._boxsize)</span>
+            
+        <span class="k">if</span> <span class="n">extsize</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">extsize</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_boxsize</span>
+            
+        <span class="bp">self</span><span class="o">.</span><span class="n">_extsize</span> <span class="o">=</span> <span class="n">extsize</span>
+            
+        <span class="bp">self</span><span class="o">.</span><span class="n">_rbins</span> <span class="o">=</span> <span class="n">rbins</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">_rfac</span> <span class="o">=</span> <span class="n">rfac</span>
+        
+        <span class="k">if</span> <span class="n">nbrfac</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_nbrfac</span> <span class="o">=</span> <span class="n">rfac</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_nbrfac</span> <span class="o">=</span> <span class="n">nbrfac</span> <span class="c1"># * (extsize/self._boxsize)</span></div>
+        
+<div class="viewcode-block" id="Visualization.set_fading"><a class="viewcode-back" href="../../code.html#bacco.Visualization.set_fading">[docs]</a>    <span class="k">def</span> <span class="nf">set_fading</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ri</span><span class="p">,</span> <span class="n">fi</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;set fading (distance dependent weights)</span>
+<span class="sd">        </span>
+<span class="sd">        ri : radii of the weights</span>
+<span class="sd">        fi : weights</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        
+        <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">ri</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">0.</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">_fade</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">ri</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">fi</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">))</span></div>
+        
+<div class="viewcode-block" id="Visualization.set_fade_equation"><a class="viewcode-back" href="../../code.html#bacco.Visualization.set_fade_equation">[docs]</a>    <span class="k">def</span> <span class="nf">set_fade_equation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ri</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">rclip</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">rfade</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">r0</span><span class="o">=</span><span class="mf">1.</span><span class="p">,</span> <span class="n">rpow</span><span class="o">=</span><span class="mf">0.</span><span class="p">,</span> <span class="n">plot</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;This gives some intuitive interface for the fading equation</span>
+<span class="sd">        </span>
+<span class="sd">        The goal is to define a set of ri and fi values as a radial </span>
+<span class="sd">        weighting function. Use plot=True to see what happens&quot;&quot;&quot;</span>
+        
+        <span class="k">if</span> <span class="n">rclip</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">rclip</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_boxsize</span><span class="o">/</span><span class="mf">100.</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_boxsize</span><span class="o">/</span><span class="mf">2.</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">rfade</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">rfade</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1.3</span><span class="o">*</span><span class="n">rclip</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mf">0.85</span><span class="o">*</span><span class="n">rclip</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+        <span class="k">if</span> <span class="n">ri</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">ri</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logspace</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">rclip</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">rclip</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="mi">21</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">np</span><span class="o">.</span><span class="n">isscalar</span><span class="p">(</span><span class="n">ri</span><span class="p">):</span>
+            <span class="n">ri</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logspace</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">rclip</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">rclip</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="n">ri</span><span class="p">)</span>
+            
+        <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">ri</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">0.</span>
+        
+        <span class="k">def</span> <span class="nf">step_spline</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">r0</span><span class="p">,</span> <span class="n">r1</span><span class="p">):</span>
+            <span class="sd">&quot;&quot;&quot;Cubic spline which goes from 0 to 1 (or 1 to 0)&quot;&quot;&quot;</span>
+
+            <span class="n">x</span> <span class="o">=</span> <span class="p">(</span><span class="n">r</span><span class="o">-</span><span class="n">r0</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">r1</span><span class="o">-</span><span class="n">r0</span><span class="p">)</span>
+
+            <span class="n">before</span> <span class="o">=</span> <span class="n">x</span> <span class="o">&lt;</span> <span class="mi">0</span>
+            <span class="n">after</span> <span class="o">=</span> <span class="n">x</span> <span class="o">&gt;</span> <span class="mi">1</span>
+            <span class="n">inside</span> <span class="o">=</span> <span class="p">(</span><span class="o">~</span><span class="n">before</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="o">~</span><span class="n">after</span><span class="p">)</span>
+
+            <span class="n">f</span> <span class="o">=</span> <span class="mf">0.</span> <span class="o">*</span> <span class="n">before</span> <span class="o">+</span> <span class="mf">1.</span><span class="o">*</span> <span class="n">after</span> <span class="o">+</span> <span class="n">inside</span> <span class="o">*</span> <span class="p">(</span><span class="mf">3.</span><span class="o">*</span><span class="n">x</span><span class="o">*</span><span class="n">x</span> <span class="o">-</span> <span class="mf">2.</span><span class="o">*</span><span class="n">x</span><span class="o">*</span><span class="n">x</span><span class="o">*</span><span class="n">x</span><span class="p">)</span>
+
+            <span class="k">return</span> <span class="n">f</span>
+
+        <span class="k">def</span> <span class="nf">fade_inout</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">rclip</span><span class="o">=</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span><span class="mf">1.</span><span class="p">),</span> <span class="n">rfade</span><span class="o">=</span><span class="p">(</span><span class="mf">0.1</span><span class="p">,</span><span class="mf">0.9</span><span class="p">)):</span>
+            <span class="k">assert</span> <span class="p">(</span><span class="n">rclip</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">rfade</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">rfade</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">rclip</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="k">return</span> <span class="n">step_spline</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">rclip</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">rfade</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="n">step_spline</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">rclip</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">rfade</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        
+        <span class="n">fi</span> <span class="o">=</span> <span class="n">fade_inout</span><span class="p">(</span><span class="n">ri</span><span class="p">,</span> <span class="n">rclip</span><span class="p">,</span> <span class="n">rfade</span><span class="p">)</span>
+        
+        <span class="n">fi</span> <span class="o">=</span> <span class="n">fi</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">((</span><span class="n">ri</span><span class="o">/</span><span class="n">r0</span><span class="p">)</span><span class="o">**</span><span class="n">rpow</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">1.</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_fading</span><span class="p">(</span><span class="n">ri</span><span class="p">,</span><span class="n">fi</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="n">plot</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ri</span><span class="p">,</span> <span class="n">fi</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;r&quot;</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;weight&quot;</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">semilogx</span><span class="p">()</span></div>
+            
+<div class="viewcode-block" id="Visualization.set_mixed_tetnb"><a class="viewcode-back" href="../../code.html#bacco.Visualization.set_mixed_tetnb">[docs]</a>    <span class="k">def</span> <span class="nf">set_mixed_tetnb</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">relf</span><span class="p">,</span> <span class="n">npos</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">mass</span><span class="o">=</span><span class="mf">1.</span><span class="o">/</span><span class="mf">64.</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;relf has shape (ngrid/2, ngrid/2, ngrid/2)&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_mixed_tetnb</span><span class="o">=</span><span class="kc">True</span>
+        <span class="k">if</span> <span class="n">npos</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_npos</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pos</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_npos</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">(</span><span class="n">npos</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_release_flags</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">relf</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">bool</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_nmass</span> <span class="o">=</span> <span class="n">mass</span></div>
+    
+<div class="viewcode-block" id="Visualization.image"><a class="viewcode-back" href="../../code.html#bacco.Visualization.image">[docs]</a>    <span class="k">def</span> <span class="nf">image</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">maxngrid</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">nthreads</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">wrapto</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">spherical_smoothing</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">rbins</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">rfac</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tetnbody</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">mass</span><span class="o">=</span><span class="mf">1.</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="s2">&quot;rclip&quot;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_rclip</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;rclip&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rclip</span>
+            
+        <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="s2">&quot;fade&quot;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_fade</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;fade&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fade</span>
+            
+        <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="s2">&quot;extsize&quot;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">):</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;extsize&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_extsize</span>
+            
+        <span class="k">if</span> <span class="n">wrapto</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">wrapto</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wrapto</span>
+            
+        <span class="k">if</span> <span class="p">(</span><span class="n">rbins</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_rbins</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="n">rbins</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rbins</span>
+            
+        <span class="k">if</span> <span class="n">rbins</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isscalar</span><span class="p">(</span><span class="n">rbins</span><span class="p">):</span>
+                <span class="n">rbins</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logspace</span><span class="p">(</span><span class="o">-</span><span class="mf">3.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">rbins</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+                
+        <span class="k">if</span> <span class="n">tetnbody</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">returnboth</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mixed_tetnb</span><span class="p">:</span>
+                <span class="n">tetnbody</span> <span class="o">=</span> <span class="s2">&quot;tetnbody&quot;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">tetnbody</span> <span class="o">=</span> <span class="s2">&quot;tet&quot;</span>
+        <span class="k">elif</span> <span class="n">tetnbody</span> <span class="o">==</span> <span class="s2">&quot;tetnbody&quot;</span><span class="p">:</span>
+            <span class="n">returnboth</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">returnboth</span> <span class="o">=</span> <span class="kc">False</span>
+            
+        
+        <span class="k">if</span> <span class="s2">&quot;tet&quot;</span> <span class="ow">in</span> <span class="n">tetnbody</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mixed_tetnb</span><span class="p">:</span>
+                <span class="k">if</span> <span class="s2">&quot;ndeposit&quot;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+                    <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;ndeposit&quot;</span><span class="p">]</span> <span class="o">*=</span> <span class="p">(</span><span class="o">~</span><span class="bp">self</span><span class="o">.</span><span class="n">_release_flags</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;ndeposit&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="o">~</span><span class="bp">self</span><span class="o">.</span><span class="n">_release_flags</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">uint16</span><span class="p">(</span><span class="n">maxngrid</span><span class="p">)</span>
+
+            <span class="n">imtet</span> <span class="o">=</span> <span class="n">qtets_image</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_pos</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">_projection</span><span class="p">,</span> <span class="n">npix</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_npix</span><span class="p">,</span> 
+                             <span class="n">boxsize</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_boxsize</span><span class="p">,</span> <span class="n">spherical</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_spherical</span><span class="p">,</span>
+                             <span class="n">wrapto</span> <span class="o">=</span> <span class="n">wrapto</span><span class="p">,</span> <span class="n">rbins</span><span class="o">=</span><span class="n">rbins</span><span class="p">,</span> <span class="n">mass</span><span class="o">=</span><span class="n">mass</span><span class="p">,</span>
+                             <span class="n">maxngrid</span><span class="o">=</span><span class="n">maxngrid</span><span class="p">,</span> <span class="n">nthreads</span><span class="o">=</span><span class="n">nthreads</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s2">&quot;nbody&quot;</span> <span class="ow">in</span> <span class="n">tetnbody</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mixed_tetnb</span>
+            
+            <span class="k">if</span> <span class="s2">&quot;ndeposit&quot;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+                <span class="k">del</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;ndeposit&quot;</span><span class="p">]</span>
+            
+            <span class="n">imnb</span> <span class="o">=</span> <span class="n">qtets_image</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_npos</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_projection</span><span class="p">,</span> <span class="n">npix</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_npix</span><span class="p">,</span> 
+                         <span class="n">boxsize</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_boxsize</span><span class="p">,</span> <span class="n">spherical</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_spherical</span><span class="p">,</span>
+                         <span class="n">wrapto</span> <span class="o">=</span> <span class="n">wrapto</span><span class="p">,</span> <span class="n">rbins</span><span class="o">=</span><span class="n">rbins</span><span class="p">,</span> <span class="n">mass</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_nmass</span><span class="p">,</span>
+                         <span class="n">maxngrid</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">nthreads</span><span class="o">=</span><span class="n">nthreads</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">tetnbody</span> <span class="o">==</span> <span class="s2">&quot;tet&quot;</span><span class="p">:</span>
+            <span class="n">ims</span> <span class="o">=</span> <span class="p">[</span><span class="n">imtet</span><span class="p">]</span>
+            <span class="n">lab</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;tet&quot;</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="n">tetnbody</span> <span class="o">==</span> <span class="s2">&quot;nbody&quot;</span><span class="p">:</span>
+            <span class="n">ims</span> <span class="o">=</span> <span class="p">[</span><span class="n">imnb</span><span class="p">]</span>
+            <span class="n">lab</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;nbody&quot;</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="n">tetnbody</span> <span class="o">==</span> <span class="s2">&quot;tetnbody&quot;</span><span class="p">:</span>
+            <span class="n">ims</span> <span class="o">=</span> <span class="p">[</span><span class="n">imtet</span><span class="p">,</span> <span class="n">imnb</span><span class="p">]</span>
+            <span class="n">lab</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;tet&quot;</span><span class="p">,</span> <span class="s2">&quot;nbody&quot;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;did not understand tetnbody = &quot;</span><span class="p">,</span> <span class="n">tetnbody</span><span class="p">)</span>
+        
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">ims</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="n">rbins</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">rfac</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">lab</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;nbody&quot;</span><span class="p">:</span>
+                        <span class="n">myrfac</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nbrfac</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rfac</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                            <span class="n">myrfac</span> <span class="o">=</span> <span class="mf">1.</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">myrfac</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rfac</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">myrfac</span> <span class="o">=</span> <span class="n">rfac</span>
+
+                <span class="n">sigmai</span> <span class="o">=</span> <span class="mf">0.5</span><span class="o">*</span><span class="p">(</span><span class="n">rbins</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">+</span> <span class="n">rbins</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="o">*</span> <span class="n">myrfac</span>
+                <span class="n">imc</span> <span class="o">=</span> <span class="n">np_convolve_gaussian</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">ims</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">axes</span><span class="o">=</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">)),</span> <span class="n">ndim</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="n">sigmai</span><span class="p">,</span> <span class="n">L</span><span class="o">=</span><span class="mf">1.</span><span class="p">,</span> <span class="n">expand</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+                <span class="n">ims</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">imc</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span> <span class="mf">1e-10</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">spherical_smoothing</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_spherical</span><span class="p">:</span>
+                    <span class="n">ims</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">spherical_smoothing</span><span class="p">(</span><span class="n">ims</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">spherical_smoothing</span><span class="o">=</span><span class="n">spherical_smoothing</span><span class="p">,</span> <span class="n">smoothingpow</span><span class="o">=</span><span class="mf">0.25</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;I did not implement non-spherical smoothing yet&quot;</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">show</span><span class="p">:</span>
+                <span class="c1"># this is a quick dirty draw, for more options directly use show_image</span>
+                <span class="n">show_image</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">ims</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">ims</span><span class="p">[</span><span class="n">i</span><span class="p">])</span><span class="o">/</span><span class="mf">1e4</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span> <span class="n">closefig</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">colormap</span><span class="o">=</span><span class="s2">&quot;cubehelix&quot;</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="n">returnboth</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">ims</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="n">ims</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">ims</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">ims</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">tetnbody</span> <span class="o">==</span> <span class="s2">&quot;tetnbody&quot;</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">ims</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">ims</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">ims</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span></div>
+        
+    <span class="n">image</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="n">qtets_image</span><span class="o">.</span><span class="vm">__doc__</span>
+    
+    <span class="k">def</span> <span class="nf">make_movie</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">camera_path</span><span class="p">,</span> <span class="n">outputdir</span><span class="p">,</span> <span class="n">cachefile</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> 
+                   <span class="n">resetcache</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">frames</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                   <span class="n">doffmpeg</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">framerate</span><span class="o">=</span><span class="mi">24</span><span class="p">,</span> <span class="n">tetnbody</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> 
+                   <span class="n">colormap</span><span class="o">=</span><span class="s2">&quot;cubehelix&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="kn">import</span> <span class="nn">time</span>
+        <span class="n">t0</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">outputdir</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Creating outputdir: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">outputdir</span><span class="p">)</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">outputdir</span><span class="p">)</span>
+            
+        <span class="k">if</span> <span class="n">cachefile</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">def</span> <span class="nf">get_image</span><span class="p">(</span><span class="n">i</span><span class="p">):</span>
+                <span class="n">camera_path</span><span class="o">.</span><span class="n">apply_projection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">image</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">cachepath</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">/</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">outputdir</span><span class="p">,</span> <span class="n">cachefile</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">resetcache</span> <span class="o">&amp;</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">cachepath</span><span class="p">):</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">cachepath</span><span class="p">)</span>
+            
+            <span class="kn">import</span> <span class="nn">bacco.decorators</span> <span class="k">as</span> <span class="nn">dc</span>
+            <span class="nd">@dc</span><span class="o">.</span><span class="n">h5cache</span><span class="p">(</span><span class="n">file</span><span class="o">=</span><span class="n">cachepath</span><span class="p">)</span>
+            <span class="k">def</span> <span class="nf">get_image</span><span class="p">(</span><span class="n">i</span><span class="p">):</span>
+                <span class="n">camera_path</span><span class="o">.</span><span class="n">apply_projection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">image</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="n">frames</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">frames</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">camera_path</span><span class="o">.</span><span class="n">get_nframes</span><span class="p">())</span>
+            
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">frames</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">verbose</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">i</span> <span class="o">%</span> <span class="mi">1</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;frame </span><span class="si">%d</span><span class="s2">/</span><span class="si">%d</span><span class="s2">, time </span><span class="si">%g</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">camera_path</span><span class="o">.</span><span class="n">get_nframes</span><span class="p">(),</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="o">-</span><span class="n">t0</span><span class="p">))</span>
+            
+            <span class="n">im</span> <span class="o">=</span> <span class="n">get_image</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+            
+            <span class="k">if</span> <span class="n">tetnbody</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">tetnbody</span> <span class="o">==</span> <span class="s2">&quot;tetnbody&quot;</span><span class="p">:</span>
+                    <span class="n">im</span><span class="p">,</span> <span class="n">imtet</span><span class="p">,</span> <span class="n">imnb</span> <span class="o">=</span> <span class="n">im</span>
+                    
+                    <span class="n">show_image</span><span class="p">(</span><span class="n">imtet</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=</span><span class="n">vmin</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="n">vmax</span><span class="p">,</span> <span class="n">colormap</span><span class="o">=</span><span class="n">colormap</span><span class="p">,</span> <span class="n">closefig</span><span class="o">=</span><span class="n">i</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">,</span>
+                       <span class="n">filename</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2">/</span><span class="si">%s</span><span class="s2">image_</span><span class="si">%04d</span><span class="s2">_tet.png&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">outputdir</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">i</span><span class="p">),</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+                    <span class="n">show_image</span><span class="p">(</span><span class="n">imnb</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=</span><span class="n">vmin</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="n">vmax</span><span class="p">,</span> <span class="n">colormap</span><span class="o">=</span><span class="n">colormap</span><span class="p">,</span> <span class="n">closefig</span><span class="o">=</span><span class="n">i</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">,</span>
+                       <span class="n">filename</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2">/</span><span class="si">%s</span><span class="s2">image_</span><span class="si">%04d</span><span class="s2">_nbody.png&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">outputdir</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">i</span><span class="p">),</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            
+            <span class="n">show_image</span><span class="p">(</span><span class="n">im</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=</span><span class="n">vmin</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="n">vmax</span><span class="p">,</span> <span class="n">colormap</span><span class="o">=</span><span class="n">colormap</span><span class="p">,</span> <span class="n">closefig</span><span class="o">=</span><span class="n">i</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">,</span>
+                       <span class="n">filename</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2">/</span><span class="si">%s</span><span class="s2">image_</span><span class="si">%04d</span><span class="s2">.png&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">outputdir</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">i</span><span class="p">),</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;finished plotting time </span><span class="si">%g</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="o">-</span><span class="n">t0</span><span class="p">))</span>
+            
+        <span class="k">def</span> <span class="nf">callffmpeg</span><span class="p">(</span><span class="n">infiles</span><span class="p">,</span> <span class="n">outfile</span><span class="p">):</span>
+            <span class="kn">import</span> <span class="nn">ffmpeg</span> <span class="c1"># install ffmpeg-python</span>
+            <span class="n">stream</span> <span class="o">=</span> <span class="n">ffmpeg</span><span class="o">.</span><span class="n">input</span><span class="p">(</span><span class="n">infiles</span><span class="p">,</span> <span class="n">framerate</span><span class="o">=</span><span class="n">framerate</span><span class="p">)</span>
+            <span class="n">stream</span> <span class="o">=</span> <span class="n">ffmpeg</span><span class="o">.</span><span class="n">output</span><span class="p">(</span><span class="n">stream</span><span class="p">,</span> <span class="n">outfile</span><span class="p">,</span> <span class="n">pix_fmt</span><span class="o">=</span><span class="s2">&quot;yuv420p&quot;</span><span class="p">)</span>
+            <span class="n">ffmpeg</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">stream</span><span class="p">,</span> <span class="n">overwrite_output</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            
+        <span class="k">if</span> <span class="n">doffmpeg</span><span class="p">:</span>
+            <span class="n">callffmpeg</span><span class="p">(</span><span class="n">outputdir</span><span class="o">+</span><span class="s2">&quot;/&quot;</span> <span class="o">+</span> <span class="n">label</span> <span class="o">+</span> <span class="s1">&#39;image_</span><span class="si">%04d</span><span class="s1">.png&#39;</span><span class="p">,</span> <span class="n">outputdir</span><span class="o">+</span><span class="s2">&quot;/&quot;</span> <span class="o">+</span> <span class="n">label</span> <span class="o">+</span> <span class="s1">&#39;amovie.mp4&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">tetnbody</span> <span class="o">==</span> <span class="s2">&quot;tetnbody&quot;</span><span class="p">:</span>
+                <span class="n">callffmpeg</span><span class="p">(</span><span class="n">outputdir</span><span class="o">+</span><span class="s2">&quot;/&quot;</span> <span class="o">+</span> <span class="n">label</span> <span class="o">+</span> <span class="s1">&#39;image_</span><span class="si">%04d</span><span class="s1">_tet.png&#39;</span><span class="p">,</span> <span class="n">outputdir</span><span class="o">+</span><span class="s2">&quot;/&quot;</span> <span class="o">+</span> <span class="n">label</span> <span class="o">+</span> <span class="s1">&#39;amovie_tet.mp4&#39;</span><span class="p">)</span>
+                <span class="n">callffmpeg</span><span class="p">(</span><span class="n">outputdir</span><span class="o">+</span><span class="s2">&quot;/&quot;</span> <span class="o">+</span> <span class="n">label</span> <span class="o">+</span> <span class="s1">&#39;image_</span><span class="si">%04d</span><span class="s1">_nbody.png&#39;</span><span class="p">,</span> <span class="n">outputdir</span><span class="o">+</span><span class="s2">&quot;/&quot;</span> <span class="o">+</span> <span class="n">label</span> <span class="o">+</span> <span class="s1">&#39;amovie_nbody.mp4&#39;</span><span class="p">)</span>
+            <span class="c1">#import ffmpeg  # requires package python-ffmpeg</span>
+            <span class="c1">#stream = ffmpeg.input(outputdir+&quot;/&quot; + label + &#39;image_%04d.png&#39;, framerate=framerate)</span>
+            <span class="c1">#stream = ffmpeg.output(stream, outputdir+&quot;/&quot; + label + &#39;amovie.mp4&#39;, pix_fmt=&quot;yuv420p&quot;)</span>
+            <span class="c1">#ffmpeg.run(stream, overwrite_output=True)</span>
+            
+            <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;finished ffmpeg time </span><span class="si">%g</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="o">-</span><span class="n">t0</span><span class="p">))</span>
+        
+    <span class="k">def</span> <span class="nf">project_points</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="n">boxwrapping</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">pixels</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">nthreads</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;This method is outdated&quot;</span><span class="p">)</span>
+        
+        <span class="kn">from</span> <span class="nn">.qtets</span> <span class="k">import</span> <span class="n">qtets</span>
+        
+        <span class="k">if</span> <span class="n">boxwrapping</span><span class="p">:</span>
+            <span class="n">boxsize</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_boxsize</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">boxsize</span> <span class="o">=</span> <span class="mf">0.</span>
+            
+        <span class="n">res</span> <span class="o">=</span> <span class="n">qtets</span><span class="o">.</span><span class="n">project_points_to_image_plane</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">pos</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">),</span> 
+                                                  <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_matrix_projection</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">),</span>
+                                                  <span class="n">boxsize</span><span class="p">,</span>
+                                                  <span class="bp">self</span><span class="o">.</span><span class="n">_spherical</span><span class="p">,</span>
+                                                  <span class="n">nthreads</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="n">pixels</span><span class="p">:</span>
+            <span class="n">pix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">((</span><span class="mf">0.5</span> <span class="o">+</span> <span class="n">res</span><span class="p">[</span><span class="o">...</span><span class="p">,</span><span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">])</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Pixels</span><span class="p">)))</span>
+            <span class="n">mask</span> <span class="o">=</span> <span class="p">(</span><span class="n">res</span><span class="p">[</span><span class="o">...</span><span class="p">,</span><span class="mi">2</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_znear</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">res</span><span class="p">[</span><span class="o">...</span><span class="p">,</span><span class="mi">2</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">zfar</span><span class="p">)</span>
+            <span class="n">mask</span> <span class="o">&amp;=</span> <span class="p">(</span><span class="n">res</span><span class="p">[</span><span class="o">...</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="o">-</span><span class="mf">0.5</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">res</span><span class="p">[</span><span class="o">...</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mf">0.5</span><span class="p">)</span>
+            <span class="n">mask</span> <span class="o">&amp;=</span> <span class="p">(</span><span class="n">res</span><span class="p">[</span><span class="o">...</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="o">-</span><span class="mf">0.5</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">res</span><span class="p">[</span><span class="o">...</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mf">0.5</span><span class="p">)</span>
+            
+            <span class="k">return</span> <span class="n">pix</span><span class="p">,</span> <span class="n">mask</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">res</span>
+            
+    <span class="k">def</span> <span class="nf">_interpolate_positions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">time</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="p">(</span><span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;This function is currently depreciated&quot;</span><span class="p">))</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sim_times</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="p">((</span><span class="n">time</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">sim_times</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">time</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">sim_times</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">])):</span>
+                <span class="k">break</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">simulation</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">cleanup</span><span class="p">()</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Interpolation using sims </span><span class="si">{0}</span><span class="s2"> and </span><span class="si">{1}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
+        <span class="n">sim1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">simulation</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="n">sim2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">simulation</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="n">UnitLength_in_cm</span> <span class="o">=</span> <span class="mf">3.08568e+24</span>
+        <span class="n">UnitVelocity_in_cm_per_s</span> <span class="o">=</span> <span class="mf">1e5</span>
+        <span class="n">Hubble</span> <span class="o">=</span> <span class="mf">3.2407789e-18</span><span class="o">*</span><span class="n">UnitLength_in_cm</span> <span class="o">/</span> <span class="n">UnitVelocity_in_cm_per_s</span>
+
+        <span class="n">vfac1</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">sim1</span><span class="o">.</span><span class="n">Cosmology</span><span class="o">.</span><span class="n">Ez_function</span><span class="p">(</span><span class="n">sim1</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;Time&#39;</span><span class="p">])</span><span class="o">/</span><span class="n">Hubble</span>
+        <span class="n">vfac2</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">sim2</span><span class="o">.</span><span class="n">Cosmology</span><span class="o">.</span><span class="n">Ez_function</span><span class="p">(</span><span class="n">sim2</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;Time&#39;</span><span class="p">])</span><span class="o">/</span><span class="n">Hubble</span>
+
+        <span class="n">dt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">sim2</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;Time&#39;</span><span class="p">])</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">sim1</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;Time&#39;</span><span class="p">])</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">time</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">sim1</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;Time&#39;</span><span class="p">])</span>
+
+        <span class="n">sort1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">sim1</span><span class="o">.</span><span class="n">dm</span><span class="p">[</span><span class="s1">&#39;ids&#39;</span><span class="p">])</span>
+        <span class="n">sort2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">sim2</span><span class="o">.</span><span class="n">dm</span><span class="p">[</span><span class="s1">&#39;ids&#39;</span><span class="p">])</span>
+
+        <span class="c1">#dx = periodic(sim2.dm[&#39;pos&#39;] - sim1.dm[&#39;pos&#39;]);</span>
+        <span class="n">dx</span> <span class="o">=</span> <span class="n">sim2</span><span class="o">.</span><span class="n">dm</span><span class="p">[</span><span class="s1">&#39;pos&#39;</span><span class="p">][</span><span class="n">sort2</span><span class="p">,</span> <span class="p">:]</span> <span class="o">-</span> <span class="n">sim1</span><span class="o">.</span><span class="n">dm</span><span class="p">[</span><span class="s1">&#39;pos&#39;</span><span class="p">][</span><span class="n">sort1</span><span class="p">,</span> <span class="p">:]</span>
+        <span class="n">dv</span> <span class="o">=</span> <span class="n">vfac2</span> <span class="o">*</span> <span class="n">sim2</span><span class="o">.</span><span class="n">dm</span><span class="p">[</span><span class="s1">&#39;vel&#39;</span><span class="p">][</span><span class="n">sort2</span><span class="p">,</span> <span class="p">:]</span> <span class="o">-</span> <span class="n">vfac1</span> <span class="o">*</span> <span class="n">sim1</span><span class="o">.</span><span class="n">dm</span><span class="p">[</span><span class="s1">&#39;vel&#39;</span><span class="p">][</span><span class="n">sort1</span><span class="p">,</span> <span class="p">:]</span>
+
+        <span class="n">c</span> <span class="o">=</span> <span class="p">(</span><span class="mi">3</span> <span class="o">*</span> <span class="n">dx</span> <span class="o">-</span> <span class="p">(</span><span class="mi">3</span> <span class="o">*</span> <span class="n">vfac1</span> <span class="o">*</span> <span class="n">sim1</span><span class="o">.</span><span class="n">dm</span><span class="p">[</span><span class="s1">&#39;vel&#39;</span><span class="p">][</span><span class="n">sort1</span><span class="p">,</span> <span class="p">:]</span> <span class="o">+</span> <span class="n">dv</span><span class="p">)</span> <span class="o">*</span> <span class="n">dt</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="mf">0.5</span><span class="o">*</span><span class="n">dt</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="p">(</span><span class="n">dv</span> <span class="o">-</span> <span class="n">dt</span> <span class="o">*</span> <span class="n">c</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="mf">3.</span><span class="o">*</span><span class="n">dt</span><span class="o">**</span><span class="mi">3</span><span class="p">)</span>
+
+        <span class="n">pnew</span> <span class="o">=</span> <span class="p">(</span><span class="n">sim1</span><span class="o">.</span><span class="n">dm</span><span class="p">[</span><span class="s1">&#39;pos&#39;</span><span class="p">][</span><span class="n">sort1</span><span class="p">,</span> <span class="p">:]</span> <span class="o">+</span> <span class="n">vfac1</span> <span class="o">*</span> <span class="n">sim1</span><span class="o">.</span><span class="n">dm</span><span class="p">[</span><span class="s1">&#39;vel&#39;</span><span class="p">]</span>
+                <span class="p">[</span><span class="n">sort1</span><span class="p">,</span> <span class="p">:]</span> <span class="o">*</span> <span class="n">t</span> <span class="o">+</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">c</span> <span class="o">*</span> <span class="n">t</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">f</span> <span class="o">*</span> <span class="n">t</span><span class="o">**</span><span class="mi">3</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Hubble </span><span class="si">{0}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">Hubble</span><span class="p">))</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{0}</span><span class="s2"> </span><span class="si">{1}</span><span class="s2"> </span><span class="si">{2}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="n">sim1</span><span class="o">.</span><span class="n">dm</span><span class="p">[</span><span class="s1">&#39;pos&#39;</span><span class="p">][</span><span class="n">sort1</span><span class="p">[</span><span class="mi">10</span><span class="p">],</span> <span class="p">:],</span> <span class="n">sim2</span><span class="o">.</span><span class="n">dm</span><span class="p">[</span><span class="s1">&#39;pos&#39;</span><span class="p">][</span><span class="n">sort2</span><span class="p">[</span><span class="mi">10</span><span class="p">],</span> <span class="p">:],</span> <span class="n">pnew</span><span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="p">:]))</span>
+
+        <span class="k">return</span> <span class="p">(</span><span class="n">sim1</span><span class="o">.</span><span class="n">dm</span><span class="p">[</span><span class="s1">&#39;pos&#39;</span><span class="p">][</span><span class="n">sort1</span><span class="p">,</span> <span class="p">:]</span> <span class="o">+</span> <span class="n">dx</span> <span class="o">*</span> <span class="n">t</span><span class="o">/</span><span class="n">dt</span><span class="p">),</span> <span class="n">sim1</span><span class="o">.</span><span class="n">dm</span><span class="p">[</span><span class="s1">&#39;ids&#39;</span><span class="p">][</span><span class="n">sort1</span><span class="p">]</span>
+<span class="c1">#        return (sim1.dm[&#39;pos&#39;][sort1,:]  + vfac1 * sim1.dm[&#39;vel&#39;][sort1,:] * t + 0.5 * c * t**2 + f * t**3), sim1.dm[&#39;ids&#39;][sort1]</span>
+
+    <span class="k">def</span> <span class="nf">make_animation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">images</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">96</span><span class="p">,</span> <span class="n">colormap</span><span class="o">=</span><span class="s1">&#39;inferno&#39;</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="p">(</span><span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;This function is currently depreciated&quot;</span><span class="p">))</span>
+
+        <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+        <span class="kn">from</span> <span class="nn">matplotlib.colors</span> <span class="k">import</span> <span class="n">LogNorm</span>
+        <span class="kn">import</span> <span class="nn">subprocess</span>
+        <span class="kn">import</span> <span class="nn">scipy.signal</span> <span class="k">as</span> <span class="nn">ssig</span>
+
+        <span class="k">if</span> <span class="n">colormap</span> <span class="o">==</span> <span class="s1">&#39;inferno&#39;</span><span class="p">:</span>
+            <span class="n">colormap</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">cm</span><span class="o">.</span><span class="n">inferno</span>
+        <span class="k">if</span> <span class="n">colormap</span> <span class="o">==</span> <span class="s1">&#39;viridis&#39;</span><span class="p">:</span>
+            <span class="n">colormap</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">cm</span><span class="o">.</span><span class="n">viridis</span>
+        <span class="k">if</span> <span class="n">colormap</span> <span class="o">!=</span> <span class="s1">&#39;viridis&#39;</span> <span class="ow">and</span> <span class="n">colormap</span> <span class="o">!=</span> <span class="s1">&#39;inferno&#39;</span><span class="p">:</span>
+            <span class="n">colormap</span> <span class="o">=</span> <span class="n">colormap</span>
+
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">images</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">str</span><span class="p">:</span>
+            <span class="n">images</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">images</span><span class="p">)</span>
+
+        <span class="n">frame</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">images</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">num</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">images</span><span class="p">))</span>
+        <span class="n">vmin</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">vmax</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">data</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">images</span><span class="p">):</span>
+            <span class="n">vmin</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">data</span><span class="p">))</span>
+            <span class="n">vmax</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">data</span><span class="p">))</span>
+        <span class="n">nsmooth</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">([</span><span class="mi">21</span><span class="p">,</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">images</span><span class="p">)</span><span class="o">//</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="mi">2</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">svmin</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">ssig</span><span class="o">.</span><span class="n">savgol_filter</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">vmin</span><span class="p">),</span> <span class="n">nsmooth</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+        <span class="n">svmax</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">ssig</span><span class="o">.</span><span class="n">savgol_filter</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">vmax</span><span class="p">),</span> <span class="n">nsmooth</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+
+        <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">semilogy</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="n">vmin</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="n">vmax</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="n">svmin</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="n">svmax</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+<span class="c1">#        cmdstring = (&#39;ffmpeg&#39;, &#39;-y&#39;, &#39;-f&#39;, &#39;image2pipe&#39;, &#39;-vcodec&#39;, &#39;libx264_nvenc&#39;, &#39;-r&#39;, &#39;48&#39;, &#39;-i&#39;, &#39;-&#39;, &#39;-qscale&#39;, &#39;5&#39;, &#39;video.avi&#39;)</span>
+        <span class="n">cmdstring</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;ffmpeg&#39;</span><span class="p">,</span> <span class="s1">&#39;-y&#39;</span><span class="p">,</span> <span class="s1">&#39;-f&#39;</span><span class="p">,</span> <span class="s1">&#39;image2pipe&#39;</span><span class="p">,</span> <span class="s1">&#39;-vcodec&#39;</span><span class="p">,</span> <span class="s1">&#39;mjpeg&#39;</span><span class="p">,</span> <span class="s1">&#39;-r&#39;</span><span class="p">,</span>
+                     <span class="s1">&#39;48&#39;</span><span class="p">,</span> <span class="s1">&#39;-i&#39;</span><span class="p">,</span> <span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="s1">&#39;-vcodec&#39;</span><span class="p">,</span> <span class="s1">&#39;mpeg4&#39;</span><span class="p">,</span> <span class="s1">&#39;-qscale&#39;</span><span class="p">,</span> <span class="s1">&#39;5&#39;</span><span class="p">,</span> <span class="s1">&#39;video.avi&#39;</span><span class="p">)</span>
+
+        <span class="n">p</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span><span class="n">cmdstring</span><span class="p">,</span> <span class="n">stdin</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">)</span>
+
+        <span class="n">figure</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Pixels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">/</span><span class="n">dpi</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Pixels</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">/</span><span class="n">dpi</span><span class="p">),</span> <span class="n">dpi</span><span class="o">=</span><span class="n">dpi</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">data</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">images</span><span class="p">):</span>
+            <span class="n">figure</span><span class="o">.</span><span class="n">figimage</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;lower&#39;</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">colormap</span><span class="p">,</span>
+                            <span class="n">norm</span><span class="o">=</span><span class="n">LogNorm</span><span class="p">(</span><span class="n">vmin</span><span class="o">=</span><span class="n">svmin</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">vmax</span><span class="o">=</span><span class="n">svmax</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
+
+            <span class="n">figure</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">stdin</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;JPEG&#39;</span><span class="p">)</span>
+
+        <span class="n">p</span><span class="o">.</span><span class="n">stdin</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016, Raul E. Angulo
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

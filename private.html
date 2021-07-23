@@ -1,0 +1,299 @@
+<!DOCTYPE HTML>
+<!--
+  Industrious by TEMPLATED
+  templated.co @templatedco
+  Released for free under the Creative Commons Attribution 3.0 license (templated.co/license)
+-->
+<html>
+  <head>
+    <title>BACCO - Private</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <meta name="description" content="" />
+    <meta name="keywords" content="" />
+    <link rel="stylesheet" href="assets/css/main.css" />
+    <script src="https://kit.fontawesome.com/fc01f3d3d3.js" crossorigin="anonymous"></script>
+    <style>
+      .mywarning {
+        background-color: rgba(231, 105, 112, 0.623);
+        border: 2px solid rgb(224, 12, 40);
+        border-radius: 5px;
+        padding: 10px;
+      }
+    </style>
+  </head>
+  <body class="is-preload" onload="main()">
+
+    <!-- Header -->
+      <header id="header">
+        <a class="logo" href="index.html">BACCO</a>
+        <div id="pvt">
+          <a href="private.html"><i class="icon fa-lock-open">&nbsp;</i>login</a>
+        </div>
+        <nav>
+          <a href="#menu">Menu</a>
+        </nav>
+      </header>
+
+    <!-- Nav -->
+    <nav id="menu">
+      <ul class="links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="bacco.html">About</a></li>
+        <li><a href="people.html">People</a></li>
+        <li><a href="papers.html">Papers</a></li>
+        <li><a href="outreach.html">Outreach</a></li>
+        <li><a href="data.html">Data</a></li>
+        <li><a href="emulator.html">Emulator</a></li>
+        <li><a href="contacts.html">Contacts</a></li>
+        <li><a href="jobs.html">Job positions</a></li>
+      </ul>
+    </nav>
+
+    <!-- Heading -->
+      <div id="heading" >
+        <h1>Internal pages</h1>
+      </div>
+
+    <!-- Main -->
+      <section id="main" class="wrapper">
+        <div class="inner">
+          <div class="content">
+            <header>
+              <h2>Here some resources for developers!</h2>
+            </header>
+            <p>The documentation of bacco is available <a href="html_docs/index.html">here</a>, while it is still not public (not very up to date, though).</p>
+            <p>You can find <a href="#tricks">here</a> some useful tricks for using DIPC computational resources.</p>
+          </div>
+        </div>
+
+        <div class="inner">
+          <div class="content">
+            <header>
+              <h2>Webinars and talks</h2>
+            </header>
+            <iframe src="https://calendar.google.com/calendar/b/1/embed?height=600&amp;wkst=1&amp;bgcolor=%234285F4&amp;ctz=Europe%2FMadrid&amp;src=Y29zbW8uZGlwY0BnbWFpbC5jb20&amp;src=YWRkcmVzc2Jvb2sjY29udGFjdHNAZ3JvdXAudi5jYWxlbmRhci5nb29nbGUuY29t&amp;src=djR0ZjZmZXZtc212aThicWw2cGRvMmRpdXNAZ3JvdXAuY2FsZW5kYXIuZ29vZ2xlLmNvbQ&amp;src=MW83aDU0N3BudDJ2bDhmZzB1MmYydGNiZDhAZ3JvdXAuY2FsZW5kYXIuZ29vZ2xlLmNvbQ&amp;src=ZW4uc3BhaW4jaG9saWRheUBncm91cC52LmNhbGVuZGFyLmdvb2dsZS5jb20&amp;color=%23039BE5&amp;color=%2333B679&amp;color=%23B39DDB&amp;color=%238E24AA&amp;color=%230B8043&amp;showTitle=0" style="border:solid 1px #777" width="800" height="600" frameborder="0" scrolling="no"></iframe>
+          </div>
+        </div>
+
+        <div class="inner">
+          <div class="content" id="tricks">
+            <header>
+              <h2>Tricks for DIPC computational resources</h2>
+            </header>
+            <p>
+              Here is a collection of common practices and useful tricks. Some are more general and some are more directly linked to the machines in use at DIPC. The contents of these section are:
+              <ul>
+                <li><a href="#login-script">Setting up your login script on atlas-248</a></li>
+                <li><a href="#ssh-key">Setting up a ssh key</a></li>
+                <li><a href="#venv">Setting up a virtual environment on atlas-248</a></li>
+                <li><a href="#jupyter">Setting up a Jupyter notebook on atlas-248</a></li>
+                <li><a href="#tunnel">Accessing your notebook on atlas-248 from outside DIPC</a></li>
+                <li><a href="#screen">Usage of screen sessions</a></li>
+                <li><a href="#atlas-mods">Recommended modules on atlas</a></li>
+                <li><a href="#git">Git workflow</a></li>
+              </ul>
+            </p>
+            <h3 id="login-script"><b>Setting up your login script on atlas-248</b></h3>
+            <p>You can login to atlas-248 through ssh by typing (from any machine connected to a DIPC internal network)<br>
+            <pre><code>ssh username@atlas-248.sw.ehu.es</code></pre></p>
+            <p>At login you will find yourself in your home folder, that is <code>/dipc/username</code>.</p>
+            <p>In this folder you can modify the file <code>.profile</code>, which is loaded every time you access a new shell. Since this file is (or soon should be) shared between atlas and atlas-248, you might want to set it up so that it can distinguish on which machine it is beeing executed. It should contain some common instructions that are performed in most of the cases (such as load the relevant modules, start a virtual environment, define useful aliases...)</p>
+            <p>Here is an example of what you can add to your existing <code>.profile</code> file: </p>
+            <pre>
+              <code>
+  if [ "$HOSTNAME" = "atlas-248" ];
+  then
+    module purge
+
+    ## This is for having the GSL libraries
+    module load GSL
+
+    ## This is for having HDF5, FFTW3, GCC, OpenMPI i/o libraries
+    ## and Mercurial
+    module purge
+    module load HDF5/1.10.2-foss-2018b
+    module load GSL
+    module load Mercurial
+    module load Python/3.6.6-foss-2018b
+
+    source /lscratch/username/VirtualEnvironment3/bin/activate
+
+    alias nb='cd /lscratch/username/Notebooks && jupyter notebook'
+  else
+    module purge
+
+    ## This is for having mpicc and the MPI functions
+    module load OpenMPI/2.1.1-GCC-6.4.0-2.28
+
+    ## This is for having the GSL libraries
+    module load GSL/2.4-GCCcore-6.4.0
+
+    ## This is for having HDF5 i/o libraries
+    ## It also loads FFTW3, which is a required dependency
+    module load HDF5/1.10.1-foss-2017b
+
+    ## Python module
+    module load Python/2.7.14-foss-2017b
+  fi
+
+  export SYSTYPE=DIPC
+
+  ## This is for having color-tagged results when executing ls
+  alias ls='ls -lhrt --color'
+              </code>
+            </pre>
+            <p>Note that this loads modules compiled with the Gnu-compiler, and therefore sets <code>SYSTYPE=DIPC</code>. For intel compiled modules execute <code>module avail</code> and choose the intel versions of the same modules. In this case, you should set <code>SYSTYPE=DIPC-Intel</code>.</p>
+            <p>These changes are not immediatly applied to your session. In order to make them effective you need either to disconnect and reconnect to atlas-248, or to execute <code>source ~/.profile</code>. Please note that this syntax is more general than the specific case of atlas-248, but, depending on the system, you might want to introduce these instructions in <code>~/.bashrc</code> rather than <code>~/.profile</code>.</p>
+            <p> <a href="#tricks"><i class="fas fa-angle-up"></i> Back to the table of contents</a></p>
+
+            <h3 id="ssh-key"><b>Setting up a ssh key</b></h3>
+            <p>If you don't want to introduce your password every time you connect from a given (trusted) computer to atlas-248, you can create a ssh key that will be checked instead of your password. To do so, you first create a local pair of keys <br>
+            <pre><code>ssh-keygen</code></pre></p>
+            <p>You will be asked if you are ok with the default path to save the file (enter to agree or type another location) and then you will be asked to enter a password. Don't type any password and hit enter to continue. Now you have your ssh key pair, but, before you are done, you need to install it in the target machine (atlas-248). To do so <br>
+            <pre><code>ssh-copy-id username@atlas-248.sw.ehu.es</code></pre></p>
+            <p>Enter your atlas-248 login password and procede. From now on, when you login to atlas-248 from this computer, you will no longer need to enter your password.</p>
+            <p> <a href="#tricks"><i class="fas fa-angle-up"></i> Back to the table of contents</a></p>
+
+            <h3 id="venv"><b>Setting up a virtual environment on atlas-248</b></h3>
+            <p>
+              It is useful to keep your own python installation separate from the system python. This allows you to have more control, to keep more order and even to have different installations (with different versions of python or of some given packages) coexisting at the same time. A common approach in this sense is to create a python virtual environment.
+            </p>
+            <p>
+              First, make sure you have Python 3. Type <code>module list</code> and check that <code>Python/3.6.6-foss-2018b</code> is present. If it isn't there, load it with
+              <pre><code>module load Python/3.6.6-foss-2018b</code></pre>
+            </p>
+            <p>
+              Now you can create your virtual environment. Move to the folder where you want to create it. You can have it in your home, or keep it in lscratch (so that it will not change name in case the home gets modified). <br>
+              <pre><code>cd /lscratch/username</code></pre>
+            </p>
+            <p>
+              To actually create the virtual environment, given that you want to call it - eg - VirtualEnvironment3, you just need to execute <br>
+              <pre><code>virtualenv VirtualEnvironment3</code></pre>
+            </p>
+            <p>To start the virtual environment you just need to <code>source VirtualEnvironment3/bin/activate</code>. To stop it execute <code>deactivate</code>.</p>
+            <p>
+              Do not load or purge modules (especially related to python) while the environment is active, in order not to mess up the environmental variables of you shell. Remember to have the same python module you used at the time of creation loaded every time you activate the virtual environment.
+            </p>
+            <p> Follow these <a href="#login-script">instructions</a> to set up a login script to automatically load your relevant modules and start your principal virtual environment.
+            </p>
+            <p> <a href="#tricks"><i class="fas fa-angle-up"></i> Back to the table of contents</a></p>
+
+            <h3 id="jupyter"><b>Setting up a Jupyter notebook on atlas-248</b></h3>
+            <p>Let's assume that you have already set up a <a href="#venv">python3 virtual environment</a> on atlas-248, and that you have it active. First you need to install jupyter notebook. <br>
+            <pre><code>pip install jupyter</code></pre></p>
+            <p>Now, you need to create a configuration file for it: <br>
+            <pre><code>jupyter notebook --generate-config</code></pre></p>
+            <p>This creates a file in your home directory, <code>/dipc/username/.jupyter/jupyter_notebook_config.py</code>.</p>
+            <p>It is useful to protect your jupyter notebook with a password. To do so type <br>
+            <pre><code>jupyter notebook password</code></pre> <br>
+            enter your desired password and confirm it by typing it a second time. Note that not only does this constitute a security measure, but it also saves you the time of copying the random password (called token) that jupyter automatically generats every time you start it.</p>
+            <p>Finally, you need to modify jupyter's config file. You need to prevent it from trying to open a browser's window, you have to tell it to serve your notebook at an address visible from the rest of the DIPC network, and you have to choose a port on which to serve it. To do so, open the configuration file and add the following lines <br>
+            <pre><code>
+  c.NotebookApp.ip = 'atlas-248.sw.ehu.es'
+  c.NotebookApp.open_browser = False
+  c.NotebookApp.port = 8888
+            </code></pre> </p>
+            <p>You will need to change the number of port, making sure it doesn't conflict with those used by other members of the group. To avoid superpositions, everyone should use a different port. Ask the other users which ports are already taken or check which ports are already taken by running</p>
+            <pre><code>
+  netstat -tulpn | grep 158.227.172
+            </code></pre>
+            <p> <a href="#tricks"><i class="fas fa-angle-up"></i> Back to the table of contents</a></p>
+
+            <h3 id="tunnel"><b>Accessing your notebook on atlas-248 from outside DIPC</b></h3>
+            <p>It is not possible to directly access atlas-248 from an external network. In general, if you have a PC at DIPC, you can first ssh to it and then to atlas-248. Another possibility is to ssh to the login node <br>
+            <pre><code>ssh username@ac.sw.ehu.es</code></pre> <br>
+            and, from there, to atlas-248. Yet another possibility is to require access to a university based virtual machine.
+            </p>
+            <p>Whatever your method of connecting to atlas-248 from the outside world, you might want to be able to see your notebooks appear in your browser as if you were connected from within DIPC. To this end, you can set up a ssh tunnel with the following syntax. On you local computer (the one outside DIPC) type <br>
+            <pre><code>ssh -L [port-on-local-pc]:atlas-248.sw.ehu.es:[port-on-atlas] username@[dipc-address]</code></pre> <br>
+            where you have to remove all [] and substitute port-on-atlas with the port you are using for jupter notebooks on atlas-248, port-on-local-pc with one valid port on you local computer and dipc-address with the IP address of a computer connected to the DIPC network (be it your DIPC desktop computer or ac.sw.ehu.es).</p>
+            <p>After this, you can open your browser and type in the address bar <br>
+            <pre><code>localhost:[port-on-local-pc]</code></pre> <br>
+            and you should see your atlas-248 notebook from anywhere you are.</p>
+            <p> <a href="#tricks"><i class="fas fa-angle-up"></i> Back to the table of contents</a></p>
+
+            <h3 id="screen"><b>Usage of screen sessions</b></h3>
+            <p>A very useful tool to run long jobs on atlas-248 is the usage of screen sessions. A screen session is nothing but a shell session that can be detached and keeps running even if you close your terminal and disconnect from atlas-248, and that can be resumed when you reconnect. </p>
+            <p class="mywarning"><b>Warning.</b> Please be responsible when using screens. Remember that atlas-248 is mainly designed as an interactive node shared by many users, so if you have very long and/or heavy jobs, consider submitting them to the queue in atlas. Moreover, screen allows you to keep jobs running when you disconnect, but you should still <b>keep a close eye</b> on your CPU and RAM usage to avoid conflicting with other users. You know already that from great power comes great responsibility.</p>
+            <p>Once you are connected to atlas-248, to create a new screen session with a user-specified name you just need to run
+            <pre><code>screen -S name_of_screen</code></pre>
+            </p>
+            <p>This lands you in a freshly created screen session. Even if in some cases this has the same modules loaded as your original shell session, it is recommended to source again your <code>.profile</code> file. Sometimes, also deactivating and reactivating your virtual environment is required. Please, make sure all libraries and modules are correctly loaded before starting to run anything.</p>
+            <p>You can detach a screen session (and leave it running) pressing the key combination <code>CTRL+A+D</code>.</p>
+            <p>To list all running screen sessions, you can execute <code>screen -ls</code>. This will also show you which sessions are open and which ones are detached.</p>
+            <p>To reconnect to a detached session, just run
+            <pre><code>screen -r name_of_screen</code></pre>
+            </p>
+            <p>Note that you can also connect to a screen session that was not detached. To do so, from a different terminal, run <code>screen -x name_of_screen</code>.</p>
+            <p>To close a screen session, after entering it, you can either execute <code>exit</code> of press <code>CTRL+D</code>.</p>
+            <p> <a href="#tricks"><i class="fas fa-angle-up"></i> Back to the table of contents</a></p>
+
+            <h3 id="atlas-mods"><b>Recommended modules for atlas</b></h3>
+            The recommended modules to load on atlas (optimized for both bacco and LG3) are:
+            <pre><code>
+module purge
+module load OpenMPI/3.1.1-GCC-7.3.0-2.30
+module load GSL
+module load HDF5/1.10.2-foss-2018b
+module load Python/3.7.0-foss-2018b
+            </code></pre>
+            <p> <a href="#tricks"><i class="fas fa-angle-up"></i> Back to the table of contents</a></p>
+
+            <h3 id="git"><b>Git workflow</b></h3>
+            <p>There are many possible ways of organizing your work with git. The common line of work among bacco users seems to be a <i>centralized workflow</i>, while only once in a while some of us chose a workflow based on <i>feature branching</i>.</p>
+            <p>In this section we will present the main steps (and relevant git commands) that make up a centralized workflow.</p>
+            <p align="center"><img src="images/git.png" alt="" width="75%"></p>
+            <p>Let's try to break it up in points.</p>
+            <p>
+              <ol>
+                <li><b>Cloning the repo.</b> One first clones bacco from the internet repository through</li>
+                <pre><code>git clone https://username@bitbucket.org/rangulo/baccogit.git</code></pre>
+                <li><b>Getting the latest version.</b> Before starting modifying bacco, you can get the latest version with the command</li>
+                <pre><code>git pull</code></pre>
+                <li><b>Modifying bacco.</b> You can now start modifying the code.</li>
+                <li><b>Checking status.</b> You can check the status of your repository (files you have modified and files you have already commited) using</li>
+                <pre><code>git status</code></pre>
+                <li><b>Comparing versions.</b> To check what is the difference between your modified version and the original one, you can execute</li>
+                <pre><code>git diff -w file.py</code></pre>
+                Note the -w option that hides differences only due to white spaces.
+                <li><b>Staging changes.</b> At this point you want to include your local changes in the main repository. First you stage one file that you have modified with</li>
+                <pre><code>git add file.py</code></pre>
+                <li><b>Documenting your changes.</b> Now git knows that you are going to tell it what you changed in file.py. You do so executing</li>
+                <pre><code>git commit -m "Here you write a brief explanation of what changed in file.py"</code></pre>
+                <li><b>Staging all changes.</b> Repeat <code>git add</code> and <code>git commit</code> for all files you modified (shown by <code>git status</code>) </li>
+                <li><b>Pushing.</b> Now push your changes to main repository with</li>
+                <pre><code>git push origin master</code></pre>
+                You can drop the <code>origin master</code> part if you are working only with the main branch of the repository (it means from local master branch to main master brach).
+                <li><b>Managing conflicts.</b> It can happen that in the meantime someone modified bacco. You will get notified by git at this point. To continue, first you need to pull the latest version of bacco. The simplest case is to execute</li>
+                <pre><code>git pull --rebase</code></pre>
+                Note the <code>--rebase</code> option, which takes all your commits and applies them to the tip of the master branch. Git now checks on a commit-by-commit base if the current commit is in conflict with the latest version. If it doesn't, it moves to the next commit. If it does, it stops and waits for you to modify the problematic file to your liking. When you are done modifying the currently conflicting file, you notify git by staging the file again (it will keep the same commit string as before)
+                <pre><code>git add currently_conflicting_file.py</code></pre>
+                and then you move to the next conflicting file with
+                <pre><code>git rebase --continue</code></pre>
+                until all conflicting files have been assessed. If confusion arises, the process can be restarted with <code>git rebase --abort</code>. Note that this process will never require a merge, leaving a very clean repository history. If you forget the <code>--rebase</code> option, you will end up having to merge, basically mixing up the different moments in which different features (and bugs!) were introduced in the code. No biggie, but better avoid it! At the end of the rebase process, you can just procede with
+                <pre><code>git push origin master</code></pre>
+              </ol>
+              For more information on git workflows, please visit <a href="https://www.atlassian.com/git/tutorials/comparing-workflows">this useful guide from Bitbucket</a>.
+            </p>
+            <p> <a href="#tricks"><i class="fas fa-angle-up"></i> Back to the table of contents</a></p>
+
+          </div>
+        </div>
+
+      </section>
+
+      <!-- Footer -->
+        <div id="includedFooter"></div>
+
+    <!-- Scripts -->
+      <script src="assets/js/jquery.min.js"></script>
+      <script src="assets/js/browser.min.js"></script>
+      <script src="assets/js/breakpoints.min.js"></script>
+      <script src="assets/js/util.js"></script>
+      <script src="assets/js/main.js"></script>
+      <script> $(function(){$("#includedFooter").load("footer.html");});</script>
+      <script> $(function(){$("#includedMenu").load("menu.html");});</script>
+
+  </body>
+</html>

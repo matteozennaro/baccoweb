@@ -1,0 +1,305 @@
+# Este fichero viminfo fue generado por Vim 7.2.
+# Usted puede editarlo, ¡solo si tiene cuidado!
+
+# Valor de «encoding» cuando se escribió este fichero
+*encoding=utf-8
+
+
+# hlsearch on (H) or off (h):
+~h
+# Historia de «Línea de comandos» (de lo más nuevo a lo más antiguo):
+:wq
+:q!
+:q
+:w
+:2067
+
+# Historia de «Cadena de búsqueda» (de lo más nuevo a lo más antiguo):
+
+# Historia de «Expresión» (de lo más nuevo a lo más antiguo):
+
+# Historia de «Línea de entrada» (de lo más nuevo a lo más antiguo):
+
+# Historia de «Línea de entrada» (de lo más nuevo a lo más antiguo):
+
+# Registros:
+""1	LINE	0
+	            don't occupy evenly the Universe: they are distributed in the shape of a web, the Cosmic web! We are
+"2	LINE	0
+	            Thanks to astronomical observations we now know that galaxies
+"3	LINE	0
+	        <section id="main" class="wrapper">
+"4	LINE	0
+	        <!-- <video autoplay loop muted playsinline src="images/fadeout.mp4"></video> -->
+"5	LINE	0
+	        <img src="images/logo-erc-black.png" width="400px">
+"6	LINE	0
+	        <!-- <img src="images/LOGO_ERC-FLAG_EU_.png" width="100px"> -->
+"7	LINE	0
+	
+"8	LINE	0
+	RedirectMatch 404 /\..*$
+"-	CHAR	0
+	s
+
+# Marcas en el fichero:
+'0  3  0  ~/bacco-astro-ph.php
+'1  1  0  ~/group-meetings.php
+'2  1  0  ~/vi
+'3  3  64  ~/astro-ph.php
+'4  1  0  ~/astro-ph.php
+'5  5  0  ~/bacco-astro-ph.php
+'6  2  0  ~/group-meetings.php
+'7  2  53  ~/dipc-bh-masses.php
+'8  2  52  ~/bacco-astro-ph.php
+'9  2  52  ~/astro-ph.php
+
+# Lista de saltos (el más reciente va primero):
+-'  3  0  ~/bacco-astro-ph.php
+-'  1  0  ~/bacco-astro-ph.php
+-'  1  0  ~/group-meetings.php
+-'  1  0  ~/vi
+-'  3  64  ~/astro-ph.php
+-'  1  0  ~/astro-ph.php
+-'  5  0  ~/bacco-astro-ph.php
+-'  2  0  ~/group-meetings.php
+-'  2  53  ~/dipc-bh-masses.php
+-'  1  0  ~/dipc-bh-masses.php
+-'  2  52  ~/bacco-astro-ph.php
+-'  2  52  ~/astro-ph.php
+-'  13  44  ~/.htaccess
+-'  1  0  ~/.htaccess
+-'  77  44  ~/private.html
+-'  1  0  ~/private.html
+-'  151  18  ~/index.html
+-'  1  0  ~/index.html
+-'  11  0  ~/.htpasswd
+-'  1  0  ~/.htpasswd
+-'  183  27  ~/private.html
+-'  229  25  ~/private.html
+-'  226  16  ~/private.html
+-'  35  0  ~/private.html
+-'  221  0  ~/private.html
+-'  61  8  ~/private.html
+-'  66  174  ~/private.html
+-'  54  69  ~/private.html
+-'  2068  81  ~/assets/css/main.css
+-'  1  0  ~/assets/css/main.css
+-'  4  0  ~/assets/css/main.css
+-'  29  183  ~/footer.html
+-'  1  0  ~/footer.html
+-'  43  72  ~/index.html
+-'  50  8  ~/index.html
+-'  685  0  ~/assets/css/main.css
+-'  346  0  ~/assets/css/main.css
+-'  14  45  ~/footer.html
+-'  8  6  ~/footer.html
+-'  7  228  ~/footer.html
+-'  59  158  ~/data.html
+-'  1  0  ~/data.html
+-'  67  0  ~/papers.html
+-'  1  0  ~/papers.html
+-'  56  54  ~/index.html
+-'  54  58  ~/papers.html
+-'  3  23  ~/.htaccess
+-'  9  0  ~/.htaccess
+-'  5  23  ~/.htaccess
+-'  11  0  ~/.htaccess
+-'  11  0  ~/.htpasswd
+-'  1  0  ~/.htpasswd
+-'  2068  81  ~/assets/css/main.css
+-'  1  0  ~/assets/css/main.css
+-'  4  0  ~/assets/css/main.css
+-'  29  183  ~/footer.html
+-'  1  0  ~/footer.html
+-'  685  0  ~/assets/css/main.css
+-'  346  0  ~/assets/css/main.css
+-'  14  45  ~/footer.html
+-'  8  6  ~/footer.html
+-'  7  228  ~/footer.html
+-'  59  158  ~/data.html
+-'  1  0  ~/data.html
+-'  67  0  ~/papers.html
+-'  1  0  ~/papers.html
+-'  54  58  ~/papers.html
+-'  11  0  ~/.htpasswd
+-'  1  0  ~/.htpasswd
+-'  11  0  ~/.htpasswd
+-'  1  0  ~/.htpasswd
+-'  151  18  ~/index.html
+-'  1  0  ~/index.html
+-'  77  44  ~/private.html
+-'  1  0  ~/private.html
+-'  151  18  ~/index.html
+-'  1  0  ~/index.html
+-'  11  0  ~/.htpasswd
+-'  1  0  ~/.htpasswd
+-'  183  27  ~/private.html
+-'  229  25  ~/private.html
+-'  77  44  ~/private.html
+-'  1  0  ~/private.html
+-'  151  18  ~/index.html
+-'  1  0  ~/index.html
+-'  11  0  ~/.htpasswd
+-'  1  0  ~/.htpasswd
+-'  183  27  ~/private.html
+-'  229  25  ~/private.html
+-'  226  16  ~/private.html
+-'  35  0  ~/private.html
+-'  221  0  ~/private.html
+-'  61  8  ~/private.html
+-'  66  174  ~/private.html
+-'  54  69  ~/private.html
+-'  2068  81  ~/assets/css/main.css
+-'  1  0  ~/assets/css/main.css
+-'  4  0  ~/assets/css/main.css
+
+# Historia de las marcas en los ficheros (de la más reciente a la más antigua):
+
+> ~/bacco-astro-ph.php
+	"	3	0
+	^	3	0
+	.	3	0
+	+	2	56
+	+	3	65
+	+	2	64
+	+	3	0
+	+	2	1
+	+	3	0
+	+	2	0
+	+	3	0
+
+> ~/group-meetings.php
+	"	1	0
+	^	2	1
+	.	2	0
+	+	4	2
+	+	4	0
+	+	2	56
+	+	3	56
+	+	2	64
+	+	3	72
+	+	2	0
+
+> ~/vi
+	"	1	0
+
+> ~/astro-ph.php
+	"	3	64
+	^	3	65
+	.	3	64
+	+	2	56
+	+	3	57
+	+	2	0
+	+	3	0
+	+	2	64
+	+	3	64
+
+> ~/dipc-bh-masses.php
+	"	2	53
+	^	2	54
+	.	2	18
+	+	2	18
+
+> ~/.htaccess
+	"	13	44
+	^	13	45
+	.	13	45
+	+	8	0
+	+	7	0
+	+	3	23
+	+	1	23
+	+	13	45
+
+> ~/private.html
+	"	77	44
+	^	77	45
+	.	77	44
+	+	54	69
+	+	66	8
+	+	65	0
+	+	66	52
+	+	69	0
+	+	68	10
+	+	64	32
+	+	66	174
+	+	61	0
+	+	77	43
+	+	98	39
+	+	218	76
+	+	227	100
+	+	218	66
+	+	220	24
+	+	226	25
+	+	225	32
+	+	221	0
+	+	220	15
+	+	226	21
+	+	229	43
+	+	218	65
+	+	205	86
+	+	187	29
+	+	102	79
+	+	155	53
+	+	163	26
+	+	77	15
+	+	67	0
+	+	77	118
+	+	79	34
+	+	83	64
+	+	84	61
+	+	77	44
+
+> ~/index.html
+	"	151	18
+	^	151	19
+	.	151	18
+	+	56	54
+	+	50	112
+	+	50	88
+	+	50	71
+	+	43	67
+	+	50	0
+	+	43	72
+	+	148	115
+	+	151	12
+	+	150	98
+	+	151	18
+
+> ~/.htpasswd
+	"	11	0
+
+> ~/assets/css/main.css
+	"	2068	81
+	^	2068	82
+	.	2068	81
+	+	2068	79
+	+	2067	4
+	+	2067	118
+	+	2068	81
+
+> ~/footer.html
+	"	29	183
+	^	29	184
+	.	29	183
+	+	8	62
+	+	8	25
+	+	8	70
+	+	8	0
+	+	7	223
+	+	6	55
+	+	8	0
+	+	14	45
+	+	29	183
+
+> ~/data.html
+	"	59	158
+	^	59	159
+	.	59	154
+	+	59	154
+
+> ~/papers.html
+	"	67	0
+	^	54	59
+	.	54	58
+	+	54	58
