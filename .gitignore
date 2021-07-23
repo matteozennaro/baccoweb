@@ -2,3 +2,4 @@ images/
 *.tar
 SFR_Mocks/
 NN_emu*
+gpy_*
