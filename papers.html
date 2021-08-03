@@ -80,6 +80,69 @@
           <h2>Our latest research</h2>
           <hr>
 
+          <h3>The Boosted Potential</h3>
+          <p><a href="https://ui.adsabs.harvard.edu/abs/2021arXiv210713008S/abstract"><i class="fas fa-angle-right"></i> go to paper</a></p>
+          <p>
+            Our basic question with this article is: How can we understand the
+            <b>potential field</b> in cosmological simulations? Why is it never used
+            in any post-processing analysis? Should it not be possible to detect
+            haloes, filaments and walls as bound regions in the potential field?
+            Considering how much it is taught in undergraduate physics books
+            that the
+            potential can be used to understand which particles are confined to
+            which regions in phase space, it is rather surprising that this
+            possibility usually doesn't even get mentioned in the computational
+            cosmology community.
+            However, the reason for this gets clear when having a brief look at
+            the global comoving potential in the left panel of the plot below:
+          </p>
+            <a href="images/boosted_potential_halo.png"><img src="images/boosted_potential_halo.png" style="display: block; margin-left: auto; margin-right: auto; width: 80%;"></a>
+            <br>
+          <p>
+            Here you can see the comoving potential in the surrounding of a
+            halo. The green circle indicates the virial radius of the halo, and
+            you can also see in the right panel the particles that belong to the
+            halo. There seems to be hardly any correspondence between the extent
+            of the halo and the equi-potential levels in the potential.
+            The potential is dominated by <b>large-scale gradients</b> that are sourced
+            by massive surrounding structures.
+          </p>
+          <p>
+            Although such large-scale gradients
+            drastically modify the equi-potential levels, they should not at
+            all influence the internal structure of the halo! They indicate that
+            the
+            whole halo is in a free-fall motion in the positive x-direction. So,
+            how would the potential look from the "boosted", free-falling system
+            of reference? When we switch to such an <b>accelerated frame of
+            reference</b>, we have to account for an additional apparent force.
+            Therefore the potential in the new frame has the form:
+          </p>
+          <p>
+            \(\phi_{\rm{boost}}(\vec{x}) = \phi(\vec{x}) + \vec{a}_0 \cdot (\vec{x} - \vec{x}_0)\)
+          </p>
+          <p>
+            We call \(\phi_{\rm{boost}}\) a boosted potential and we show it in
+            the central panel of the plot above. Through the "boost" operation
+            we have effectively removed the large scale gradient (\(-\vec{a}_0\)) that was
+            messing up our potential landscape! In the boosted potential we can
+            find a critical contour which corresponds to the <b>tidal boundary</b>
+            of our halo and the associated energy is an effective <b>escape energy</b>
+            of the halo. With this, we can define a new binding criterion which appropriately
+            accounts for the effect of the external tidal field. Note that the effect of
+            the tidal field is currently neglected in every state-of-the-art
+            structure finder with a self-potential binding check! (Subfind,
+            HBT, Rockstar, etc...)
+          </p>
+          <p>
+            There are many applications of the boosted potential and there is
+            plenty of new things to learn about haloes, binding-checks, tidal
+            boundaries, virialization, the cosmic web, sub-halo disruption and
+            the possibility of potential-only structure-finders. If you got
+            curious, please check out
+            <a href="https://ui.adsabs.harvard.edu/abs/2021arXiv210713008S/abstract">our article</a>!
+          </p>
+
           <h3>Tidal response of structure formation</h3>
           <p><a href="https://ui.adsabs.harvard.edu/abs/2020arXiv200306427S"><i class="fas fa-angle-right"></i> go to paper</a></p>
           <p>
