@@ -91,6 +91,7 @@
                 <li><a href="#tunnel">Accessing your notebook on atlas-248 from outside DIPC</a></li>
                 <li><a href="#screen">Usage of screen sessions</a></li>
                 <li><a href="#atlas-mods">Recommended modules on atlas</a></li>
+                <li><a href="#conda">Conda install on atlas-248</a></li>
                 <li><a href="#git">Git workflow</a></li>
               </ul>
             </p>
@@ -239,6 +240,45 @@ module load HDF5/1.10.2-foss-2018b
 module load Python/3.7.0-foss-2018b
             </code></pre>
             <p> <a href="#tricks"><i class="fas fa-angle-up"></i> Back to the table of contents</a></p>
+
+            <h3 id="conda"><b>Recommended conda installation on atlas-248</b></h3>
+            The recommended modules to load on atlas (optimized for both bacco and LG3) are:
+
+            1. Enter with no modules and no environments loaded
+            2. Create a new miniconda environment
+            <pre><code>
+wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
+./Miniconda3-latest-Linux-x86_64.sh
+[/dipc/mzennaro/miniconda3] >>> /scratch/mzennaro/miniconda3
+source /scratch/mzennaro/miniconda3/bin/activate
+conda create -n condaenv python=3.9
+conda activate condaenv
+            </code></pre>
+            3. Load modules
+<pre><code>
+module purge
+module load OpenMPI/4.0.3-GCC-9.3.0
+module load FFTW/3.3.8-gompi-2020a
+module load GSL/2.6-GCC-9.3.0
+module load HDF5/1.10.6-gompi-2020a
+module load CMake/.3.16.4-GCCcore-9.3.0
+module load OpenBLAS/0.3.9-GCC-9.3.0
+</code></pre>
+            4. Compile codes, install pip packages, install bacco etc... <br>
+            5. If you want this as default, in .profile:
+            <pre><code>
+source /scratch/mzennaro/miniconda3/bin/activate
+conda activate condaenv
+module purge
+module load OpenMPI/4.0.3-GCC-9.3.0
+module load FFTW/3.3.8-gompi-2020a
+module load GSL/2.6-GCC-9.3.0
+module load HDF5/1.10.6-gompi-2020a
+module load CMake/.3.16.4-GCCcore-9.3.0
+module load OpenBLAS/0.3.9-GCC-9.3.0
+            </code></pre>
+            <p> <a href="#tricks"><i class="fas fa-angle-up"></i> Back to the table of contents</a></p>
+
 
             <h3 id="git"><b>Git workflow</b></h3>
             <p>There are many possible ways of organizing your work with git. The common line of work among bacco users seems to be a <i>centralized workflow</i>, while only once in a while some of us chose a workflow based on <i>feature branching</i>.</p>
