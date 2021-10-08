@@ -1,0 +1,116 @@
+<!DOCTYPE HTML>
+<!--
+  Industrious by TEMPLATED
+  templated.co @templatedco
+  Released for free under the Creative Commons Attribution 3.0 license (templated.co/license)
+-->
+<html>
+  <head>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-163689805-1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() { dataLayer.push(arguments); }
+      gtag('js', new Date());
+
+      gtag('config', 'UA-163689805-1');
+    </script>
+
+    <title>The Complexity of the Dark Matter Sheet</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <meta name="description" content="" />
+    <meta name="keywords" content="" />
+    <link rel="stylesheet" href="assets/css/main.css" />
+    <script src="https://kit.fontawesome.com/fc01f3d3d3.js" crossorigin="anonymous"></script>
+    <!-- <script type="text/javascript" src="ZoomifyImageViewerFree-min.js"></script>
+        <script type="text/javascript"> Z.showImage("myContainer", "/home/bacco/images"); </script> -->
+  </head>
+  <body class="is-preload">
+
+    <!-- Header -->
+      <header id="header">
+        <a class="logo" href="index.html">BACCO</a>
+        <div id="pvt">
+          <a href="private.html"><i class="icon fa-lock">&nbsp;</i>login</a>
+        </div>
+        <nav>
+          <a href="#menu">Menu</a>
+        </nav>
+      </header>
+
+    <!-- Nav -->
+    <nav id="menu">
+      <ul class="links">
+        <li><a href="index.html">Home</a></li>
+        <!-- <li><a href="bacco.html">About</a></li> -->
+        <li><a href="people.html">People</a></li>
+        <li><a href="papers.html">Papers</a></li>
+        <li><a href="outreach.html">Outreach</a></li>
+        <li><a href="data.html">Data</a></li>
+        <li><a href="emulator.html">Emulator</a></li>
+        <li><a href="contacts.html">Contacts</a></li>
+        <li><a href="jobs.html">Job positions</a></li>
+      </ul>
+    </nav>
+
+    <!-- Heading -->
+      <div id="heading" >
+        <h1>Synthetic galaxy power spectra</h1>
+      </div>
+
+    <!-- Main -->
+      <section id="main" class="wrapper">
+        <div class="inner">
+          <div class="content">
+            <header>
+              <h2>Synthetic galaxy power spectra</h2>
+            </header>
+
+          </div>
+        </div>
+
+      </section>
+
+      <!-- Footer -->
+        <div id="includedFooter"></div>
+
+    <!-- Scripts -->
+      <script src="assets/js/jquery.min.js"></script>
+      <script src="assets/js/browser.min.js"></script>
+      <script src="assets/js/breakpoints.min.js"></script>
+      <script src="assets/js/util.js"></script>
+      <script src="assets/js/main.js"></script>
+      <script> $(function(){$("#includedFooter").load("footer.html");});</script>
+      <script> $(function(){$("#includedMenu").load("menu.html");});</script>
+      <script>
+        var slideIndex = 1;
+        showDivs(slideIndex);
+
+        function plusDivs(n) {
+          showDivs(slideIndex += n);
+        }
+
+        function currentDiv(n) {
+          showDivs(slideIndex = n);
+        }
+
+        function showDivs(n) {
+          var i;
+          var x = document.getElementsByClassName("mySlides");
+          var dots = document.getElementsByClassName("demo");
+          if (n > x.length) { slideIndex = 1 }
+          if (n < 1) { slideIndex = x.length }
+          for (i = 0; i < x.length; i++) {
+            x[i].style.display = "none";
+          }
+          for (i = 0; i < dots.length; i++) {
+            dots[i].className = dots[i].className.replace(" w3-white", "");
+          }
+          x[slideIndex - 1].style.display = "block";
+          dots[slideIndex - 1].className += " w3-white";
+        }
+      </script>
+
+  </body>
+</html>
