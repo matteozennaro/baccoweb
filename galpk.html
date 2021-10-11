@@ -94,10 +94,40 @@
             </table>
             <p>
               You can also directly download these files from the command line with
-<code><pre>
-wget https://bacco.dipc.org/SHAMeGalPk/sm_galaxy_samples.hdf5
+<pre><code>wget https://bacco.dipc.org/SHAMeGalPk/sm_galaxy_samples.hdf5
 wget https://bacco.dipc.org/SHAMeGalPk/sfr_galaxy_samples.hdf5
-</pre></code>
+</code></pre>
+            </p>
+            <p>
+              Once download, you can use these files loading them with your favorite HDF5 reading library and accessing the dictionary contained within. For example
+<pre><code>import deepdish as dd
+sfr = dd.io.load('sfr_galaxy_samples.hdf5')
+sm = dd.io.load('sm_galaxy_samples.hdf5')
+print(sfr.keys())
+</code></pre>
+              will give
+<pre><code>dict_keys(['SHAMe_pars', 'atarget', 'auto', 'cosmology', 'cross', 'ndens', 'satellite_fraction'])
+</code></pre>
+            </p>
+            <p>
+              These keywords contain
+              <ul>
+                <li><code>SHAMe_pars</code>: the choice of SHAMe parameters for each sample (\(\sigma_{M_*}, t_{\rm merger}, f_{\rm s}\) for SM-selected galaxies, \(\beta, \gamma, \log_{10}(M_1), \tau_0, \tau_{\rm s}\) for SFR-selected galaxies).</li>
+                <li><code>atarget</code>: the expansion factor of the sample.</li>
+                <li><code>cosmology</code>: the name of the cosmology (nenya, narya, vilya, power).</li>
+                <li><code>ndens</code>: the number density of the sample in \(h^3 \mathrm{Mpc}^{-3}\).</li>
+                <li><code>satellite_fraction</code>: the satellite fraction of the sample.</li>
+                <li><code>auto</code>: a dictionary with wavenumbers <code>k</code>, galaxy auto power spectrum <code>pk</code>, number of modes in each wavenumber bin <code>nmodes</code>, statistical error assuming the simulation volume and accounting for fixing and pairing <code>fnp_pk_error</code>, shotnoise <code>shotnoise</code>, separation bins <code>r</code>, 2-point correlation function (from inverse FT of power spectrum) <code>xi</code>.</li>
+                <li><code>cross</code>: a dictionary with wavenumbers <code>k</code>, galaxy matter cross power spectrum <code>pk</code>, number of modes in each wavenumber bin <code>nmodes</code>, statistical error assuming the simulation volume and accounting for fixing and pairing
+                <code>fnp_pk_error</code>, shotnoise <code>shotnoise</code>.</li>
+              </ul>
+            </p>
+            <p>
+              If you use these spectra, please cite these two papers:
+              <ul>
+                <li><a href="https://ui.adsabs.harvard.edu/abs/2021MNRAS.508..175C/abstract">Presentation paper of the SHAMe model: Contreras et al., 2021b</a></li>
+                <li><a href="#">Presentation paper of these galaxy samples: Zennaro et al., 2021b</a></li>
+              </ul>
             </p>
           </div>
         </div>
